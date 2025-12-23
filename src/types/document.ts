@@ -8,7 +8,10 @@ export interface DocumentItem {
   quantity: number;
   unit: string;
   price: number;
-  total: number;
+  discount: number; // postotak rabata
+  pdv: number; // postotak PDV-a
+  subtotal: number; // prije rabata i PDV-a
+  total: number; // konačni iznos s rabatom i PDV-om
 }
 
 export interface Document {
