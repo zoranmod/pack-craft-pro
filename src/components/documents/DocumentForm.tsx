@@ -23,6 +23,7 @@ export function DocumentForm() {
   const [formData, setFormData] = useState({
     type: initialType,
     clientName: '',
+    clientOib: '',
     clientAddress: '',
     clientPhone: '',
     clientEmail: '',
@@ -121,13 +122,24 @@ export function DocumentForm() {
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h2 className="font-semibold text-foreground mb-4">Podaci o klijentu</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
+              <div>
                 <Label htmlFor="clientName">Naziv klijenta *</Label>
                 <Input
                   id="clientName"
                   value={formData.clientName}
                   onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
                   placeholder="Unesite naziv klijenta"
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="clientOib">OIB</Label>
+                <Input
+                  id="clientOib"
+                  value={formData.clientOib}
+                  onChange={(e) => setFormData({ ...formData, clientOib: e.target.value })}
+                  placeholder="12345678901"
+                  maxLength={11}
                   className="mt-1.5"
                 />
               </div>
