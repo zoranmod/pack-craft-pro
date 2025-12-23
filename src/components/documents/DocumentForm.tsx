@@ -15,6 +15,16 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 
+// Helper function to calculate item totals
+const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
+  const subtotal = item.quantity * item.price;
+  const discountAmount = subtotal * (item.discount / 100);
+  const afterDiscount = subtotal - discountAmount;
+  const pdvAmount = afterDiscount * (item.pdv / 100);
+  const total = afterDiscount + pdvAmount;
+  return { subtotal, total };
+};
+
 export function DocumentForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -31,11 +41,11 @@ export function DocumentForm() {
   });
 
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
-    { name: '', quantity: 1, unit: 'kom', price: 0, total: 0 },
+    { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
   ]);
 
   const addItem = () => {
-    setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, total: 0 }]);
+    setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -48,13 +58,22 @@ export function DocumentForm() {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
     
-    if (field === 'quantity' || field === 'price') {
-      newItems[index].total = newItems[index].quantity * newItems[index].price;
+    // Recalculate totals when relevant fields change
+    if (['quantity', 'price', 'discount', 'pdv'].includes(field)) {
+      const { subtotal, total } = calculateItemTotals(newItems[index]);
+      newItems[index].subtotal = subtotal;
+      newItems[index].total = total;
     }
     
     setItems(newItems);
   };
 
+  const subtotalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
+  const totalDiscount = items.reduce((sum, item) => sum + (item.subtotal * (item.discount / 100)), 0);
+  const totalPdv = items.reduce((sum, item) => {
+    const afterDiscount = item.subtotal - (item.subtotal * (item.discount / 100));
+    return sum + (afterDiscount * (item.pdv / 100));
+  }, 0);
   const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -189,72 +208,114 @@ export function DocumentForm() {
             
             <div className="space-y-4">
               {items.map((item, index) => (
-                <div key={index} className="grid gap-3 sm:grid-cols-12 items-end p-4 bg-muted/30 rounded-lg">
-                  <div className="sm:col-span-4">
-                    <Label>Naziv</Label>
-                    <Input
-                      value={item.name}
-                      onChange={(e) => updateItem(index, 'name', e.target.value)}
-                      placeholder="Naziv stavke"
-                      className="mt-1.5"
-                    />
+                <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3">
+                  {/* First row - Name, Quantity, Unit */}
+                  <div className="grid gap-3 sm:grid-cols-12 items-end">
+                    <div className="sm:col-span-6">
+                      <Label>Naziv</Label>
+                      <Input
+                        value={item.name}
+                        onChange={(e) => updateItem(index, 'name', e.target.value)}
+                        placeholder="Naziv stavke"
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <Label>Količina</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <Label>Jedinica</Label>
+                      <Select
+                        value={item.unit}
+                        onValueChange={(value) => updateItem(index, 'unit', value)}
+                      >
+                        <SelectTrigger className="mt-1.5">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="kom">kom</SelectItem>
+                          <SelectItem value="m">m</SelectItem>
+                          <SelectItem value="m²">m²</SelectItem>
+                          <SelectItem value="usluga">usluga</SelectItem>
+                          <SelectItem value="sat">sat</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <Label>Količina</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Label>Jedinica</Label>
-                    <Select
-                      value={item.unit}
-                      onValueChange={(value) => updateItem(index, 'unit', value)}
-                    >
-                      <SelectTrigger className="mt-1.5">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kom">kom</SelectItem>
-                        <SelectItem value="m">m</SelectItem>
-                        <SelectItem value="m²">m²</SelectItem>
-                        <SelectItem value="usluga">usluga</SelectItem>
-                        <SelectItem value="sat">sat</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Label>Cijena (€)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.price}
-                      onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div className="sm:col-span-1 text-right">
-                    <Label className="invisible">Ukupno</Label>
-                    <p className="mt-1.5 py-2 font-medium text-foreground">
-                      {item.total.toLocaleString('hr-HR')} €
-                    </p>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeItem(index)}
-                      disabled={items.length === 1}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  
+                  {/* Second row - Price, Discount, PDV, Total */}
+                  <div className="grid gap-3 sm:grid-cols-12 items-end">
+                    <div className="sm:col-span-3">
+                      <Label>Cijena (€)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value) || 0)}
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label>Rabat (%)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.5"
+                        value={item.discount}
+                        onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label>PDV (%)</Label>
+                      <Select
+                        value={item.pdv.toString()}
+                        onValueChange={(value) => updateItem(index, 'pdv', parseFloat(value))}
+                      >
+                        <SelectTrigger className="mt-1.5">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0%</SelectItem>
+                          <SelectItem value="5">5%</SelectItem>
+                          <SelectItem value="13">13%</SelectItem>
+                          <SelectItem value="25">25%</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="sm:col-span-2 text-right">
+                      <Label className="text-muted-foreground">Osnovica</Label>
+                      <p className="mt-1.5 py-2 text-sm text-muted-foreground">
+                        {item.subtotal.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </div>
+                    <div className="sm:col-span-2 text-right">
+                      <Label>Ukupno</Label>
+                      <p className="mt-1.5 py-2 font-semibold text-foreground">
+                        {item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      </p>
+                    </div>
+                    <div className="sm:col-span-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeItem(index)}
+                        disabled={items.length === 1}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -294,11 +355,31 @@ export function DocumentForm() {
                 </span>
               </div>
               
-              <div className="border-t border-border pt-3 mt-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ukupno</span>
-                  <span className="text-2xl font-bold text-foreground">
-                    {totalAmount.toLocaleString('hr-HR')} €
+              <div className="border-t border-border pt-3 mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Osnovica</span>
+                  <span className="text-foreground">
+                    {subtotalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                  </span>
+                </div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Rabat</span>
+                    <span className="text-success">
+                      -{totalDiscount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">PDV</span>
+                  <span className="text-foreground">
+                    {totalPdv.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                  </span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-border">
+                  <span className="font-medium text-foreground">Ukupno</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                   </span>
                 </div>
               </div>

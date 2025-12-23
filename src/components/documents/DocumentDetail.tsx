@@ -112,14 +112,16 @@ export function DocumentDetail({ documents }: DocumentDetailProps) {
             </div>
 
             {/* Items Table */}
-            <div className="mb-8">
+            <div className="mb-8 overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="py-3 text-left text-sm font-medium text-muted-foreground">Stavka</th>
-                    <th className="py-3 text-center text-sm font-medium text-muted-foreground">Količina</th>
+                    <th className="py-3 text-center text-sm font-medium text-muted-foreground">Kol.</th>
                     <th className="py-3 text-center text-sm font-medium text-muted-foreground">Jed.</th>
                     <th className="py-3 text-right text-sm font-medium text-muted-foreground">Cijena</th>
+                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">Rabat</th>
+                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">PDV</th>
                     <th className="py-3 text-right text-sm font-medium text-muted-foreground">Ukupno</th>
                   </tr>
                 </thead>
@@ -129,8 +131,10 @@ export function DocumentDetail({ documents }: DocumentDetailProps) {
                       <td className="py-4 text-foreground">{item.name}</td>
                       <td className="py-4 text-center text-foreground">{item.quantity}</td>
                       <td className="py-4 text-center text-muted-foreground">{item.unit}</td>
-                      <td className="py-4 text-right text-foreground">{item.price.toLocaleString('hr-HR')} €</td>
-                      <td className="py-4 text-right font-medium text-foreground">{item.total.toLocaleString('hr-HR')} €</td>
+                      <td className="py-4 text-right text-foreground">{item.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
+                      <td className="py-4 text-right text-foreground">{item.discount > 0 ? `${item.discount}%` : '-'}</td>
+                      <td className="py-4 text-right text-foreground">{item.pdv}%</td>
+                      <td className="py-4 text-right font-medium text-foreground">{item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
                     </tr>
                   ))}
                 </tbody>
@@ -139,20 +143,35 @@ export function DocumentDetail({ documents }: DocumentDetailProps) {
 
             {/* Total */}
             <div className="flex justify-end">
-              <div className="w-64 space-y-2">
+              <div className="w-72 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Osnovica</span>
-                  <span className="text-foreground">{document.totalAmount.toLocaleString('hr-HR')} €</span>
+                  <span className="text-foreground">
+                    {document.items.reduce((sum, item) => sum + item.subtotal, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                  </span>
                 </div>
+                {document.items.some(item => item.discount > 0) && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Rabat</span>
+                    <span className="text-success">
+                      -{document.items.reduce((sum, item) => sum + (item.subtotal * item.discount / 100), 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">PDV (25%)</span>
-                  <span className="text-foreground">{(document.totalAmount * 0.25).toLocaleString('hr-HR')} €</span>
+                  <span className="text-muted-foreground">PDV</span>
+                  <span className="text-foreground">
+                    {document.items.reduce((sum, item) => {
+                      const afterDiscount = item.subtotal - (item.subtotal * item.discount / 100);
+                      return sum + (afterDiscount * item.pdv / 100);
+                    }, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                  </span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="font-semibold text-foreground">UKUPNO</span>
                   <span className="text-xl font-bold text-primary">
-                    {(document.totalAmount * 1.25).toLocaleString('hr-HR')} €
+                    {document.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                   </span>
                 </div>
               </div>
