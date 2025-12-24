@@ -24,6 +24,7 @@ export interface Document {
   clientAddress: string;
   clientPhone?: string;
   clientEmail?: string;
+  clientOib?: string;
   items: DocumentItem[];
   notes?: string;
   totalAmount: number;

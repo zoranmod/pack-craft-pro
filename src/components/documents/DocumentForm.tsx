@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { toast } from 'sonner';
+import { useCreateDocument } from '@/hooks/useDocuments';
 
 // Helper function to calculate item totals
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -29,6 +29,7 @@ export function DocumentForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialType = (searchParams.get('type') as DocumentType) || 'ponuda';
+  const createDocument = useCreateDocument();
 
   const [formData, setFormData] = useState({
     type: initialType,
@@ -76,22 +77,29 @@ export function DocumentForm() {
   }, 0);
   const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
     if (!formData.clientName || !formData.clientAddress) {
-      toast.error('Molimo ispunite obavezna polja');
       return;
     }
 
     if (items.some(item => !item.name)) {
-      toast.error('Molimo unesite naziv za sve stavke');
       return;
     }
 
-    // Here you would save to database
-    toast.success('Dokument uspješno kreiran!');
+    await createDocument.mutateAsync({
+      type: formData.type as DocumentType,
+      clientName: formData.clientName,
+      clientOib: formData.clientOib || undefined,
+      clientAddress: formData.clientAddress,
+      clientPhone: formData.clientPhone || undefined,
+      clientEmail: formData.clientEmail || undefined,
+      notes: formData.notes || undefined,
+      items,
+    });
+    
     navigate('/documents');
   };
 
@@ -108,8 +116,8 @@ export function DocumentForm() {
           <ArrowLeft className="h-4 w-4" />
           Natrag
         </Button>
-        <Button type="submit" className="gap-2 btn-float">
-          <Save className="h-4 w-4" />
+        <Button type="submit" className="gap-2 btn-float" disabled={createDocument.isPending}>
+          {createDocument.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Spremi dokument
         </Button>
       </div>

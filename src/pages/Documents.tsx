@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, Loader2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DocumentList } from '@/components/documents/DocumentList';
 import { Button } from '@/components/ui/button';
@@ -11,16 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { mockDocuments } from '@/data/mockDocuments';
+import { useDocuments } from '@/hooks/useDocuments';
 import { DocumentType, documentTypeLabels } from '@/types/document';
 
 const Documents = () => {
   const [filter, setFilter] = useState<DocumentType | 'all'>('all');
+  const { data: documents = [], isLoading } = useDocuments();
 
   return (
     <MainLayout 
       title="Svi dokumenti" 
-      subtitle={`Ukupno ${mockDocuments.length} dokumenata`}
+      subtitle={`Ukupno ${documents.length} dokumenata`}
     >
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -50,7 +51,13 @@ const Documents = () => {
       </div>
 
       {/* Document List */}
-      <DocumentList documents={mockDocuments} filter={filter} />
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <DocumentList documents={documents} filter={filter} />
+      )}
     </MainLayout>
   );
 };

@@ -1,6 +1,13 @@
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   title: string;
@@ -8,6 +15,12 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle }: HeaderProps) {
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b border-border">
       <div className="flex h-16 items-center justify-between px-6">
@@ -33,12 +46,25 @@ export function Header({ title, subtitle }: HeaderProps) {
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
           </Button>
 
-          {/* User */}
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <div className="h-8 w-8 rounded-full gradient-primary flex items-center justify-center">
-              <User className="h-4 w-4 text-primary-foreground" />
-            </div>
-          </Button>
+          {/* User Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <div className="h-8 w-8 rounded-full gradient-primary flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary-foreground" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <div className="px-2 py-1.5 text-sm text-muted-foreground truncate">
+                {user?.email}
+              </div>
+              <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                <LogOut className="h-4 w-4 mr-2" />
+                Odjava
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
