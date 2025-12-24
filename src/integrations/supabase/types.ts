@@ -14,7 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      document_items: {
+        Row: {
+          created_at: string
+          discount: number
+          document_id: string
+          id: string
+          name: string
+          pdv: number
+          price: number
+          quantity: number
+          subtotal: number
+          total: number
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          discount?: number
+          document_id: string
+          id?: string
+          name: string
+          pdv?: number
+          price?: number
+          quantity?: number
+          subtotal?: number
+          total?: number
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          document_id?: string
+          id?: string
+          name?: string
+          pdv?: number
+          price?: number
+          quantity?: number
+          subtotal?: number
+          total?: number
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_items_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          client_address: string
+          client_email: string | null
+          client_name: string
+          client_oib: string | null
+          client_phone: string | null
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          number: string
+          status: string
+          total_amount: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_address: string
+          client_email?: string | null
+          client_name: string
+          client_oib?: string | null
+          client_phone?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          number: string
+          status?: string
+          total_amount?: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_address?: string
+          client_email?: string | null
+          client_name?: string
+          client_oib?: string | null
+          client_phone?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          number?: string
+          status?: string
+          total_amount?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
