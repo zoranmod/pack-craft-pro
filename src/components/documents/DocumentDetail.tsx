@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Download, Printer, Mail, Trash2 } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels } from '@/types/document';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface DocumentDetailProps {
-  documents: Document[];
+  document: Document | null | undefined;
+  error?: string;
 }
 
 const statusStyles: Record<string, string> = {
@@ -17,11 +18,21 @@ const statusStyles: Record<string, string> = {
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
-export function DocumentDetail({ documents }: DocumentDetailProps) {
+export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const document = documents.find(d => d.id === id);
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-lg font-medium text-destructive">Greška: {error}</p>
+        <Button variant="ghost" onClick={() => navigate('/documents')} className="mt-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Natrag na listu
+        </Button>
+      </div>
+    );
+  }
   
   if (!document) {
     return (
