@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Trash2, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
@@ -28,18 +28,29 @@ const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
 export function DocumentForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const initialType = (searchParams.get('type') as DocumentType) || 'ponuda';
+
+  const typeParam = searchParams.get('type');
+  const typeFromUrl: DocumentType = typeParam && typeParam in documentTypeLabels
+    ? (typeParam as DocumentType)
+    : 'ponuda';
+
   const createDocument = useCreateDocument();
 
-  const [formData, setFormData] = useState({
-    type: initialType,
+  const [formData, setFormData] = useState(() => ({
+    type: typeFromUrl,
     clientName: '',
     clientOib: '',
     clientAddress: '',
     clientPhone: '',
     clientEmail: '',
     notes: '',
-  });
+  }));
+
+  // When switching between "Nova ponuda / otpremnica / ..." we stay on /documents/new,
+  // only the query param changes. Sync form type with URL.
+  useEffect(() => {
+    setFormData((prev) => (prev.type === typeFromUrl ? prev : { ...prev, type: typeFromUrl }));
+  }, [typeFromUrl]);
 
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
