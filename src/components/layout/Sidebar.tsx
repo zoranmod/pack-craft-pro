@@ -55,8 +55,12 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-3">
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path || 
-              (item.path !== '/' && location.pathname.startsWith(item.path.split('?')[0]));
+            const currentFullPath = location.pathname + location.search;
+            const isActive = item.path === '/' 
+              ? location.pathname === '/'
+              : item.path.includes('?')
+                ? currentFullPath === item.path
+                : location.pathname === item.path;
             
             return (
               <Link
