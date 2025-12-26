@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { toast } from 'sonner';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -21,6 +25,84 @@ const statusStyles: Record<string, string> = {
 export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const printRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handlePrint = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error('Blokirani skočni prozori. Molimo omogućite ih za ispis.');
+      return;
+    }
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${document?.number || 'Dokument'}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { font-weight: 600; color: #666; }
+            .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+            .total-section { text-align: right; margin-top: 20px; }
+            .notes { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 30px; }
+            @media print { body { print-color-adjust: exact; } }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!printRef.current || !document) return;
+    
+    setIsGeneratingPdf(true);
+    toast.info('Generiram PDF...');
+    
+    try {
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`${document.number}.pdf`);
+      
+      toast.success('PDF uspješno generiran!');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      toast.error('Greška pri generiranju PDF-a');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
   
   if (error) {
     return (
@@ -66,13 +148,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Ispis
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
-            PDF
+            {isGeneratingPdf ? 'Generiram...' : 'PDF'}
           </Button>
           <Button variant="outline" size="sm">
             <Mail className="mr-2 h-4 w-4" />
@@ -90,7 +172,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Document Preview */}
         <div className="lg:col-span-2">
-          <div className="bg-card rounded-xl shadow-card border border-border/50 p-8">
+          <div ref={printRef} className="bg-card rounded-xl shadow-card border border-border/50 p-8">
             {/* Document Header */}
             <div className="flex justify-between items-start mb-8">
               <div>
@@ -229,9 +311,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h3 className="font-semibold text-foreground mb-4">Brze akcije</h3>
             <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                 <Download className="mr-2 h-4 w-4" />
-                Preuzmi kao PDF
+                {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi kao PDF'}
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <Mail className="mr-2 h-4 w-4" />
