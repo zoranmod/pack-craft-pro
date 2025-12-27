@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Package,
   Users,
-  PackageSearch
+  PackageSearch,
+  UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
@@ -23,6 +24,7 @@ const menuItems = [
   { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
   { icon: Users, label: 'Klijenti', path: '/clients' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
+  { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },
 ];
 
 export function Sidebar() {
