@@ -69,59 +69,71 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error("Zaposlenik već ima korisnički račun");
     }
 
-    // Create the user account
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true, // Auto-confirm email
-      user_metadata: {
-        first_name: firstName,
-        last_name: lastName,
-        is_employee: true,
-        employee_id: employeeId,
-      },
-    });
+    // Check if user already exists with this email
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === email);
 
-    if (createError) {
-      console.error("Error creating user:", createError);
-      if (createError.message.includes("already")) {
-        throw new Error("Korisnik s ovom email adresom već postoji");
+    let userId: string;
+
+    if (existingUser) {
+      // User exists - link to this employee
+      console.log(`User with email ${email} already exists, linking to employee ${employeeId}`);
+      userId = existingUser.id;
+    } else {
+      // Create new user account
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirm email
+        user_metadata: {
+          first_name: firstName,
+          last_name: lastName,
+          is_employee: true,
+          employee_id: employeeId,
+        },
+      });
+
+      if (createError) {
+        console.error("Error creating user:", createError);
+        throw new Error(createError.message);
       }
-      throw new Error(createError.message);
-    }
 
-    console.log(`User created with ID: ${newUser.user.id}`);
+      console.log(`User created with ID: ${newUser.user.id}`);
+      userId = newUser.user.id;
+    }
 
     // Update employee with auth_user_id
     const { error: updateError } = await supabaseAdmin
       .from("employees")
-      .update({ auth_user_id: newUser.user.id })
+      .update({ auth_user_id: userId })
       .eq("id", employeeId);
 
     if (updateError) {
       console.error("Error updating employee:", updateError);
-      // Try to clean up the created user
-      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      // Only try to delete if we created a new user
+      if (!existingUser) {
+        await supabaseAdmin.auth.admin.deleteUser(userId);
+      }
       throw new Error("Greška pri povezivanju računa sa zaposlenikom");
     }
 
-    // Add employee role
+    // Add employee role (upsert to avoid duplicates)
     const { error: roleError } = await supabaseAdmin
       .from("user_roles")
-      .insert({
-        user_id: newUser.user.id,
+      .upsert({
+        user_id: userId,
         role: "employee",
-      });
+      }, { onConflict: 'user_id,role' });
 
     if (roleError) {
       console.error("Error adding role:", roleError);
       // Non-critical, continue
     }
 
-    // Create default permissions
+    // Create default permissions (upsert to avoid duplicates)
     const { error: permError } = await supabaseAdmin
       .from("employee_permissions")
-      .insert({
+      .upsert({
         employee_id: employeeId,
         can_view_documents: false,
         can_create_documents: false,
@@ -137,7 +149,7 @@ serve(async (req: Request): Promise<Response> => {
         can_edit_clients: false,
         can_view_settings: false,
         can_edit_settings: false,
-      });
+      }, { onConflict: 'employee_id' });
 
     if (permError) {
       console.error("Error creating permissions:", permError);
@@ -149,14 +161,18 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({
         success: true,
-        userId: newUser.user.id,
-        message: "Račun uspješno kreiran",
+        userId: userId,
+        message: existingUser 
+          ? "Postojeći račun uspješno povezan sa zaposlenikom" 
+          : "Račun uspješno kreiran",
+        linkedExisting: !!existingUser,
       }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
+
   } catch (error: any) {
     console.error("Error in create-employee-account:", error);
     return new Response(
