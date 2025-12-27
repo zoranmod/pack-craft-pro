@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, FileText, Download, AlertTriangle } from 'lucide-react';
+import { Plus, Pencil, Trash2, FileText, Download, AlertTriangle, CalendarIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useEmployeeDocuments } from '@/hooks/useEmployees';
+import { formatDateHR, cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { hr } from 'date-fns/locale';
 
 interface DocumentsTabProps {
   employeeId: string;
@@ -128,18 +137,11 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                 <li key={doc.id} className="text-sm">
                   <span className="font-medium">{doc.document_name}</span>
                   {' - '}
-                  {(() => {
-                    const d = new Date(doc.expiry_date!);
-                    const day = d.getDate().toString().padStart(2, '0');
-                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const year = d.getFullYear();
-                    const formatted = `${day}.${month}.${year}.`;
-                    return isExpired(doc.expiry_date) ? (
-                      <span className="text-destructive">Isteklo {formatted}</span>
-                    ) : (
-                      <span className="text-yellow-600">Ističe {formatted}</span>
-                    );
-                  })()}
+                  {isExpired(doc.expiry_date) ? (
+                    <span className="text-destructive">Isteklo {formatDateHR(doc.expiry_date)}</span>
+                  ) : (
+                    <span className="text-yellow-600">Ističe {formatDateHR(doc.expiry_date)}</span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -196,13 +198,7 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                               : ''
                           }
                         >
-                          {(() => {
-                            const d = new Date(doc.expiry_date);
-                            const day = d.getDate().toString().padStart(2, '0');
-                            const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                            const year = d.getFullYear();
-                            return `${day}.${month}.${year}.`;
-                          })()}
+                          {formatDateHR(doc.expiry_date)}
                           {isExpired(doc.expiry_date) && ' (isteklo)'}
                           {isExpiringSoon(doc.expiry_date) && ' (uskoro)'}
                         </span>
@@ -275,11 +271,32 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
             </div>
             <div>
               <Label>Datum isteka</Label>
-              <Input
-                type="date"
-                value={form.expiry_date}
-                onChange={(e) => setForm({ ...form, expiry_date: e.target.value })}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !form.expiry_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.expiry_date ? formatDateHR(form.expiry_date) : 'Odaberi datum'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.expiry_date ? new Date(form.expiry_date) : undefined}
+                    onSelect={(date) => setForm({ 
+                      ...form, 
+                      expiry_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                    })}
+                    locale={hr}
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div>
               <Label>URL dokumenta</Label>

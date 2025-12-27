@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Check, X, Clock } from 'lucide-react';
+import { Plus, Check, X, Clock, CalendarIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useLeaveEntitlements, useLeaveRequests } from '@/hooks/useEmployees';
+import { formatDateHR, cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { hr } from 'date-fns/locale';
 
 interface LeaveTabProps {
   employeeId: string;
@@ -205,16 +214,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                 requests.map((req) => (
                   <TableRow key={req.id}>
                     <TableCell>
-                      {(() => {
-                        const formatD = (date: string) => {
-                          const d = new Date(date);
-                          const day = d.getDate().toString().padStart(2, '0');
-                          const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                          const year = d.getFullYear();
-                          return `${day}.${month}.${year}.`;
-                        };
-                        return `${formatD(req.start_date)} - ${formatD(req.end_date)}`;
-                      })()}
+                      {formatDateHR(req.start_date)} - {formatDateHR(req.end_date)}
                     </TableCell>
                     <TableCell>{req.days_requested}</TableCell>
                     <TableCell className="capitalize">{req.leave_type}</TableCell>
@@ -291,19 +291,61 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Od datuma</Label>
-                <Input
-                  type="date"
-                  value={requestForm.start_date}
-                  onChange={(e) => setRequestForm({ ...requestForm, start_date: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !requestForm.start_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {requestForm.start_date ? formatDateHR(requestForm.start_date) : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={requestForm.start_date ? new Date(requestForm.start_date) : undefined}
+                      onSelect={(date) => setRequestForm({ 
+                        ...requestForm, 
+                        start_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                      })}
+                      locale={hr}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label>Do datuma</Label>
-                <Input
-                  type="date"
-                  value={requestForm.end_date}
-                  onChange={(e) => setRequestForm({ ...requestForm, end_date: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !requestForm.end_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {requestForm.end_date ? formatDateHR(requestForm.end_date) : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={requestForm.end_date ? new Date(requestForm.end_date) : undefined}
+                      onSelect={(date) => setRequestForm({ 
+                        ...requestForm, 
+                        end_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                      })}
+                      locale={hr}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">

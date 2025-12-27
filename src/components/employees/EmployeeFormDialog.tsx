@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { CalendarIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,7 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useEmployees } from '@/hooks/useEmployees';
+import { formatDateHR, cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { hr } from 'date-fns/locale';
 import type { Employee } from '@/types/employee';
 
 const formSchema = z.object({
@@ -72,7 +82,7 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
       postal_code: '',
       phone: '',
       email: '',
-      employment_start_date: new Date().toISOString().split('T')[0],
+      employment_start_date: format(new Date(), 'yyyy-MM-dd'),
       employment_end_date: '',
       position: '',
       department: '',
@@ -113,7 +123,7 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
         postal_code: '',
         phone: '',
         email: '',
-        employment_start_date: new Date().toISOString().split('T')[0],
+        employment_start_date: format(new Date(), 'yyyy-MM-dd'),
         employment_end_date: '',
         position: '',
         department: '',
@@ -222,9 +232,34 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Datum rođenja</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? formatDateHR(field.value) : 'Odaberi datum'}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          locale={hr}
+                          className="pointer-events-auto"
+                          captionLayout="dropdown-buttons"
+                          fromYear={1940}
+                          toYear={new Date().getFullYear()}
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -386,9 +421,31 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Datum zaposlenja *</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? formatDateHR(field.value) : 'Odaberi datum'}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          locale={hr}
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -399,9 +456,31 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Datum prestanka</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? formatDateHR(field.value) : 'Odaberi datum'}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          locale={hr}
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
