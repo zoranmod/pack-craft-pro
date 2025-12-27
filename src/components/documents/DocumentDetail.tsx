@@ -302,13 +302,25 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Kreirano</span>
                 <span className="text-foreground">
-                  {new Date(document.createdAt).toLocaleDateString('hr-HR')}
+                  {(() => {
+                    const d = new Date(document.createdAt);
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${day}.${month}.${year}.`;
+                  })()}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Ažurirano</span>
                 <span className="text-foreground">
-                  {new Date(document.updatedAt).toLocaleDateString('hr-HR')}
+                  {(() => {
+                    const d = new Date(document.updatedAt);
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${day}.${month}.${year}.`;
+                  })()}
                 </span>
               </div>
             </div>
