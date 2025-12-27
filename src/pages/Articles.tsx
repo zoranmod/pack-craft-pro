@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Package } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Package, Upload } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +38,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, Article, CreateArticleData } from '@/hooks/useArticles';
+import { ArticleImportDialog } from '@/components/articles/ArticleImportDialog';
 
 const emptyForm: CreateArticleData = {
   code: '',
@@ -56,6 +57,7 @@ const Articles = () => {
 
   const [search, setSearch] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateArticleData>(emptyForm);
@@ -117,12 +119,17 @@ const Articles = () => {
               className="pl-9"
             />
           </div>
-          <Button onClick={openNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Dodaj artikl
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Uvoz iz Excel-a
+            </Button>
+            <Button onClick={openNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Dodaj artikl
+            </Button>
+          </div>
         </div>
-
         {/* Articles Table */}
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Učitavanje...</div>
@@ -298,6 +305,8 @@ const Articles = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ArticleImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
     </MainLayout>
   );
 };
