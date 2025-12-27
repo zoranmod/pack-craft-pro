@@ -122,7 +122,7 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
     setIsLoading(true);
 
     try {
-      // Call edge function to reset password (reuse create-employee-account which updates existing users)
+      // Call edge function to reset password
       const { data, error: fnError } = await supabase.functions.invoke('create-employee-account', {
         body: {
           email: employee.email,
@@ -130,6 +130,7 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
           employeeId: employee.id,
           firstName: employee.first_name,
           lastName: employee.last_name,
+          resetPassword: true,
         },
       });
 

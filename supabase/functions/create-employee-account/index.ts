@@ -12,6 +12,7 @@ interface CreateAccountRequest {
   employeeId: string;
   firstName: string;
   lastName: string;
+  resetPassword?: boolean; // If true, just reset password for existing account
 }
 
 function parseBearerToken(authHeader: string): string | null {
@@ -78,9 +79,9 @@ serve(async (req: Request): Promise<Response> => {
 
     console.log(`Request from user: ${requestingUserId}`);
 
-    const { email, password, employeeId, firstName, lastName }: CreateAccountRequest = await req.json();
+    const { email, password, employeeId, firstName, lastName, resetPassword }: CreateAccountRequest = await req.json();
 
-    console.log(`Creating account for employee ${employeeId} with email ${email}`);
+    console.log(`${resetPassword ? 'Resetting password' : 'Creating account'} for employee ${employeeId} with email ${email}`);
 
     // Verify the requesting user owns this employee
     const { data: employee, error: employeeError } = await supabaseAdmin
@@ -95,6 +96,33 @@ serve(async (req: Request): Promise<Response> => {
 
     if (employee.user_id !== requestingUserId) {
       throw new Error("Nemate ovlasti za ovog zaposlenika");
+    }
+
+    // Handle password reset for existing accounts
+    if (employee.auth_user_id && resetPassword) {
+      console.log(`Resetting password for existing account ${employee.auth_user_id}`);
+      
+      const { error: resetError } = await supabaseAdmin.auth.admin.updateUserById(employee.auth_user_id, {
+        password: password,
+      });
+
+      if (resetError) {
+        console.error("Error resetting password:", resetError);
+        throw new Error("Greška pri resetiranju lozinke");
+      }
+
+      console.log(`Password reset complete for employee ${employeeId}`);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Lozinka uspješno resetirana",
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
     if (employee.auth_user_id) {
