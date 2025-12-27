@@ -13,6 +13,7 @@ import {
   PackageSearch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import logo from '@/assets/logo.png';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Nadzorna ploča', path: '/' },
@@ -40,11 +41,12 @@ export function Sidebar() {
         <div className="flex h-16 items-center justify-between border-b border-border px-4">
           {!collapsed && (
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
-                <FileText className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
               <span className="font-semibold text-foreground">Akord</span>
             </div>
+          )}
+          {collapsed && (
+            <img src={logo} alt="Akord logo" className="h-7 w-7 object-contain mx-auto" />
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
