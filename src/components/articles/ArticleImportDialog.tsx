@@ -227,12 +227,12 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
                 <Label>Šifra (ROBA)</Label>
-                <Select value={mapping.code} onValueChange={(v) => setMapping({ ...mapping, code: v })}>
+                <Select value={mapping.code || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, code: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Preskoči --</SelectItem>
+                    <SelectItem value="__skip__">-- Preskoči --</SelectItem>
                     {columns.map(col => (
                       <SelectItem key={col} value={col}>{col}</SelectItem>
                     ))}
@@ -241,7 +241,7 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
               </div>
               <div>
                 <Label>Naziv *</Label>
-                <Select value={mapping.name} onValueChange={(v) => setMapping({ ...mapping, name: v })}>
+                <Select value={mapping.name || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, name: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
@@ -254,12 +254,12 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
               </div>
               <div>
                 <Label>Prodajna cijena (MPCIJENA)</Label>
-                <Select value={mapping.price} onValueChange={(v) => setMapping({ ...mapping, price: v })}>
+                <Select value={mapping.price || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, price: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Preskoči --</SelectItem>
+                    <SelectItem value="__skip__">-- Preskoči --</SelectItem>
                     {columns.map(col => (
                       <SelectItem key={col} value={col}>{col}</SelectItem>
                     ))}
@@ -268,12 +268,12 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
               </div>
               <div>
                 <Label>Nabavna cijena (VPCIJENA)</Label>
-                <Select value={mapping.purchasePrice} onValueChange={(v) => setMapping({ ...mapping, purchasePrice: v })}>
+                <Select value={mapping.purchasePrice || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, purchasePrice: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Preskoči --</SelectItem>
+                    <SelectItem value="__skip__">-- Preskoči --</SelectItem>
                     {columns.map(col => (
                       <SelectItem key={col} value={col}>{col}</SelectItem>
                     ))}
@@ -282,12 +282,12 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
               </div>
               <div>
                 <Label>Stanje/Zaliha</Label>
-                <Select value={mapping.stock} onValueChange={(v) => setMapping({ ...mapping, stock: v })}>
+                <Select value={mapping.stock || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, stock: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Preskoči --</SelectItem>
+                    <SelectItem value="__skip__">-- Preskoči --</SelectItem>
                     {columns.map(col => (
                       <SelectItem key={col} value={col}>{col}</SelectItem>
                     ))}
@@ -296,12 +296,12 @@ export function ArticleImportDialog({ open, onOpenChange }: ArticleImportDialogP
               </div>
               <div>
                 <Label>Barkod</Label>
-                <Select value={mapping.barcode} onValueChange={(v) => setMapping({ ...mapping, barcode: v })}>
+                <Select value={mapping.barcode || "__skip__"} onValueChange={(v) => setMapping({ ...mapping, barcode: v === "__skip__" ? "" : v })}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Odaberi stupac" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Preskoči --</SelectItem>
+                    <SelectItem value="__skip__">-- Preskoči --</SelectItem>
                     {columns.map(col => (
                       <SelectItem key={col} value={col}>{col}</SelectItem>
                     ))}
