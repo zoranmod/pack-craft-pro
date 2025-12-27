@@ -29,8 +29,8 @@ const Auth = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error('Lozinka mora imati najmanje 6 znakova');
+    if (password.length < 8) {
+      toast.error('Lozinka mora imati najmanje 8 znakova');
       return;
     }
 
