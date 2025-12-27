@@ -177,7 +177,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-xl font-bold text-foreground gradient-primary bg-clip-text text-transparent">
-                  DocuFlow
+                  Akord
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">Vaša tvrtka d.o.o.</p>
                 <p className="text-sm text-muted-foreground">Ulica 123, 10000 Zagreb</p>
