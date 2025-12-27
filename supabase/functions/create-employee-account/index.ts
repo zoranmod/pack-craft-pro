@@ -14,6 +14,30 @@ interface CreateAccountRequest {
   lastName: string;
 }
 
+function parseBearerToken(authHeader: string): string | null {
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  const token = match?.[1]?.trim();
+  return token && token.length > 0 ? token : null;
+}
+
+function decodeBase64Url(input: string): string {
+  const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = base64.length % 4;
+  const padded = pad ? base64 + "=".repeat(4 - pad) : base64;
+  return atob(padded);
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const json = decodeBase64Url(parts[1]);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -33,29 +57,26 @@ serve(async (req: Request): Promise<Response> => {
     });
 
     // Get the requesting user from the auth header
-    const authHeader = req.headers.get("Authorization");
+    const authHeader = req.headers.get("Authorization") ?? req.headers.get("authorization");
     if (!authHeader) {
       throw new Error("Nedostaje autorizacija");
     }
 
-    // Verify the requesting user by validating provided JWT (do NOT rely on stored sessions)
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabaseAuth = createClient(supabaseUrl, anonKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user: requestingUser }, error: authError } = await supabaseAuth.auth.getUser(token);
-
-    if (authError || !requestingUser) {
-      console.error("Auth error:", authError);
+    const token = parseBearerToken(authHeader);
+    if (!token) {
       throw new Error("Neautoriziran pristup");
     }
 
-    console.log(`Request from user: ${requestingUser.id}`);
+    // JWT is already verified by the platform (verify_jwt=true); we only decode it to get the user id.
+    const jwtPayload = decodeJwtPayload(token);
+    const requestingUserId = typeof jwtPayload?.sub === "string" ? (jwtPayload.sub as string) : null;
+
+    if (!requestingUserId) {
+      console.error("Auth error: Missing sub in JWT payload");
+      throw new Error("Neautoriziran pristup");
+    }
+
+    console.log(`Request from user: ${requestingUserId}`);
 
     const { email, password, employeeId, firstName, lastName }: CreateAccountRequest = await req.json();
 
@@ -72,7 +93,7 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error("Zaposlenik nije pronađen");
     }
 
-    if (employee.user_id !== requestingUser.id) {
+    if (employee.user_id !== requestingUserId) {
       throw new Error("Nemate ovlasti za ovog zaposlenika");
     }
 
