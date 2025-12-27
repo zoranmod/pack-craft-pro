@@ -10,6 +10,8 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
+import { ContractDocumentView } from './ContractDocumentView';
+import { useCompanySettings } from '@/hooks/useSettings';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -28,6 +30,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const { data: companySettings } = useCompanySettings();
+  
+  const isContract = document?.type === 'ugovor';
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -179,112 +184,122 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Document Preview */}
         <div className="lg:col-span-2">
-          <div ref={printRef} className="bg-card rounded-xl shadow-card border border-border/50 p-8">
-            {/* Document Header */}
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-xl font-bold text-foreground gradient-primary bg-clip-text text-transparent">
-                  Akord
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">Vaša tvrtka d.o.o.</p>
-                <p className="text-sm text-muted-foreground">Ulica 123, 10000 Zagreb</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-foreground">{document.number}</p>
-                <p className="text-sm text-muted-foreground">{documentTypeLabels[document.type]}</p>
-                <p className="text-sm text-muted-foreground mt-2">Datum: {document.date}</p>
-              </div>
+          {isContract ? (
+            <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
+              <ContractDocumentView 
+                ref={printRef} 
+                document={document} 
+                companySettings={companySettings} 
+              />
             </div>
-
-            <Separator className="my-6" />
-
-            {/* Client Info */}
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">KLIJENT</h3>
-              <p className="font-semibold text-foreground">{document.clientName}</p>
-              <p className="text-muted-foreground">{document.clientAddress}</p>
-              {document.clientPhone && (
-                <p className="text-muted-foreground">Tel: {document.clientPhone}</p>
-              )}
-              {document.clientEmail && (
-                <p className="text-muted-foreground">Email: {document.clientEmail}</p>
-              )}
-            </div>
-
-            {/* Items Table */}
-            <div className="mb-8 overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="py-3 text-left text-sm font-medium text-muted-foreground">Stavka</th>
-                    <th className="py-3 text-center text-sm font-medium text-muted-foreground">Kol.</th>
-                    <th className="py-3 text-center text-sm font-medium text-muted-foreground">Jed.</th>
-                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">Cijena</th>
-                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">Rabat</th>
-                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">PDV</th>
-                    <th className="py-3 text-right text-sm font-medium text-muted-foreground">Ukupno</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {document.items.map((item) => (
-                    <tr key={item.id} className="border-b border-border/50">
-                      <td className="py-4 text-foreground">{item.name}</td>
-                      <td className="py-4 text-center text-foreground">{item.quantity}</td>
-                      <td className="py-4 text-center text-muted-foreground">{item.unit}</td>
-                      <td className="py-4 text-right text-foreground">{item.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
-                      <td className="py-4 text-right text-foreground">{item.discount > 0 ? `${item.discount}%` : '-'}</td>
-                      <td className="py-4 text-right text-foreground">{item.pdv}%</td>
-                      <td className="py-4 text-right font-medium text-foreground">{item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Total */}
-            <div className="flex justify-end">
-              <div className="w-72 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Osnovica</span>
-                  <span className="text-foreground">
-                    {document.items.reduce((sum, item) => sum + item.subtotal, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
-                  </span>
+          ) : (
+            <div ref={printRef} className="bg-card rounded-xl shadow-card border border-border/50 p-8">
+              {/* Document Header */}
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h2 className="text-xl font-bold text-foreground gradient-primary bg-clip-text text-transparent">
+                    {companySettings?.company_name || 'Akord'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">{companySettings?.company_name || 'Vaša tvrtka d.o.o.'}</p>
+                  <p className="text-sm text-muted-foreground">{companySettings?.address || 'Ulica 123, 10000 Zagreb'}</p>
                 </div>
-                {document.items.some(item => item.discount > 0) && (
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-foreground">{document.number}</p>
+                  <p className="text-sm text-muted-foreground">{documentTypeLabels[document.type]}</p>
+                  <p className="text-sm text-muted-foreground mt-2">Datum: {document.date}</p>
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Client Info */}
+              <div className="mb-8">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">KLIJENT</h3>
+                <p className="font-semibold text-foreground">{document.clientName}</p>
+                <p className="text-muted-foreground">{document.clientAddress}</p>
+                {document.clientPhone && (
+                  <p className="text-muted-foreground">Tel: {document.clientPhone}</p>
+                )}
+                {document.clientEmail && (
+                  <p className="text-muted-foreground">Email: {document.clientEmail}</p>
+                )}
+              </div>
+
+              {/* Items Table */}
+              <div className="mb-8 overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="py-3 text-left text-sm font-medium text-muted-foreground">Stavka</th>
+                      <th className="py-3 text-center text-sm font-medium text-muted-foreground">Kol.</th>
+                      <th className="py-3 text-center text-sm font-medium text-muted-foreground">Jed.</th>
+                      <th className="py-3 text-right text-sm font-medium text-muted-foreground">Cijena</th>
+                      <th className="py-3 text-right text-sm font-medium text-muted-foreground">Rabat</th>
+                      <th className="py-3 text-right text-sm font-medium text-muted-foreground">PDV</th>
+                      <th className="py-3 text-right text-sm font-medium text-muted-foreground">Ukupno</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {document.items.map((item) => (
+                      <tr key={item.id} className="border-b border-border/50">
+                        <td className="py-4 text-foreground">{item.name}</td>
+                        <td className="py-4 text-center text-foreground">{item.quantity}</td>
+                        <td className="py-4 text-center text-muted-foreground">{item.unit}</td>
+                        <td className="py-4 text-right text-foreground">{item.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
+                        <td className="py-4 text-right text-foreground">{item.discount > 0 ? `${item.discount}%` : '-'}</td>
+                        <td className="py-4 text-right text-foreground">{item.pdv}%</td>
+                        <td className="py-4 text-right font-medium text-foreground">{item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Total */}
+              <div className="flex justify-end">
+                <div className="w-72 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Rabat</span>
-                    <span className="text-success">
-                      -{document.items.reduce((sum, item) => sum + (item.subtotal * item.discount / 100), 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                    <span className="text-muted-foreground">Osnovica</span>
+                    <span className="text-foreground">
+                      {document.items.reduce((sum, item) => sum + item.subtotal, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                     </span>
                   </div>
-                )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">PDV</span>
-                  <span className="text-foreground">
-                    {document.items.reduce((sum, item) => {
-                      const afterDiscount = item.subtotal - (item.subtotal * item.discount / 100);
-                      return sum + (afterDiscount * item.pdv / 100);
-                    }, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="font-semibold text-foreground">UKUPNO</span>
-                  <span className="text-xl font-bold text-primary">
-                    {document.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
-                  </span>
+                  {document.items.some(item => item.discount > 0) && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Rabat</span>
+                      <span className="text-success">
+                        -{document.items.reduce((sum, item) => sum + (item.subtotal * item.discount / 100), 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">PDV</span>
+                    <span className="text-foreground">
+                      {document.items.reduce((sum, item) => {
+                        const afterDiscount = item.subtotal - (item.subtotal * item.discount / 100);
+                        return sum + (afterDiscount * item.pdv / 100);
+                      }, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                    </span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-foreground">UKUPNO</span>
+                    <span className="text-xl font-bold text-primary">
+                      {document.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Notes */}
-            {document.notes && (
-              <div className="mt-8 p-4 bg-muted/30 rounded-lg">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">NAPOMENE</h3>
-                <p className="text-foreground">{document.notes}</p>
-              </div>
-            )}
-          </div>
+              {/* Notes */}
+              {document.notes && (
+                <div className="mt-8 p-4 bg-muted/30 rounded-lg">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">NAPOMENE</h3>
+                  <p className="text-foreground">{document.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
