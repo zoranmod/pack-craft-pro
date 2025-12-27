@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -38,11 +39,17 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       return;
     }
     
+    // Sanitize innerHTML to prevent XSS attacks
+    const sanitizedContent = DOMPurify.sanitize(printContent.innerHTML, {
+      ALLOWED_TAGS: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li'],
+      ALLOWED_ATTR: ['class', 'style', 'src', 'alt', 'colspan', 'rowspan'],
+    });
+    
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${document?.number || 'Dokument'}</title>
+          <title>${DOMPurify.sanitize(document?.number || 'Dokument')}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
             table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -55,7 +62,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           </style>
         </head>
         <body>
-          ${printContent.innerHTML}
+          ${sanitizedContent}
         </body>
       </html>
     `);
