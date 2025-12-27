@@ -293,6 +293,7 @@ export type Database = {
       }
       employee_leave_entitlements: {
         Row: {
+          carried_over_days: number | null
           created_at: string
           employee_id: string
           id: string
@@ -302,6 +303,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          carried_over_days?: number | null
           created_at?: string
           employee_id: string
           id?: string
@@ -311,6 +313,7 @@ export type Database = {
           year: number
         }
         Update: {
+          carried_over_days?: number | null
           created_at?: string
           employee_id?: string
           id?: string
@@ -377,6 +380,77 @@ export type Database = {
             foreignKeyName: "employee_leave_requests_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_permissions: {
+        Row: {
+          can_approve_leave: boolean | null
+          can_create_documents: boolean | null
+          can_edit_articles: boolean | null
+          can_edit_clients: boolean | null
+          can_edit_documents: boolean | null
+          can_edit_settings: boolean | null
+          can_manage_employees: boolean | null
+          can_request_leave: boolean | null
+          can_request_sick_leave: boolean | null
+          can_view_articles: boolean | null
+          can_view_clients: boolean | null
+          can_view_documents: boolean | null
+          can_view_settings: boolean | null
+          can_view_work_clothing: boolean | null
+          created_at: string | null
+          employee_id: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          can_approve_leave?: boolean | null
+          can_create_documents?: boolean | null
+          can_edit_articles?: boolean | null
+          can_edit_clients?: boolean | null
+          can_edit_documents?: boolean | null
+          can_edit_settings?: boolean | null
+          can_manage_employees?: boolean | null
+          can_request_leave?: boolean | null
+          can_request_sick_leave?: boolean | null
+          can_view_articles?: boolean | null
+          can_view_clients?: boolean | null
+          can_view_documents?: boolean | null
+          can_view_settings?: boolean | null
+          can_view_work_clothing?: boolean | null
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          can_approve_leave?: boolean | null
+          can_create_documents?: boolean | null
+          can_edit_articles?: boolean | null
+          can_edit_clients?: boolean | null
+          can_edit_documents?: boolean | null
+          can_edit_settings?: boolean | null
+          can_manage_employees?: boolean | null
+          can_request_leave?: boolean | null
+          can_request_sick_leave?: boolean | null
+          can_view_articles?: boolean | null
+          can_view_clients?: boolean | null
+          can_view_documents?: boolean | null
+          can_view_settings?: boolean | null
+          can_view_work_clothing?: boolean | null
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_permissions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -482,6 +556,7 @@ export type Database = {
       employees: {
         Row: {
           address: string | null
+          auth_user_id: string | null
           city: string | null
           created_at: string
           date_of_birth: string | null
@@ -504,6 +579,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          auth_user_id?: string | null
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -526,6 +602,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          auth_user_id?: string | null
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -616,15 +693,49 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_employee_admin: { Args: { _user_id: string }; Returns: string }
+      get_employee_id: { Args: { _user_id: string }; Returns: string }
+      has_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "employee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -751,6 +862,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "employee"],
+    },
   },
 } as const

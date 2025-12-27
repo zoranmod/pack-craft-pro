@@ -1,6 +1,7 @@
 export interface Employee {
   id: string;
   user_id: string;
+  auth_user_id?: string;
   first_name: string;
   last_name: string;
   oib?: string;
@@ -27,6 +28,28 @@ export interface EmployeeLeaveEntitlement {
   year: number;
   total_days: number;
   used_days: number;
+  carried_over_days: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmployeePermissions {
+  id: string;
+  employee_id: string;
+  can_view_documents: boolean;
+  can_create_documents: boolean;
+  can_edit_documents: boolean;
+  can_manage_employees: boolean;
+  can_request_leave: boolean;
+  can_approve_leave: boolean;
+  can_request_sick_leave: boolean;
+  can_view_work_clothing: boolean;
+  can_view_articles: boolean;
+  can_edit_articles: boolean;
+  can_view_clients: boolean;
+  can_edit_clients: boolean;
+  can_view_settings: boolean;
+  can_edit_settings: boolean;
   created_at: string;
   updated_at: string;
 }

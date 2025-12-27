@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Check, X, Clock, CalendarIcon } from 'lucide-react';
+import { Plus, Check, X, Clock, CalendarIcon, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,7 +49,11 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
   
   const [isEntitlementOpen, setIsEntitlementOpen] = useState(false);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
-  const [entitlementForm, setEntitlementForm] = useState({ year: new Date().getFullYear(), total_days: 20 });
+  const [entitlementForm, setEntitlementForm] = useState({ 
+    year: new Date().getFullYear(), 
+    total_days: 20,
+    carried_over_days: 0,
+  });
   const [requestForm, setRequestForm] = useState({
     start_date: '',
     end_date: '',
@@ -59,8 +64,11 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
 
   const currentYear = new Date().getFullYear();
   const currentEntitlement = entitlements.find((e) => e.year === currentYear);
+  const totalAvailable = currentEntitlement 
+    ? currentEntitlement.total_days + (currentEntitlement.carried_over_days || 0) 
+    : 0;
   const remainingDays = currentEntitlement 
-    ? currentEntitlement.total_days - currentEntitlement.used_days 
+    ? totalAvailable - currentEntitlement.used_days 
     : 0;
 
   const handleCreateEntitlement = async () => {
@@ -69,9 +77,47 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
       year: entitlementForm.year,
       total_days: entitlementForm.total_days,
       used_days: 0,
+      carried_over_days: entitlementForm.carried_over_days,
     });
     setIsEntitlementOpen(false);
-    setEntitlementForm({ year: currentYear, total_days: 20 });
+    setEntitlementForm({ year: currentYear, total_days: 20, carried_over_days: 0 });
+  };
+
+  const handleCarryOver = async () => {
+    // Find previous year's entitlement
+    const previousYear = currentYear - 1;
+    const previousEntitlement = entitlements.find((e) => e.year === previousYear);
+    
+    if (!previousEntitlement) {
+      toast.error(`Nema prava za godinu ${previousYear}`);
+      return;
+    }
+
+    const remainingFromPrevious = previousEntitlement.total_days + (previousEntitlement.carried_over_days || 0) - previousEntitlement.used_days;
+    
+    if (remainingFromPrevious <= 0) {
+      toast.error('Nema preostalih dana za prijenos');
+      return;
+    }
+
+    if (currentEntitlement) {
+      // Update current year
+      await updateEntitlement.mutateAsync({
+        id: currentEntitlement.id,
+        carried_over_days: (currentEntitlement.carried_over_days || 0) + remainingFromPrevious,
+      });
+    } else {
+      // Create current year with carried over days
+      await createEntitlement.mutateAsync({
+        employee_id: employeeId,
+        year: currentYear,
+        total_days: 20,
+        used_days: 0,
+        carried_over_days: remainingFromPrevious,
+      });
+    }
+    
+    toast.success(`Preneseno ${remainingFromPrevious} dana iz ${previousYear}`);
   };
 
   const handleCreateRequest = async () => {
@@ -112,12 +158,20 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Ukupno dana ({currentYear})</p>
+              <p className="text-sm text-muted-foreground">Osnovni dani ({currentYear})</p>
               <p className="text-3xl font-bold">{currentEntitlement?.total_days ?? 0}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Preneseni dani</p>
+              <p className="text-3xl font-bold text-orange-500">{currentEntitlement?.carried_over_days ?? 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -132,12 +186,32 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Preostalo</p>
+              <p className="text-sm text-muted-foreground">Preostalo ukupno</p>
               <p className="text-3xl font-bold text-primary">{remainingDays}</p>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Carry Over Button */}
+      {entitlements.some(e => e.year === currentYear - 1) && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Prijenos dana iz prošle godine</p>
+                <p className="text-sm text-muted-foreground">
+                  Prenesite neiskorištene dane iz {currentYear - 1} u {currentYear}
+                </p>
+              </div>
+              <Button variant="outline" onClick={handleCarryOver}>
+                <ArrowRight className="h-4 w-4 mr-2" />
+                Prenesi dane
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Entitlements */}
       <Card>
@@ -153,7 +227,8 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Godina</TableHead>
-                <TableHead>Ukupno dana</TableHead>
+                <TableHead>Osnovni</TableHead>
+                <TableHead>Preneseni</TableHead>
                 <TableHead>Iskorišteno</TableHead>
                 <TableHead>Preostalo</TableHead>
               </TableRow>
@@ -161,7 +236,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <TableBody>
               {entitlements.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
                     Nema unesenih prava na godišnji
                   </TableCell>
                 </TableRow>
@@ -170,9 +245,10 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                   <TableRow key={ent.id}>
                     <TableCell className="font-medium">{ent.year}</TableCell>
                     <TableCell>{ent.total_days}</TableCell>
+                    <TableCell className="text-orange-500">{ent.carried_over_days || 0}</TableCell>
                     <TableCell>{ent.used_days}</TableCell>
                     <TableCell className="font-medium text-primary">
-                      {ent.total_days - ent.used_days}
+                      {ent.total_days + (ent.carried_over_days || 0) - ent.used_days}
                     </TableCell>
                   </TableRow>
                 ))
