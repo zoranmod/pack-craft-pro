@@ -155,8 +155,16 @@ export function SickLeaveTab({ employeeId }: SickLeaveTabProps) {
                 sickLeaves.map((sl) => (
                   <TableRow key={sl.id}>
                     <TableCell>
-                      {new Date(sl.start_date).toLocaleDateString('hr-HR')}
-                      {sl.end_date && ` - ${new Date(sl.end_date).toLocaleDateString('hr-HR')}`}
+                      {(() => {
+                        const formatD = (date: string) => {
+                          const d = new Date(date);
+                          const day = d.getDate().toString().padStart(2, '0');
+                          const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                          const year = d.getFullYear();
+                          return `${day}.${month}.${year}.`;
+                        };
+                        return formatD(sl.start_date) + (sl.end_date ? ` - ${formatD(sl.end_date)}` : '');
+                      })()}
                     </TableCell>
                     <TableCell>{sl.days_count || '-'}</TableCell>
                     <TableCell>

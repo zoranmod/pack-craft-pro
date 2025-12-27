@@ -161,7 +161,13 @@ export default function Employees() {
                       <TableCell>{employee.department || '-'}</TableCell>
                       <TableCell className="capitalize">{employee.employment_type}</TableCell>
                       <TableCell>
-                        {new Date(employee.employment_start_date).toLocaleDateString('hr-HR')}
+                        {(() => {
+                          const d = new Date(employee.employment_start_date);
+                          const day = d.getDate().toString().padStart(2, '0');
+                          const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                          const year = d.getFullYear();
+                          return `${day}.${month}.${year}.`;
+                        })()}
                       </TableCell>
                       <TableCell>
                         <Badge

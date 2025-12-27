@@ -128,11 +128,18 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                 <li key={doc.id} className="text-sm">
                   <span className="font-medium">{doc.document_name}</span>
                   {' - '}
-                  {isExpired(doc.expiry_date) ? (
-                    <span className="text-destructive">Isteklo {new Date(doc.expiry_date!).toLocaleDateString('hr-HR')}</span>
-                  ) : (
-                    <span className="text-yellow-600">Ističe {new Date(doc.expiry_date!).toLocaleDateString('hr-HR')}</span>
-                  )}
+                  {(() => {
+                    const d = new Date(doc.expiry_date!);
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const year = d.getFullYear();
+                    const formatted = `${day}.${month}.${year}.`;
+                    return isExpired(doc.expiry_date) ? (
+                      <span className="text-destructive">Isteklo {formatted}</span>
+                    ) : (
+                      <span className="text-yellow-600">Ističe {formatted}</span>
+                    );
+                  })()}
                 </li>
               ))}
             </ul>
@@ -189,7 +196,13 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                               : ''
                           }
                         >
-                          {new Date(doc.expiry_date).toLocaleDateString('hr-HR')}
+                          {(() => {
+                            const d = new Date(doc.expiry_date);
+                            const day = d.getDate().toString().padStart(2, '0');
+                            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                            const year = d.getFullYear();
+                            return `${day}.${month}.${year}.`;
+                          })()}
                           {isExpired(doc.expiry_date) && ' (isteklo)'}
                           {isExpiringSoon(doc.expiry_date) && ' (uskoro)'}
                         </span>
