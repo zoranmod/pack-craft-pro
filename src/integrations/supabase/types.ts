@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           iban: string | null
           id: string
+          logo_url: string | null
           oib: string | null
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           iban?: string | null
           id?: string
+          logo_url?: string | null
           oib?: string | null
           updated_at?: string
           user_id: string
@@ -41,6 +43,7 @@ export type Database = {
           created_at?: string
           iban?: string | null
           id?: string
+          logo_url?: string | null
           oib?: string | null
           updated_at?: string
           user_id?: string

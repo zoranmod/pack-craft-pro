@@ -9,6 +9,7 @@ interface CompanySettings {
   address: string;
   oib: string;
   iban: string;
+  logo_url?: string;
 }
 
 interface UserProfile {
@@ -60,6 +61,7 @@ export function useSaveCompanySettings() {
             address: settings.address,
             oib: settings.oib,
             iban: settings.iban,
+            logo_url: settings.logo_url,
           })
           .eq('user_id', user.id);
 
@@ -73,6 +75,7 @@ export function useSaveCompanySettings() {
             address: settings.address,
             oib: settings.oib,
             iban: settings.iban,
+            logo_url: settings.logo_url,
           });
 
         if (error) throw error;
@@ -84,6 +87,59 @@ export function useSaveCompanySettings() {
     },
     onError: (error) => {
       toast.error('Greška pri spremanju: ' + error.message);
+    },
+  });
+}
+
+export function useUploadCompanyLogo() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/logo.${fileExt}`;
+
+      // Upload file
+      const { error: uploadError } = await supabase.storage
+        .from('company-logos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('company-logos')
+        .getPublicUrl(fileName);
+
+      // Update company settings with logo URL
+      const { data: existing } = await supabase
+        .from('company_settings')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('company_settings')
+          .update({ logo_url: publicUrl })
+          .eq('user_id', user.id);
+      } else {
+        await supabase
+          .from('company_settings')
+          .insert({ user_id: user.id, logo_url: publicUrl });
+      }
+
+      return publicUrl;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-settings'] });
+      toast.success('Logo uspješno učitan!');
+    },
+    onError: (error) => {
+      toast.error('Greška pri učitavanju loga: ' + error.message);
     },
   });
 }

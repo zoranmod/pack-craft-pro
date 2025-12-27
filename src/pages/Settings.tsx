@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Building2, User, Bell, Database, Loader2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Building2, User, Bell, Database, Loader2, Upload, X } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import {
   useSaveCompanySettings,
   useUserProfile,
   useSaveUserProfile,
+  useUploadCompanyLogo,
 } from '@/hooks/useSettings';
 
 const Settings = () => {
@@ -20,11 +21,14 @@ const Settings = () => {
   // Company settings
   const { data: companyData, isLoading: companyLoading } = useCompanySettings();
   const saveCompany = useSaveCompanySettings();
+  const uploadLogo = useUploadCompanyLogo();
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [company, setCompany] = useState({
     company_name: '',
     address: '',
     oib: '',
     iban: '',
+    logo_url: '',
   });
 
   // User profile
@@ -43,6 +47,7 @@ const Settings = () => {
         address: companyData.address || '',
         oib: companyData.oib || '',
         iban: companyData.iban || '',
+        logo_url: companyData.logo_url || '',
       });
     }
   }, [companyData]);
@@ -62,6 +67,24 @@ const Settings = () => {
 
   const handleSaveProfile = () => {
     saveProfile.mutate(profile);
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        return; // Max 2MB
+      }
+      uploadLogo.mutate(file, {
+        onSuccess: (url) => {
+          setCompany({ ...company, logo_url: url });
+        },
+      });
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setCompany({ ...company, logo_url: '' });
   };
 
   return (
@@ -88,6 +111,57 @@ const Settings = () => {
             </div>
           ) : (
             <>
+              {/* Logo Upload */}
+              <div className="mb-6">
+                <Label>Logo tvrtke</Label>
+                <div className="mt-2 flex items-center gap-4">
+                  {company.logo_url ? (
+                    <div className="relative">
+                      <img 
+                        src={company.logo_url} 
+                        alt="Logo tvrtke" 
+                        className="h-20 w-20 object-contain rounded-lg border border-border bg-muted"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-20 w-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/30">
+                      <Building2 className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadLogo.isPending}
+                    >
+                      {uploadLogo.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="mr-2 h-4 w-4" />
+                      )}
+                      {company.logo_url ? 'Promijeni logo' : 'Učitaj logo'}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG do 2MB</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Label htmlFor="companyName">Naziv tvrtke</Label>
