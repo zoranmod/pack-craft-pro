@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Nadzorna ploča', path: '/' },
+  { icon: LayoutDashboard, label: 'Početna stranica', path: '/' },
   { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
   { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
   { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },

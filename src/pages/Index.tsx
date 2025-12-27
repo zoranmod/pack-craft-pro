@@ -2,7 +2,6 @@ import { FileText, Package, Truck, Wrench } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
-import { QuickActions } from '@/components/dashboard/QuickActions';
 import { useDocuments } from '@/hooks/useDocuments';
 
 const Index = () => {
@@ -17,8 +16,8 @@ const Index = () => {
 
   return (
     <MainLayout 
-      title="Nadzorna ploča" 
-      subtitle="Pregled i upravljanje dokumentima"
+      title="Početna stranica" 
+      subtitle="Dobrodošli u sustav"
     >
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -48,15 +47,8 @@ const Index = () => {
         />
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RecentDocuments documents={documents} />
-        </div>
-        <div>
-          <QuickActions />
-        </div>
-      </div>
+      {/* Main Content */}
+      <RecentDocuments documents={documents} />
     </MainLayout>
   );
 };
