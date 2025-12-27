@@ -5,7 +5,6 @@ import {
   FileText, 
   FilePlus, 
   Truck, 
-  Wrench, 
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -18,8 +17,7 @@ const menuItems = [
   { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
   { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
   { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },
-  { icon: Truck, label: 'Nalog za dostavu', path: '/documents/new?type=nalog-dostava' },
-  { icon: Wrench, label: 'Nalog za montažu', path: '/documents/new?type=nalog-montaza' },
+  { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
 ];
 
 export function Sidebar() {

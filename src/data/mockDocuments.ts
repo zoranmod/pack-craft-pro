@@ -42,8 +42,8 @@ export const mockDocuments: Document[] = [
   },
   {
     id: '3',
-    type: 'nalog-dostava',
-    number: 'DOS-2024-042',
+    type: 'nalog-dostava-montaza',
+    number: 'NDM-2024-042',
     date: '2024-12-21',
     status: 'pending',
     clientName: 'Stambena zgrada Zeleni Gaj',
@@ -60,8 +60,8 @@ export const mockDocuments: Document[] = [
   },
   {
     id: '4',
-    type: 'nalog-montaza',
-    number: 'MON-2024-028',
+    type: 'nalog-dostava-montaza',
+    number: 'NDM-2024-028',
     date: '2024-12-22',
     status: 'draft',
     clientName: 'Petar Horvat',
