@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, Save, ArrowLeft, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
+import { ContractArticleFormData } from '@/types/contractArticle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,8 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCreateDocument } from '@/hooks/useDocuments';
+import { useContractArticleTemplates, useSaveDocumentContractArticles, useInitializeDefaultTemplates } from '@/hooks/useContractArticles';
 import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
 import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
+import { ContractArticlesEditor } from '@/components/contracts/ContractArticlesEditor';
 import { Client } from '@/hooks/useClients';
 import { Article } from '@/hooks/useArticles';
 
@@ -60,8 +63,51 @@ export function DocumentForm() {
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
   ]);
 
+  // Contract articles state
+  const { data: articleTemplates = [] } = useContractArticleTemplates();
+  const initializeTemplates = useInitializeDefaultTemplates();
+  const saveDocumentArticles = useSaveDocumentContractArticles();
+  const [contractArticles, setContractArticles] = useState<ContractArticleFormData[]>([]);
+  const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({});
+
+  // Initialize contract articles when templates load (for ugovor type)
+  useEffect(() => {
+    if (formData.type === 'ugovor' && articleTemplates.length === 0) {
+      initializeTemplates.mutate();
+    }
+  }, [formData.type, articleTemplates.length]);
+
+  useEffect(() => {
+    if (formData.type === 'ugovor' && articleTemplates.length > 0 && contractArticles.length === 0) {
+      setContractArticles(
+        articleTemplates
+          .filter(t => t.is_active)
+          .map(t => ({
+            article_number: t.article_number,
+            title: t.title,
+            content: t.content,
+            is_selected: true,
+          }))
+      );
+    }
+  }, [formData.type, articleTemplates]);
+
+  // Update placeholder values based on form data
+  useEffect(() => {
+    setPlaceholderValues(prev => ({
+      ...prev,
+      adresa_kupca: formData.clientAddress,
+      ukupna_cijena: totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 }),
+      predujam: prev.predujam || '',
+      ostatak: prev.predujam ? (totalAmount - parseFloat(prev.predujam.replace(',', '.') || '0')).toLocaleString('hr-HR', { minimumFractionDigits: 2 }) : '',
+      datum_ugovora: new Date().toLocaleDateString('hr-HR'),
+      mjesto_ugovora: prev.mjesto_ugovora || '',
+    }));
+  }, [formData.clientAddress, totalAmount]);
+
   // Document type specific rules - ponuda, račun and ugovor have prices
   const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(formData.type);
+  const isContract = formData.type === 'ugovor';
 
   const addItem = () => {
     setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);
@@ -95,6 +141,18 @@ export function DocumentForm() {
   }, 0) : 0;
   const totalAmount = hasPrices ? items.reduce((sum, item) => sum + item.total, 0) : 0;
 
+  const handlePlaceholderChange = (key: string, value: string) => {
+    setPlaceholderValues(prev => {
+      const updated = { ...prev, [key]: value };
+      // Auto-calculate ostatak when predujam changes
+      if (key === 'predujam') {
+        const predujamValue = parseFloat(value.replace(',', '.') || '0');
+        updated.ostatak = (totalAmount - predujamValue).toLocaleString('hr-HR', { minimumFractionDigits: 2 });
+      }
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -107,7 +165,8 @@ export function DocumentForm() {
       return;
     }
 
-    await createDocument.mutateAsync({
+    // Create the document first
+    const document = await createDocument.mutateAsync({
       type: formData.type as DocumentType,
       clientName: formData.clientName,
       clientOib: formData.clientOib || undefined,
@@ -117,6 +176,30 @@ export function DocumentForm() {
       notes: formData.notes || undefined,
       items,
     });
+
+    // If it's a contract, save the contract articles
+    if (isContract && document?.id) {
+      const selectedArticles = contractArticles
+        .filter(a => a.is_selected)
+        .map((article, index) => {
+          // Replace placeholders in content
+          let content = article.content;
+          Object.entries(placeholderValues).forEach(([key, value]) => {
+            content = content.replace(new RegExp(`\\{${key}\\}`, 'g'), value || `{${key}}`);
+          });
+          return {
+            article_number: index + 1,
+            title: article.title,
+            content,
+            sort_order: index,
+          };
+        });
+
+      await saveDocumentArticles.mutateAsync({
+        documentId: document.id,
+        articles: selectedArticles,
+      });
+    }
     
     navigate('/documents');
   };

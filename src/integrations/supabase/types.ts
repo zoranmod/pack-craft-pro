@@ -143,6 +143,77 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_article_templates: {
+        Row: {
+          article_number: number
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_number: number
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_number?: number
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      document_contract_articles: {
+        Row: {
+          article_number: number
+          content: string
+          created_at: string
+          document_id: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          article_number: number
+          content: string
+          created_at?: string
+          document_id: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          article_number?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_contract_articles_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_items: {
         Row: {
           created_at: string

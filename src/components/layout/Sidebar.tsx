@@ -13,7 +13,8 @@ import {
   PackageSearch,
   UserCircle,
   FileSignature,
-  Receipt
+  Receipt,
+  BookText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
@@ -36,6 +37,7 @@ const menuItems = [
   { icon: Users, label: 'Klijenti', path: '/clients' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
   { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },
+  { icon: BookText, label: 'Predlošci ugovora', path: '/contract-templates' },
 ];
 
 export function Sidebar() {
