@@ -12,6 +12,8 @@ import DocumentView from "./pages/DocumentView";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Clients from "./pages/Clients";
+import Articles from "./pages/Articles";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
             <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
             <Route path="/documents/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
+            <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
