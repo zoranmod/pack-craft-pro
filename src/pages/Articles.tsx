@@ -37,6 +37,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, Article, CreateArticleData } from '@/hooks/useArticles';
 import { ArticleImportDialog } from '@/components/articles/ArticleImportDialog';
 
@@ -198,15 +203,48 @@ const Articles = () => {
                     <TableHead className="text-right">Akcije</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+<TableBody>
                   {articles.map((article) => (
                     <TableRow key={article.id}>
-                      <TableCell className="font-mono text-muted-foreground">
-                        {article.code || '-'}
+                      <TableCell className="font-mono text-muted-foreground min-w-[80px] max-w-[120px]">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="block whitespace-normal break-words cursor-default">
+                              {article.code || '-'}
+                            </span>
+                          </TooltipTrigger>
+                          {article.code && (
+                            <TooltipContent>
+                              <p>{article.code}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </TableCell>
-                      <TableCell className="font-medium max-w-[200px] truncate">{article.name}</TableCell>
-                      <TableCell className="font-mono text-muted-foreground text-xs">
-                        {article.barcode || '-'}
+                      <TableCell className="font-medium min-w-[150px] max-w-[300px]">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="block whitespace-normal break-words cursor-default">
+                              {article.name}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[400px]">
+                            <p>{article.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="font-mono text-muted-foreground text-xs min-w-[100px] max-w-[150px]">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="block whitespace-normal break-words cursor-default">
+                              {article.barcode || '-'}
+                            </span>
+                          </TooltipTrigger>
+                          {article.barcode && (
+                            <TooltipContent>
+                              <p>{article.barcode}</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </TableCell>
                       <TableCell>{article.unit}</TableCell>
                       <TableCell className="text-right text-muted-foreground">
