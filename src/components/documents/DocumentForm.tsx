@@ -92,6 +92,19 @@ export function DocumentForm() {
     }
   }, [formData.type, articleTemplates]);
 
+  // Document type specific rules - ponuda, račun and ugovor have prices
+  const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(formData.type);
+  const isContract = formData.type === 'ugovor';
+
+  // Calculate totals BEFORE the useEffect that uses them
+  const subtotalAmount = hasPrices ? items.reduce((sum, item) => sum + item.subtotal, 0) : 0;
+  const totalDiscount = hasPrices ? items.reduce((sum, item) => sum + (item.subtotal * (item.discount / 100)), 0) : 0;
+  const totalPdv = hasPrices ? items.reduce((sum, item) => {
+    const afterDiscount = item.subtotal - (item.subtotal * (item.discount / 100));
+    return sum + (afterDiscount * (item.pdv / 100));
+  }, 0) : 0;
+  const totalAmount = hasPrices ? items.reduce((sum, item) => sum + item.total, 0) : 0;
+
   // Update placeholder values based on form data
   useEffect(() => {
     setPlaceholderValues(prev => ({
@@ -104,10 +117,6 @@ export function DocumentForm() {
       mjesto_ugovora: prev.mjesto_ugovora || '',
     }));
   }, [formData.clientAddress, totalAmount]);
-
-  // Document type specific rules - ponuda, račun and ugovor have prices
-  const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(formData.type);
-  const isContract = formData.type === 'ugovor';
 
   const addItem = () => {
     setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);
@@ -132,14 +141,6 @@ export function DocumentForm() {
     
     setItems(newItems);
   };
-
-  const subtotalAmount = hasPrices ? items.reduce((sum, item) => sum + item.subtotal, 0) : 0;
-  const totalDiscount = hasPrices ? items.reduce((sum, item) => sum + (item.subtotal * (item.discount / 100)), 0) : 0;
-  const totalPdv = hasPrices ? items.reduce((sum, item) => {
-    const afterDiscount = item.subtotal - (item.subtotal * (item.discount / 100));
-    return sum + (afterDiscount * (item.pdv / 100));
-  }, 0) : 0;
-  const totalAmount = hasPrices ? items.reduce((sum, item) => sum + item.total, 0) : 0;
 
   const handlePlaceholderChange = (key: string, value: string) => {
     setPlaceholderValues(prev => {
