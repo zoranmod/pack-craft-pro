@@ -18,13 +18,9 @@ export function ArticleAutocomplete({
 }: ArticleAutocompleteProps) {
   const [search, setSearch] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
-  const { data: articles = [], isLoading } = useArticles();
+  const { data, isLoading } = useArticles({ search, pageSize: 20 });
+  const articles = data?.articles || [];
   const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const filteredArticles = articles.filter(article =>
-    article.name.toLowerCase().includes(search.toLowerCase()) ||
-    (article.code && article.code.toLowerCase().includes(search.toLowerCase()))
-  );
 
   useEffect(() => {
     setSearch(value);
@@ -67,9 +63,9 @@ export function ArticleAutocomplete({
             <div className="p-3 text-sm text-muted-foreground text-center">
               Učitavanje...
             </div>
-          ) : filteredArticles.length > 0 ? (
+          ) : articles.length > 0 ? (
             <div className="py-1">
-              {filteredArticles.map((article) => (
+              {articles.map((article) => (
                 <button
                   key={article.id}
                   type="button"

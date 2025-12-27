@@ -31,19 +31,49 @@ export interface CreateArticleData {
   stock?: number;
 }
 
-export function useArticles() {
+export interface ArticlesParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
+export interface ArticlesResult {
+  articles: Article[];
+  totalCount: number;
+  totalPages: number;
+}
+
+export function useArticles(params: ArticlesParams = {}) {
   const { user } = useAuth();
+  const { page = 1, pageSize = 50, search = '' } = params;
 
   return useQuery({
-    queryKey: ['articles'],
-    queryFn: async () => {
-      const { data, error } = await supabase
+    queryKey: ['articles', page, pageSize, search],
+    queryFn: async (): Promise<ArticlesResult> => {
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = supabase
         .from('articles')
-        .select('*')
-        .order('name', { ascending: true });
+        .select('*', { count: 'exact' });
+
+      // Server-side search
+      if (search.trim()) {
+        query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%,barcode.ilike.%${search}%`);
+      }
+
+      const { data, error, count } = await query
+        .order('name', { ascending: true })
+        .range(from, to);
 
       if (error) throw error;
-      return data as Article[];
+      
+      const totalCount = count || 0;
+      return {
+        articles: data as Article[],
+        totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+      };
     },
     enabled: !!user,
   });
