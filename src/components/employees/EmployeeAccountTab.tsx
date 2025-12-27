@@ -90,7 +90,10 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
         });
       }
 
-      toast.success('Korisnički račun uspješno kreiran');
+      const successMessage = data?.linkedExisting 
+        ? 'Postojeći račun uspješno povezan sa zaposlenikom' 
+        : 'Korisnički račun uspješno kreiran';
+      toast.success(successMessage);
       setIsDialogOpen(false);
       setPassword('');
       setConfirmPassword('');
