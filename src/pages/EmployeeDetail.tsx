@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +24,8 @@ import { LeaveTab } from '@/components/employees/LeaveTab';
 import { SickLeaveTab } from '@/components/employees/SickLeaveTab';
 import { WorkClothingTab } from '@/components/employees/WorkClothingTab';
 import { DocumentsTab } from '@/components/employees/DocumentsTab';
+import { EmployeeAccountTab } from '@/components/employees/EmployeeAccountTab';
+import { EmployeePermissionsTab } from '@/components/employees/EmployeePermissionsTab';
 
 export default function EmployeeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -113,18 +114,27 @@ export default function EmployeeDetail() {
           {employee.department && <Badge variant="outline">{employee.department}</Badge>}
         </div>
 
-        {/* Tabs */}
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="info">Osnovni podaci</TabsTrigger>
-            <TabsTrigger value="leave">Godišnji odmor</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="info">Podaci</TabsTrigger>
+            <TabsTrigger value="account">Račun</TabsTrigger>
+            <TabsTrigger value="permissions">Dozvole</TabsTrigger>
+            <TabsTrigger value="leave">Godišnji</TabsTrigger>
             <TabsTrigger value="sick">Bolovanja</TabsTrigger>
-            <TabsTrigger value="clothing">Radna odjeća</TabsTrigger>
+            <TabsTrigger value="clothing">Odjeća</TabsTrigger>
             <TabsTrigger value="documents">Dokumenti</TabsTrigger>
           </TabsList>
 
           <TabsContent value="info" className="mt-6">
             <EmployeeInfoTab employee={employee} />
+          </TabsContent>
+
+          <TabsContent value="account" className="mt-6">
+            <EmployeeAccountTab employee={employee} />
+          </TabsContent>
+
+          <TabsContent value="permissions" className="mt-6">
+            <EmployeePermissionsTab employeeId={employee.id} hasAccount={!!employee.auth_user_id} />
           </TabsContent>
 
           <TabsContent value="leave" className="mt-6">
