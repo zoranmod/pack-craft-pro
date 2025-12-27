@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UserPlus, Mail, Key, AlertCircle, Check, Loader2 } from 'lucide-react';
+import { UserPlus, Mail, Key, AlertCircle, Check, Loader2, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ interface EmployeeAccountTabProps {
 export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
   const { updateEmployee } = useEmployees();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -105,6 +106,48 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
     }
   };
 
+  const handleResetPassword = async () => {
+    setError('');
+
+    if (password.length < 8) {
+      setError('Lozinka mora imati najmanje 8 znakova.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Lozinke se ne podudaraju.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Call edge function to reset password (reuse create-employee-account which updates existing users)
+      const { data, error: fnError } = await supabase.functions.invoke('create-employee-account', {
+        body: {
+          email: employee.email,
+          password,
+          employeeId: employee.id,
+          firstName: employee.first_name,
+          lastName: employee.last_name,
+        },
+      });
+
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('Lozinka uspješno resetirana');
+      setIsResetDialogOpen(false);
+      setPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      console.error('Error resetting password:', err);
+      setError(err.message || 'Greška pri resetiranju lozinke');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Account Status Card */}
@@ -147,6 +190,14 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
                   Ako je zaboravio lozinku, možete mu resetirati pristup.
                 </AlertDescription>
               </Alert>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsResetDialogOpen(true)}
+                className="w-full sm:w-auto"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Resetiraj lozinku
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -245,6 +296,75 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Kreiraj račun
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resetiraj lozinku</DialogTitle>
+            <DialogDescription>
+              Postavite novu lozinku za {employee.first_name} {employee.last_name}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="resetPassword">Nova lozinka</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="resetPassword"
+                  type="text"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Unesite novu lozinku"
+                />
+                <Button type="button" variant="outline" onClick={generatePassword}>
+                  <Key className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resetConfirmPassword">Potvrdite lozinku</Label>
+              <Input
+                id="resetConfirmPassword"
+                type="text"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Ponovite lozinku"
+              />
+            </div>
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Zabilježite lozinku i proslijedite je zaposleniku na siguran način.
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsResetDialogOpen(false)}>
+                Odustani
+              </Button>
+              <Button onClick={handleResetPassword} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Resetiranje...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Resetiraj lozinku
                   </>
                 )}
               </Button>
