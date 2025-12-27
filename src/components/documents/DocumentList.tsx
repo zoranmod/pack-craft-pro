@@ -29,6 +29,8 @@ const typeIcons: Record<DocumentType, string> = {
   'otpremnica': '📦',
   'ponuda': '📄',
   'nalog-dostava-montaza': '🚚',
+  'racun': '🧾',
+  'ugovor': '📝',
 };
 
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
