@@ -247,6 +247,307 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_documents: {
+        Row: {
+          created_at: string
+          document_name: string
+          document_type: string
+          employee_id: string
+          expiry_date: string | null
+          file_url: string | null
+          id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_name: string
+          document_type: string
+          employee_id: string
+          expiry_date?: string | null
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_name?: string
+          document_type?: string
+          employee_id?: string
+          expiry_date?: string | null
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_documents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_leave_entitlements: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          total_days: number
+          updated_at: string
+          used_days: number
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          total_days?: number
+          updated_at?: string
+          used_days?: number
+          year: number
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          total_days?: number
+          updated_at?: string
+          used_days?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_leave_entitlements_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_leave_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          days_requested: number
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type: string
+          reason: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          days_requested: number
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type?: string
+          reason?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          days_requested?: number
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type?: string
+          reason?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_leave_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_sick_leaves: {
+        Row: {
+          created_at: string
+          days_count: number | null
+          document_number: string | null
+          employee_id: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          sick_leave_type: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          days_count?: number | null
+          document_number?: string | null
+          employee_id: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          sick_leave_type?: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          days_count?: number | null
+          document_number?: string | null
+          employee_id?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          sick_leave_type?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_sick_leaves_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_work_clothing: {
+        Row: {
+          assigned_date: string
+          condition: string
+          created_at: string
+          employee_id: string
+          id: string
+          item_name: string
+          notes: string | null
+          quantity: number
+          return_date: string | null
+          size: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_date?: string
+          condition?: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          item_name: string
+          notes?: string | null
+          quantity?: number
+          return_date?: string | null
+          size?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_date?: string
+          condition?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          item_name?: string
+          notes?: string | null
+          quantity?: number
+          return_date?: string | null
+          size?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_work_clothing_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          department: string | null
+          email: string | null
+          employment_end_date: string | null
+          employment_start_date: string
+          employment_type: string
+          first_name: string
+          id: string
+          last_name: string
+          notes: string | null
+          oib: string | null
+          phone: string | null
+          position: string | null
+          postal_code: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          department?: string | null
+          email?: string | null
+          employment_end_date?: string | null
+          employment_start_date: string
+          employment_type?: string
+          first_name: string
+          id?: string
+          last_name: string
+          notes?: string | null
+          oib?: string | null
+          phone?: string | null
+          position?: string | null
+          postal_code?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          department?: string | null
+          email?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string
+          employment_type?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          oib?: string | null
+          phone?: string | null
+          position?: string | null
+          postal_code?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
