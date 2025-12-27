@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut } from 'lucide-react';
+import { Search, User, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { NotificationDropdown } from './NotificationDropdown';
 
 interface HeaderProps {
   title: string;
@@ -41,10 +42,7 @@ export function Header({ title, subtitle }: HeaderProps) {
           </div>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
-          </Button>
+          <NotificationDropdown />
 
           {/* User Dropdown */}
           <DropdownMenu>
