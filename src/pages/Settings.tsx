@@ -1,12 +1,69 @@
-import { Building2, User, Bell, Shield, Database } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Building2, User, Bell, Database, Loader2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  useCompanySettings,
+  useSaveCompanySettings,
+  useUserProfile,
+  useSaveUserProfile,
+} from '@/hooks/useSettings';
 
 const Settings = () => {
+  const { user } = useAuth();
+  
+  // Company settings
+  const { data: companyData, isLoading: companyLoading } = useCompanySettings();
+  const saveCompany = useSaveCompanySettings();
+  const [company, setCompany] = useState({
+    company_name: '',
+    address: '',
+    oib: '',
+    iban: '',
+  });
+
+  // User profile
+  const { data: profileData, isLoading: profileLoading } = useUserProfile();
+  const saveProfile = useSaveUserProfile();
+  const [profile, setProfile] = useState({
+    first_name: '',
+    last_name: '',
+  });
+
+  // Sync with fetched data
+  useEffect(() => {
+    if (companyData) {
+      setCompany({
+        company_name: companyData.company_name || '',
+        address: companyData.address || '',
+        oib: companyData.oib || '',
+        iban: companyData.iban || '',
+      });
+    }
+  }, [companyData]);
+
+  useEffect(() => {
+    if (profileData) {
+      setProfile({
+        first_name: profileData.first_name || '',
+        last_name: profileData.last_name || '',
+      });
+    }
+  }, [profileData]);
+
+  const handleSaveCompany = () => {
+    saveCompany.mutate(company);
+  };
+
+  const handleSaveProfile = () => {
+    saveProfile.mutate(profile);
+  };
+
   return (
     <MainLayout 
       title="Postavke" 
@@ -25,28 +82,64 @@ const Settings = () => {
             </div>
           </div>
           
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <Label htmlFor="companyName">Naziv tvrtke</Label>
-              <Input id="companyName" defaultValue="Vaša tvrtka d.o.o." className="mt-1.5" />
+          {companyLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-            <div className="sm:col-span-2">
-              <Label htmlFor="address">Adresa</Label>
-              <Input id="address" defaultValue="Ulica 123, 10000 Zagreb" className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="oib">OIB</Label>
-              <Input id="oib" defaultValue="12345678901" className="mt-1.5" />
-            </div>
-            <div>
-              <Label htmlFor="iban">IBAN</Label>
-              <Input id="iban" defaultValue="HR1234567890123456789" className="mt-1.5" />
-            </div>
-          </div>
-          
-          <div className="mt-6">
-            <Button>Spremi promjene</Button>
-          </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="companyName">Naziv tvrtke</Label>
+                  <Input 
+                    id="companyName" 
+                    value={company.company_name}
+                    onChange={(e) => setCompany({ ...company, company_name: e.target.value })}
+                    placeholder="Unesite naziv tvrtke"
+                    className="mt-1.5" 
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="address">Adresa</Label>
+                  <Input 
+                    id="address" 
+                    value={company.address}
+                    onChange={(e) => setCompany({ ...company, address: e.target.value })}
+                    placeholder="Unesite adresu"
+                    className="mt-1.5" 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="oib">OIB</Label>
+                  <Input 
+                    id="oib" 
+                    value={company.oib}
+                    onChange={(e) => setCompany({ ...company, oib: e.target.value })}
+                    placeholder="12345678901"
+                    maxLength={11}
+                    className="mt-1.5" 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="iban">IBAN</Label>
+                  <Input 
+                    id="iban" 
+                    value={company.iban}
+                    onChange={(e) => setCompany({ ...company, iban: e.target.value })}
+                    placeholder="HR1234567890123456789"
+                    className="mt-1.5" 
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <Button onClick={handleSaveCompany} disabled={saveCompany.isPending}>
+                  {saveCompany.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Spremi promjene
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* User Profile */}
@@ -61,24 +154,54 @@ const Settings = () => {
             </div>
           </div>
           
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="firstName">Ime</Label>
-              <Input id="firstName" defaultValue="Ivan" className="mt-1.5" />
+          {profileLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-            <div>
-              <Label htmlFor="lastName">Prezime</Label>
-              <Input id="lastName" defaultValue="Horvat" className="mt-1.5" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="ivan@tvrtka.hr" className="mt-1.5" />
-            </div>
-          </div>
-          
-          <div className="mt-6">
-            <Button>Spremi promjene</Button>
-          </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="firstName">Ime</Label>
+                  <Input 
+                    id="firstName" 
+                    value={profile.first_name}
+                    onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+                    placeholder="Unesite ime"
+                    className="mt-1.5" 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Prezime</Label>
+                  <Input 
+                    id="lastName" 
+                    value={profile.last_name}
+                    onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+                    placeholder="Unesite prezime"
+                    className="mt-1.5" 
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={user?.email || ''}
+                    disabled
+                    className="mt-1.5 bg-muted" 
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Email se ne može promijeniti</p>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <Button onClick={handleSaveProfile} disabled={saveProfile.isPending}>
+                  {saveProfile.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Spremi promjene
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Notifications */}
