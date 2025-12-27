@@ -48,6 +48,25 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
     setConfirmPassword(pass);
   };
 
+  const validatePassword = (pwd: string): string | null => {
+    if (pwd.length < 10) {
+      return 'Lozinka mora imati najmanje 10 znakova.';
+    }
+    if (pwd.length > 128) {
+      return 'Lozinka ne smije imati više od 128 znakova.';
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return 'Lozinka mora sadržavati barem jedno veliko slovo.';
+    }
+    if (!/[a-z]/.test(pwd)) {
+      return 'Lozinka mora sadržavati barem jedno malo slovo.';
+    }
+    if (!/[0-9]/.test(pwd)) {
+      return 'Lozinka mora sadržavati barem jedan broj.';
+    }
+    return null;
+  };
+
   const handleCreateAccount = async () => {
     setError('');
 
@@ -56,8 +75,9 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Lozinka mora imati najmanje 8 znakova.');
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
@@ -109,8 +129,9 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
   const handleResetPassword = async () => {
     setError('');
 
-    if (password.length < 8) {
-      setError('Lozinka mora imati najmanje 8 znakova.');
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
