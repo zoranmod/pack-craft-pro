@@ -49,8 +49,7 @@ const generateDocumentNumber = (type: DocumentType) => {
   const prefixes: Record<DocumentType, string> = {
     'otpremnica': 'OTP',
     'ponuda': 'PON',
-    'nalog-dostava': 'DOS',
-    'nalog-montaza': 'MON',
+    'nalog-dostava-montaza': 'NDM',
   };
   const year = new Date().getFullYear();
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');

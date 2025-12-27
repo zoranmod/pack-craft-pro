@@ -56,24 +56,15 @@ export function DocumentForm() {
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
   ]);
 
-  // Document type specific rules
+  // Document type specific rules - only "ponuda" has prices
   const hasPrices = formData.type === 'ponuda';
-  const isSingleItemOnly = formData.type === 'nalog-dostava' || formData.type === 'nalog-montaza';
-
-  // When switching to single-item type, keep only first item
-  useEffect(() => {
-    if (isSingleItemOnly && items.length > 1) {
-      setItems([items[0]]);
-    }
-  }, [isSingleItemOnly, items.length]);
 
   const addItem = () => {
-    if (isSingleItemOnly) return;
     setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);
   };
 
   const removeItem = (index: number) => {
-    if (items.length > 1 && !isSingleItemOnly) {
+    if (items.length > 1) {
       setItems(items.filter((_, i) => i !== index));
     }
   };
@@ -230,15 +221,11 @@ export function DocumentForm() {
           {/* Items */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-foreground">
-                {isSingleItemOnly ? 'Stavka' : 'Stavke'}
-              </h2>
-              {!isSingleItemOnly && (
-                <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Dodaj stavku
-                </Button>
-              )}
+              <h2 className="font-semibold text-foreground">Stavke</h2>
+              <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Dodaj stavku
+              </Button>
             </div>
             
             <div className="space-y-4">
@@ -356,7 +343,7 @@ export function DocumentForm() {
                   )}
 
                   {/* Delete button for non-price types with multiple items */}
-                  {!hasPrices && !isSingleItemOnly && (
+                  {!hasPrices && (
                     <div className="flex justify-end">
                       <Button
                         type="button"
@@ -397,12 +384,10 @@ export function DocumentForm() {
                 <span className="text-muted-foreground">Vrsta dokumenta</span>
                 <span className="font-medium text-foreground">{documentTypeLabels[formData.type]}</span>
               </div>
-              {!isSingleItemOnly && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Broj stavki</span>
-                  <span className="font-medium text-foreground">{items.filter(i => i.name).length}</span>
-                </div>
-              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Broj stavki</span>
+                <span className="font-medium text-foreground">{items.filter(i => i.name).length}</span>
+              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Datum</span>
                 <span className="font-medium text-foreground">

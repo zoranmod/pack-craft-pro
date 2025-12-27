@@ -28,8 +28,7 @@ const statusStyles: Record<string, string> = {
 const typeIcons: Record<DocumentType, string> = {
   'otpremnica': '📦',
   'ponuda': '📄',
-  'nalog-dostava': '🚚',
-  'nalog-montaza': '🔧',
+  'nalog-dostava-montaza': '🚚',
 };
 
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {

@@ -1,4 +1,4 @@
-export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava' | 'nalog-montaza';
+export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza';
 
 export type DocumentStatus = 'draft' | 'pending' | 'completed' | 'cancelled';
 
@@ -35,8 +35,7 @@ export interface Document {
 export const documentTypeLabels: Record<DocumentType, string> = {
   'otpremnica': 'Otpremnica',
   'ponuda': 'Ponuda',
-  'nalog-dostava': 'Nalog za dostavu',
-  'nalog-montaza': 'Nalog za montažu',
+  'nalog-dostava-montaza': 'Nalog za dostavu i montažu',
 };
 
 export const documentStatusLabels: Record<DocumentStatus, string> = {
