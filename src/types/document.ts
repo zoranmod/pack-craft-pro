@@ -14,6 +14,14 @@ export interface DocumentItem {
   total: number; // konačni iznos s rabatom i PDV-om
 }
 
+export interface DocumentContractArticle {
+  id: string;
+  articleNumber: number;
+  title: string;
+  content: string;
+  sortOrder: number;
+}
+
 export interface Document {
   id: string;
   type: DocumentType;
@@ -30,6 +38,7 @@ export interface Document {
   totalAmount: number;
   createdAt: string;
   updatedAt: string;
+  contractArticles?: DocumentContractArticle[];
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {

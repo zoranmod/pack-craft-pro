@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { Document, DocumentItem, DocumentType, DocumentStatus } from '@/types/document';
+import { Document, DocumentItem, DocumentType, DocumentStatus, DocumentContractArticle } from '@/types/document';
 import { toast } from 'sonner';
 
 interface CreateDocumentData {
@@ -16,7 +16,7 @@ interface CreateDocumentData {
 }
 
 // Convert database row to Document type
-const mapDbToDocument = (row: any, items: any[]): Document => ({
+const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Document => ({
   id: row.id,
   type: row.type as DocumentType,
   number: row.number,
@@ -42,6 +42,13 @@ const mapDbToDocument = (row: any, items: any[]): Document => ({
   totalAmount: Number(row.total_amount),
   createdAt: row.created_at,
   updatedAt: row.updated_at,
+  contractArticles: contractArticles?.map(article => ({
+    id: article.id,
+    articleNumber: article.article_number,
+    title: article.title,
+    content: article.content,
+    sortOrder: article.sort_order,
+  })),
 });
 
 // Generate document number based on type
@@ -112,7 +119,18 @@ export function useDocument(id: string) {
         .select('*')
         .eq('document_id', id);
 
-      return mapDbToDocument(doc, items || []);
+      // Fetch contract articles if document is ugovor
+      let contractArticles = undefined;
+      if (doc.type === 'ugovor') {
+        const { data: articles } = await supabase
+          .from('document_contract_articles')
+          .select('*')
+          .eq('document_id', id)
+          .order('sort_order', { ascending: true });
+        contractArticles = articles || [];
+      }
+
+      return mapDbToDocument(doc, items || [], contractArticles);
     },
     enabled: !!user && !!id,
   });
