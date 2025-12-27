@@ -38,13 +38,22 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error("Nedostaje autorizacija");
     }
 
-    // Verify the requesting user is an admin (owns employees)
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user: requestingUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    // Create client with user's JWT to verify their identity
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseClient = createClient(supabaseUrl, anonKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      }
+    });
+
+    const { data: { user: requestingUser }, error: authError } = await supabaseClient.auth.getUser();
     
     if (authError || !requestingUser) {
+      console.error("Auth error:", authError);
       throw new Error("Neautoriziran pristup");
     }
+
+    console.log(`Request from user: ${requestingUser.id}`);
 
     const { email, password, employeeId, firstName, lastName }: CreateAccountRequest = await req.json();
 
