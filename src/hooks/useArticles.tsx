@@ -12,6 +12,9 @@ export interface Article {
   price: number;
   pdv: number;
   description: string | null;
+  barcode: string | null;
+  purchase_price: number;
+  stock: number;
   created_at: string;
   updated_at: string;
 }
@@ -23,6 +26,9 @@ export interface CreateArticleData {
   price?: number;
   pdv?: number;
   description?: string;
+  barcode?: string;
+  purchase_price?: number;
+  stock?: number;
 }
 
 export function useArticles() {
@@ -61,6 +67,9 @@ export function useCreateArticle() {
           price: articleData.price || 0,
           pdv: articleData.pdv || 25,
           description: articleData.description || null,
+          barcode: articleData.barcode || null,
+          purchase_price: articleData.purchase_price || 0,
+          stock: articleData.stock || 0,
         })
         .select()
         .single();
@@ -92,6 +101,9 @@ export function useUpdateArticle() {
           price: articleData.price || 0,
           pdv: articleData.pdv || 25,
           description: articleData.description || null,
+          barcode: articleData.barcode || null,
+          purchase_price: articleData.purchase_price || 0,
+          stock: articleData.stock || 0,
         })
         .eq('id', id)
         .select()

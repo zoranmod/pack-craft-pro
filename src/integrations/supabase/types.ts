@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       articles: {
         Row: {
+          barcode: string | null
           code: string | null
           created_at: string
           description: string | null
@@ -23,11 +24,14 @@ export type Database = {
           name: string
           pdv: number
           price: number
+          purchase_price: number
+          stock: number
           unit: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          barcode?: string | null
           code?: string | null
           created_at?: string
           description?: string | null
@@ -35,11 +39,14 @@ export type Database = {
           name: string
           pdv?: number
           price?: number
+          purchase_price?: number
+          stock?: number
           unit?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          barcode?: string | null
           code?: string | null
           created_at?: string
           description?: string | null
@@ -47,6 +54,8 @@ export type Database = {
           name?: string
           pdv?: number
           price?: number
+          purchase_price?: number
+          stock?: number
           unit?: string
           updated_at?: string
           user_id?: string
