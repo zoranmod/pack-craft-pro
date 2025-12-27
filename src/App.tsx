@@ -16,6 +16,7 @@ import Clients from "./pages/Clients";
 import Articles from "./pages/Articles";
 import Employees from "./pages/Employees";
 import EmployeeDetail from "./pages/EmployeeDetail";
+import EmployeePortal from "./pages/EmployeePortal";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/employee-portal" element={<EmployeePortal />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
             <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
