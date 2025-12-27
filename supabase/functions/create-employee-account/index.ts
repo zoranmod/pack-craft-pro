@@ -59,7 +59,36 @@ serve(async (req: Request): Promise<Response> => {
 
     const { email, password, employeeId, firstName, lastName, resetPassword }: CreateAccountRequest = await req.json();
 
-    console.log(`${resetPassword ? 'Resetting password' : 'Creating account'} for employee ${employeeId} with email ${email}`);
+    // Server-side password validation - critical security control
+    if (!password || typeof password !== 'string') {
+      throw new Error("Lozinka je obavezna");
+    }
+    if (password.length < 10) {
+      throw new Error("Lozinka mora imati najmanje 10 znakova");
+    }
+    if (password.length > 128) {
+      throw new Error("Lozinka ne smije imati više od 128 znakova");
+    }
+    if (!/[A-Z]/.test(password)) {
+      throw new Error("Lozinka mora sadržavati barem jedno veliko slovo");
+    }
+    if (!/[a-z]/.test(password)) {
+      throw new Error("Lozinka mora sadržavati barem jedno malo slovo");
+    }
+    if (!/[0-9]/.test(password)) {
+      throw new Error("Lozinka mora sadržavati barem jedan broj");
+    }
+
+    // Email validation
+    if (!email || typeof email !== 'string') {
+      throw new Error("Email je obavezan");
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error("Neispravna email adresa");
+    }
+
+    console.log(`${resetPassword ? 'Resetting password' : 'Creating account'} for employee ${employeeId}`);
 
     // Verify the requesting user owns this employee
     const { data: employee, error: employeeError } = await supabaseAdmin
