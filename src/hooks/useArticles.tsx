@@ -57,9 +57,18 @@ export function useArticles(params: ArticlesParams = {}) {
         .from('articles')
         .select('*', { count: 'exact' });
 
-      // Server-side search
+      // Server-side search with input sanitization
       if (search.trim()) {
-        query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%,barcode.ilike.%${search}%`);
+        // Escape special SQL LIKE pattern characters and PostgREST filter characters
+        const sanitizedSearch = search
+          .trim()
+          .slice(0, 100) // Limit search length
+          .replace(/[%_\\]/g, '\\$&') // Escape LIKE wildcards
+          .replace(/[,()]/g, ''); // Remove PostgREST filter syntax characters
+        
+        if (sanitizedSearch) {
+          query = query.or(`name.ilike.%${sanitizedSearch}%,code.ilike.%${sanitizedSearch}%,barcode.ilike.%${sanitizedSearch}%`);
+        }
       }
 
       const { data, error, count } = await query
