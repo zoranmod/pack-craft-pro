@@ -38,16 +38,18 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error("Nedostaje autorizacija");
     }
 
-    // Create client with user's JWT to verify their identity
+    // Verify the requesting user by validating provided JWT (do NOT rely on stored sessions)
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabaseClient = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: { Authorization: authHeader }
-      }
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
     });
 
-    const { data: { user: requestingUser }, error: authError } = await supabaseClient.auth.getUser();
-    
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user: requestingUser }, error: authError } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !requestingUser) {
       console.error("Auth error:", authError);
       throw new Error("Neautoriziran pristup");
