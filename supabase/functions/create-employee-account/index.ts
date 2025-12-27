@@ -76,8 +76,26 @@ serve(async (req: Request): Promise<Response> => {
     let userId: string;
 
     if (existingUser) {
-      // User exists - link to this employee
-      console.log(`User with email ${email} already exists, linking to employee ${employeeId}`);
+      // User exists - update password and link to this employee
+      console.log(`User with email ${email} already exists, updating password and linking to employee ${employeeId}`);
+      
+      // Update user password and metadata
+      const { error: updateUserError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          first_name: firstName,
+          last_name: lastName,
+          is_employee: true,
+          employee_id: employeeId,
+        },
+      });
+
+      if (updateUserError) {
+        console.error("Error updating existing user:", updateUserError);
+        throw new Error("Greška pri ažuriranju postojećeg računa");
+      }
+
       userId = existingUser.id;
     } else {
       // Create new user account
