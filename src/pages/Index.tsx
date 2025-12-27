@@ -11,7 +11,9 @@ const Index = () => {
     totalDocuments: documents.length,
     pendingDocuments: documents.filter(d => d.status === 'pending').length,
     completedThisMonth: documents.filter(d => d.status === 'completed').length,
-    totalRevenue: documents.reduce((sum, d) => sum + d.totalAmount, 0),
+    totalRevenue: documents
+      .filter(d => d.type !== 'ponuda')
+      .reduce((sum, d) => sum + d.totalAmount, 0),
   };
 
   return (

@@ -60,8 +60,8 @@ export function DocumentForm() {
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
   ]);
 
-  // Document type specific rules - only "ponuda" has prices
-  const hasPrices = formData.type === 'ponuda';
+  // Document type specific rules - ponuda, račun and ugovor have prices
+  const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(formData.type);
 
   const addItem = () => {
     setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);

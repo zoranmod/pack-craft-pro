@@ -50,6 +50,8 @@ const generateDocumentNumber = (type: DocumentType) => {
     'otpremnica': 'OTP',
     'ponuda': 'PON',
     'nalog-dostava-montaza': 'NDM',
+    'racun': 'RAC',
+    'ugovor': 'UGO',
   };
   const year = new Date().getFullYear();
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
