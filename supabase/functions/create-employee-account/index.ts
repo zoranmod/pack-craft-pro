@@ -15,30 +15,6 @@ interface CreateAccountRequest {
   resetPassword?: boolean; // If true, just reset password for existing account
 }
 
-function parseBearerToken(authHeader: string): string | null {
-  const match = authHeader.match(/^Bearer\s+(.+)$/i);
-  const token = match?.[1]?.trim();
-  return token && token.length > 0 ? token : null;
-}
-
-function decodeBase64Url(input: string): string {
-  const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = base64.length % 4;
-  const padded = pad ? base64 + "=".repeat(4 - pad) : base64;
-  return atob(padded);
-}
-
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  const parts = token.split(".");
-  if (parts.length !== 3) return null;
-  try {
-    const json = decodeBase64Url(parts[1]);
-    return JSON.parse(json);
-  } catch {
-    return null;
-  }
-}
-
 serve(async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -48,8 +24,9 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Create admin client with service role key
+    // Create admin client with service role key for privileged operations
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -57,27 +34,28 @@ serve(async (req: Request): Promise<Response> => {
       },
     });
 
-    // Get the requesting user from the auth header
+    // Get the requesting user from the auth header using proper JWT validation
     const authHeader = req.headers.get("Authorization") ?? req.headers.get("authorization");
     if (!authHeader) {
       throw new Error("Nedostaje autorizacija");
     }
 
-    const token = parseBearerToken(authHeader);
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
     if (!token) {
       throw new Error("Neautoriziran pristup");
     }
 
-    // JWT is already verified by the platform (verify_jwt=true); we only decode it to get the user id.
-    const jwtPayload = decodeJwtPayload(token);
-    const requestingUserId = typeof jwtPayload?.sub === "string" ? (jwtPayload.sub as string) : null;
+    // Use Supabase's built-in JWT validation to get the authenticated user
+    // This cryptographically verifies the token signature
+    const { data: { user: authenticatedUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-    if (!requestingUserId) {
-      console.error("Auth error: Missing sub in JWT payload");
+    if (authError || !authenticatedUser) {
+      console.error("Auth error:", authError?.message || "No user found");
       throw new Error("Neautoriziran pristup");
     }
 
-    console.log(`Request from user: ${requestingUserId}`);
+    const requestingUserId = authenticatedUser.id;
+    console.log(`Request from authenticated user: ${requestingUserId}`);
 
     const { email, password, employeeId, firstName, lastName, resetPassword }: CreateAccountRequest = await req.json();
 
@@ -95,6 +73,7 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     if (employee.user_id !== requestingUserId) {
+      console.error(`Authorization failed: employee.user_id (${employee.user_id}) !== requestingUserId (${requestingUserId})`);
       throw new Error("Nemate ovlasti za ovog zaposlenika");
     }
 
