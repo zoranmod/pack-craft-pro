@@ -8,7 +8,9 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Package
+  Package,
+  Users,
+  PackageSearch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +20,8 @@ const menuItems = [
   { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
   { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },
   { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
+  { icon: Users, label: 'Klijenti', path: '/clients' },
+  { icon: PackageSearch, label: 'Artikli', path: '/articles' },
 ];
 
 export function Sidebar() {

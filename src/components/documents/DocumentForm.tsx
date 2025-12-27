@@ -14,6 +14,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCreateDocument } from '@/hooks/useDocuments';
+import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
+import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
+import { Client } from '@/hooks/useClients';
+import { Article } from '@/hooks/useArticles';
 
 // Helper function to calculate item totals
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -162,6 +166,28 @@ export function DocumentForm() {
           {/* Client Info */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h2 className="font-semibold text-foreground mb-4">Podaci o klijentu</h2>
+            
+            {/* Client Autocomplete */}
+            <div className="mb-4">
+              <Label>Brzi odabir klijenta</Label>
+              <div className="mt-1.5">
+                <ClientAutocomplete
+                  value={formData.clientName}
+                  onSelect={(client: Client) => {
+                    setFormData({
+                      ...formData,
+                      clientName: client.name,
+                      clientOib: client.oib || '',
+                      clientAddress: [client.address, client.postal_code, client.city].filter(Boolean).join(', '),
+                      clientPhone: client.phone || '',
+                      clientEmail: client.email || '',
+                    });
+                  }}
+                  placeholder="Pretraži postojeće klijente..."
+                />
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="clientName">Naziv klijenta *</Label>
@@ -235,12 +261,29 @@ export function DocumentForm() {
                   <div className="grid gap-3 sm:grid-cols-12 items-end">
                     <div className={hasPrices ? "sm:col-span-6" : "sm:col-span-6"}>
                       <Label>Naziv</Label>
-                      <Input
-                        value={item.name}
-                        onChange={(e) => updateItem(index, 'name', e.target.value)}
-                        placeholder="Naziv stavke"
-                        className="mt-1.5"
-                      />
+                      <div className="mt-1.5">
+                        <ArticleAutocomplete
+                          value={item.name}
+                          onChange={(value) => updateItem(index, 'name', value)}
+                          onSelect={(article: Article) => {
+                            const newItems = [...items];
+                            newItems[index] = {
+                              ...newItems[index],
+                              name: article.name,
+                              unit: article.unit,
+                              price: article.price,
+                              pdv: article.pdv,
+                            };
+                            if (hasPrices) {
+                              const { subtotal, total } = calculateItemTotals(newItems[index]);
+                              newItems[index].subtotal = subtotal;
+                              newItems[index].total = total;
+                            }
+                            setItems(newItems);
+                          }}
+                          placeholder="Naziv stavke"
+                        />
+                      </div>
                     </div>
                     <div className="sm:col-span-3">
                       <Label>Količina</Label>
