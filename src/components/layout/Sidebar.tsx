@@ -11,17 +11,28 @@ import {
   Package,
   Users,
   PackageSearch,
-  UserCircle
+  UserCircle,
+  FileSignature,
+  Receipt
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
 
 const menuItems = [
+  // Početna
   { icon: LayoutDashboard, label: 'Početna stranica', path: '/' },
+  
+  // Dokumenti - pregled
   { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
+  
+  // Dokumenti - kreiranje (logičan poslovni tok: ponuda → ugovor → otpremnica → dostava → račun)
   { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
+  { icon: FileSignature, label: 'Novi ugovor', path: '/documents/new?type=ugovor' },
   { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },
   { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
+  { icon: Receipt, label: 'Novi račun', path: '/documents/new?type=racun' },
+  
+  // Matični podaci
   { icon: Users, label: 'Klijenti', path: '/clients' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
   { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },

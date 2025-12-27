@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, CalendarIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useWorkClothing } from '@/hooks/useEmployees';
+import { formatDateHR, cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { hr } from 'date-fns/locale';
 
 interface WorkClothingTabProps {
   employeeId: string;
@@ -41,7 +50,7 @@ export function WorkClothingTab({ employeeId }: WorkClothingTabProps) {
     item_name: '',
     size: '',
     quantity: 1,
-    assigned_date: new Date().toISOString().split('T')[0],
+    assigned_date: format(new Date(), 'yyyy-MM-dd'),
     return_date: '',
     condition: 'novo',
     notes: '',
@@ -52,7 +61,7 @@ export function WorkClothingTab({ employeeId }: WorkClothingTabProps) {
       item_name: '',
       size: '',
       quantity: 1,
-      assigned_date: new Date().toISOString().split('T')[0],
+      assigned_date: format(new Date(), 'yyyy-MM-dd'),
       return_date: '',
       condition: 'novo',
       notes: '',
@@ -175,26 +184,8 @@ export function WorkClothingTab({ employeeId }: WorkClothingTabProps) {
                     <TableCell className="font-medium">{item.item_name}</TableCell>
                     <TableCell>{item.size || '-'}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
-                    <TableCell>
-                      {(() => {
-                        const d = new Date(item.assigned_date);
-                        const day = d.getDate().toString().padStart(2, '0');
-                        const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                        const year = d.getFullYear();
-                        return `${day}.${month}.${year}.`;
-                      })()}
-                    </TableCell>
-                    <TableCell>
-                      {item.return_date
-                        ? (() => {
-                            const d = new Date(item.return_date);
-                            const day = d.getDate().toString().padStart(2, '0');
-                            const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                            const year = d.getFullYear();
-                            return `${day}.${month}.${year}.`;
-                          })()
-                        : '-'}
-                    </TableCell>
+                    <TableCell>{formatDateHR(item.assigned_date)}</TableCell>
+                    <TableCell>{item.return_date ? formatDateHR(item.return_date) : '-'}</TableCell>
                     <TableCell>{getConditionBadge(item.condition)}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -254,19 +245,61 @@ export function WorkClothingTab({ employeeId }: WorkClothingTabProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Datum zaduženja *</Label>
-                <Input
-                  type="date"
-                  value={form.assigned_date}
-                  onChange={(e) => setForm({ ...form, assigned_date: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.assigned_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.assigned_date ? formatDateHR(form.assigned_date) : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.assigned_date ? new Date(form.assigned_date) : undefined}
+                      onSelect={(date) => setForm({ 
+                        ...form, 
+                        assigned_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                      })}
+                      locale={hr}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label>Datum vraćanja</Label>
-                <Input
-                  type="date"
-                  value={form.return_date}
-                  onChange={(e) => setForm({ ...form, return_date: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.return_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.return_date ? formatDateHR(form.return_date) : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.return_date ? new Date(form.return_date) : undefined}
+                      onSelect={(date) => setForm({ 
+                        ...form, 
+                        return_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                      })}
+                      locale={hr}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             <div>
