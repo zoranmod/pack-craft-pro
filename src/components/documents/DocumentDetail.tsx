@@ -39,6 +39,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: articlesData } = useArticles({ pageSize: 1000 });
   
   const isContract = document?.type === 'ugovor';
+  
+  // Document types that should NOT show prices (otpremnica, nalog-dostava-montaza)
+  const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor'].includes(document.type) : true;
 
   // Enrich items with codes from articles if not already present
   const enrichedItems = useMemo(() => {
@@ -367,12 +370,16 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                       <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Naziv</th>
                       <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Jed.</th>
                       <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Kol.</th>
-                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
-                      {template?.show_discount_column !== false && (
-                        <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Rabat</th>
+                      {hasPrices && (
+                        <>
+                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
+                          {template?.show_discount_column !== false && (
+                            <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Rabat</th>
+                          )}
+                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>PDV</th>
+                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Ukupno</th>
+                        </>
                       )}
-                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>PDV</th>
-                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Ukupno</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -383,54 +390,60 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                         <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
                         <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
                         <td className="py-1 text-center" style={{ color: '#000' }}>{item.quantity}</td>
-                        <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
-                        {template?.show_discount_column !== false && (
-                          <td className="py-1 text-right" style={{ color: '#000' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
+                        {hasPrices && (
+                          <>
+                            <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
+                            {template?.show_discount_column !== false && (
+                              <td className="py-1 text-right" style={{ color: '#000' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
+                            )}
+                            <td className="py-1 text-right" style={{ color: '#000' }}>{round2(item.pdv)}%</td>
+                            <td className="py-1 text-right font-medium" style={{ color: '#000' }}>{formatCurrency(item.total)} €</td>
+                          </>
                         )}
-                        <td className="py-1 text-right" style={{ color: '#000' }}>{round2(item.pdv)}%</td>
-                        <td className="py-1 text-right font-medium" style={{ color: '#000' }}>{formatCurrency(item.total)} €</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Totals */}
-              <div className="flex justify-end mb-6">
-                <div className="w-64 space-y-1" style={{ fontSize: '10px' }}>
-                  <div className="flex justify-between">
-                    <span style={{ color: '#000' }}>Osnovica:</span>
-                    <span style={{ color: '#000' }}>
-                      {formatCurrency(document.items.reduce((sum, item) => sum + item.subtotal, 0))} €
-                    </span>
-                  </div>
-                  {document.items.some(item => item.discount > 0) && (
+              {/* Totals - only show for document types with prices */}
+              {hasPrices && (
+                <div className="flex justify-end mb-6">
+                  <div className="w-64 space-y-1" style={{ fontSize: '10px' }}>
                     <div className="flex justify-between">
-                      <span style={{ color: '#000' }}>Rabat:</span>
+                      <span style={{ color: '#000' }}>Osnovica:</span>
                       <span style={{ color: '#000' }}>
-                        -{formatCurrency(document.items.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0))} €
+                        {formatCurrency(document.items.reduce((sum, item) => sum + item.subtotal, 0))} €
                       </span>
                     </div>
-                  )}
-                  {template?.show_pdv_breakdown !== false && (
-                    <div className="flex justify-between">
-                      <span style={{ color: '#000' }}>PDV (25%):</span>
-                      <span style={{ color: '#000' }}>
-                        {formatCurrency(document.items.reduce((sum, item) => {
-                          const afterDiscount = round2(item.subtotal - round2(item.subtotal * item.discount / 100));
-                          return sum + round2(afterDiscount * item.pdv / 100);
-                        }, 0))} €
+                    {document.items.some(item => item.discount > 0) && (
+                      <div className="flex justify-between">
+                        <span style={{ color: '#000' }}>Rabat:</span>
+                        <span style={{ color: '#000' }}>
+                          -{formatCurrency(document.items.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0))} €
+                        </span>
+                      </div>
+                    )}
+                    {template?.show_pdv_breakdown !== false && (
+                      <div className="flex justify-between">
+                        <span style={{ color: '#000' }}>PDV (25%):</span>
+                        <span style={{ color: '#000' }}>
+                          {formatCurrency(document.items.reduce((sum, item) => {
+                            const afterDiscount = round2(item.subtotal - round2(item.subtotal * item.discount / 100));
+                            return sum + round2(afterDiscount * item.pdv / 100);
+                          }, 0))} €
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between pt-1 border-t-2 border-gray-800">
+                      <span className="font-bold" style={{ color: '#000' }}>UKUPNO:</span>
+                      <span className="font-bold" style={{ color: '#000' }}>
+                        {formatCurrency(document.totalAmount)} €
                       </span>
                     </div>
-                  )}
-                  <div className="flex justify-between pt-1 border-t-2 border-gray-800">
-                    <span className="font-bold" style={{ color: '#000' }}>UKUPNO:</span>
-                    <span className="font-bold" style={{ color: '#000' }}>
-                      {formatCurrency(document.totalAmount)} €
-                    </span>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Notes */}
               {document.notes && (
