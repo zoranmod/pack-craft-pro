@@ -10,6 +10,7 @@ interface ProfessionalDocumentFooterProps {
   showRegistrationInfo?: boolean;
   footerNote?: string;
   preparedByLabel?: string;
+  preparedByName?: string;
   showPreparedBy?: boolean;
   showSignatureLine?: boolean;
   showStampPlaceholder?: boolean;
@@ -23,6 +24,7 @@ export const ProfessionalDocumentFooter = ({
   showRegistrationInfo = true,
   footerNote = 'Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.',
   preparedByLabel = 'Ponudu izradio/la:',
+  preparedByName,
   showPreparedBy = true,
   showSignatureLine = true,
   showStampPlaceholder = true,
@@ -34,9 +36,12 @@ export const ProfessionalDocumentFooter = ({
       {showPreparedBy && (
         <div className="flex justify-between items-end mb-6">
           <div>
-            <p className="text-sm text-gray-600 mb-6">{preparedByLabel}</p>
+            <p className="text-sm text-gray-600 mb-1">{preparedByLabel}</p>
+            {preparedByName && (
+              <p className="text-sm font-medium text-gray-900 mb-2">{preparedByName}</p>
+            )}
             {showSignatureLine && (
-              <div className="w-40 border-b border-gray-400" />
+              <div className="w-40 border-b border-gray-400 mt-4" />
             )}
           </div>
           
