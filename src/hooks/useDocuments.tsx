@@ -4,7 +4,7 @@ import { useAuth } from './useAuth';
 import { Document, DocumentItem, DocumentType, DocumentStatus, DocumentContractArticle } from '@/types/document';
 import { toast } from 'sonner';
 
-interface CreateDocumentData {
+export interface CreateDocumentData {
   type: DocumentType;
   clientName: string;
   clientOib?: string;
