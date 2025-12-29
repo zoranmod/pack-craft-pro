@@ -33,9 +33,10 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
 
   // Otpremnica i nalog za dostavu/montažu ne bi trebali prikazivati novčane iznose
   const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(template.document_type as DocumentType);
+  const tableColumns = template.table_columns || ['rbr', 'naziv', 'jmj', 'kolicina'];
   const visibleColumns = hasPrices
-    ? template.table_columns
-    : template.table_columns.filter(
+    ? tableColumns
+    : tableColumns.filter(
         (col) => !['cijena', 'rabat', 'cijena_s_rabatom', 'pdv', 'pdv_iznos', 'ukupno'].includes(col)
       );
 
