@@ -63,7 +63,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
     return (
       <div ref={ref} className="bg-white text-black p-8 min-h-[297mm] font-serif" style={{ width: '210mm' }}>
         {/* Memorandum Header - identical for all documents */}
-        <MemorandumHeader companySettings={companySettings} />
+        <MemorandumHeader />
 
         {/* Contract Title */}
         <div className="text-center mb-8">
@@ -209,7 +209,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
         )}
 
         {/* Memorandum Footer - identical for all documents */}
-        <MemorandumFooter companySettings={companySettings} />
+        <MemorandumFooter />
       </div>
     );
   }

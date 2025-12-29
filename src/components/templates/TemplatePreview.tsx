@@ -43,7 +43,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
       }}
     >
       {/* Memorandum Header - identical for all documents */}
-      <MemorandumHeader companySettings={companySettings} />
+      <MemorandumHeader />
 
       {/* Document Title */}
       <div className="text-center mb-6">
@@ -133,11 +133,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
       </div>
 
       {/* Memorandum Footer - identical for all documents */}
-      <MemorandumFooter 
-        companySettings={companySettings}
-        showPreparedBy={template.show_prepared_by}
-        preparedByLabel={template.prepared_by_label}
-      />
+      <MemorandumFooter />
     </div>
   );
 };
