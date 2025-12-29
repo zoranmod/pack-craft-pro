@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, User, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,6 +19,15 @@ interface HeaderProps {
 
 export function Header({ title, subtitle }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      navigate(`/documents?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -37,6 +48,9 @@ export function Header({ title, subtitle }: HeaderProps) {
             <Input
               type="search"
               placeholder="Pretraži dokumente..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
               className="w-64 pl-9 bg-muted/50 border-0 focus-visible:ring-1"
             />
           </div>

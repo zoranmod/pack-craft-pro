@@ -1,4 +1,4 @@
-import { FileText, Package, Truck, Wrench } from 'lucide-react';
+import { FileText, Package, Truck } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
@@ -12,9 +12,6 @@ const Index = () => {
     totalDocuments: documents.length,
     pendingDocuments: documents.filter(d => d.status === 'pending').length,
     completedThisMonth: documents.filter(d => d.status === 'completed').length,
-    totalRevenue: documents
-      .filter(d => d.type !== 'ponuda')
-      .reduce((sum, d) => sum + d.totalAmount, 0),
   };
 
   return (
@@ -23,7 +20,7 @@ const Index = () => {
       subtitle="Dobrodošli u sustav"
     >
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
         <StatCard
           title="Ukupno dokumenata"
           value={isLoading ? '...' : stats.totalDocuments}
@@ -44,12 +41,6 @@ const Index = () => {
           icon={Truck}
           trend={{ value: 8, isPositive: true }}
           href="/documents?status=completed"
-        />
-        <StatCard
-          title="Ukupni promet"
-          value={isLoading ? '...' : `${stats.totalRevenue.toLocaleString('hr-HR')} €`}
-          icon={Wrench}
-          trend={{ value: 15, isPositive: true }}
         />
       </div>
 
