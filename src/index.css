@@ -146,3 +146,22 @@
     @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
   }
 }
+
+/* Print styles - remove browser headers/footers */
+@media print {
+  @page {
+    margin: 10mm;
+    size: A4;
+  }
+  
+  /* Hide browser-generated headers and footers */
+  html {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
