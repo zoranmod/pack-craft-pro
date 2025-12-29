@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download } from 'lucide-react';
-import { Document, DocumentType, documentTypeLabels, documentStatusLabels } from '@/types/document';
+import { Link, useNavigate } from 'react-router-dom';
+import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight } from 'lucide-react';
+import { Document, DocumentType, documentTypeLabels, documentStatusLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useConvertDocument } from '@/hooks/useDocuments';
 
 interface DocumentListProps {
   documents: Document[];
@@ -34,9 +35,26 @@ const typeIcons: Record<DocumentType, string> = {
 };
 
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
+  const navigate = useNavigate();
+  const convertDocument = useConvertDocument();
+  
   const filteredDocs = filter === 'all' 
     ? documents 
     : documents.filter(doc => doc.type === filter);
+
+  const handleConvert = async (doc: Document) => {
+    const nextType = getNextDocumentType(doc.type);
+    if (!nextType) return;
+    
+    const result = await convertDocument.mutateAsync({
+      sourceDocument: doc,
+      targetType: nextType,
+    });
+    
+    if (result?.id) {
+      navigate(`/documents/${result.id}`);
+    }
+  };
 
   return (
     <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
@@ -124,6 +142,19 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                       <DropdownMenuItem>
                         <Download className="mr-2 h-4 w-4" /> Preuzmi PDF
                       </DropdownMenuItem>
+                      {getNextDocumentType(doc.type) && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleConvert(doc)}
+                            disabled={convertDocument.isPending}
+                            className="text-primary"
+                          >
+                            <ArrowRight className="mr-2 h-4 w-4" /> 
+                            {getNextDocumentLabel(doc.type)}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive">
                         <Trash2 className="mr-2 h-4 w-4" /> Obriši

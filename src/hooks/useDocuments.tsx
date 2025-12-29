@@ -240,3 +240,78 @@ export function useDeleteDocument() {
     },
   });
 }
+
+// Hook for converting a document to the next type in the flow
+export function useConvertDocument() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ 
+      sourceDocument, 
+      targetType 
+    }: { 
+      sourceDocument: Document; 
+      targetType: DocumentType 
+    }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
+
+      // Create new document with data from source
+      const { data: doc, error: docError } = await supabase
+        .from('documents')
+        .insert({
+          user_id: user.id,
+          type: targetType,
+          number: generateDocumentNumber(targetType),
+          client_name: sourceDocument.clientName,
+          client_oib: sourceDocument.clientOib,
+          client_address: sourceDocument.clientAddress,
+          client_phone: sourceDocument.clientPhone,
+          client_email: sourceDocument.clientEmail,
+          notes: sourceDocument.notes,
+          total_amount: totalAmount,
+        })
+        .select()
+        .single();
+
+      if (docError) throw docError;
+
+      // Copy items
+      const itemsToInsert = sourceDocument.items.map(item => ({
+        document_id: doc.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: item.price,
+        discount: item.discount,
+        pdv: item.pdv,
+        subtotal: item.subtotal,
+        total: item.total,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('document_items')
+        .insert(itemsToInsert);
+
+      if (itemsError) throw itemsError;
+
+      return doc;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      const typeLabel = {
+        'ponuda': 'Ponuda',
+        'ugovor': 'Ugovor',
+        'otpremnica': 'Otpremnica',
+        'racun': 'Račun',
+        'nalog-dostava-montaza': 'Nalog',
+      }[variables.targetType];
+      toast.success(`${typeLabel} uspješno kreiran!`);
+    },
+    onError: (error) => {
+      toast.error('Greška pri konverziji dokumenta: ' + error.message);
+    },
+  });
+}
