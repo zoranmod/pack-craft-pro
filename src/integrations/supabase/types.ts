@@ -486,8 +486,10 @@ export type Database = {
           client_name: string
           client_oib: string | null
           client_phone: string | null
+          contact_person: string | null
           created_at: string
           date: string
+          delivery_address: string | null
           delivery_days: number | null
           id: string
           notes: string | null
@@ -508,8 +510,10 @@ export type Database = {
           client_name: string
           client_oib?: string | null
           client_phone?: string | null
+          contact_person?: string | null
           created_at?: string
           date?: string
+          delivery_address?: string | null
           delivery_days?: number | null
           id?: string
           notes?: string | null
@@ -530,8 +534,10 @@ export type Database = {
           client_name?: string
           client_oib?: string | null
           client_phone?: string | null
+          contact_person?: string | null
           created_at?: string
           date?: string
+          delivery_address?: string | null
           delivery_days?: number | null
           id?: string
           notes?: string | null

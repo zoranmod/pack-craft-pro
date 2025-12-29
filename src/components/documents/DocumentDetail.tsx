@@ -209,6 +209,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   {document.clientOib && <p className="text-gray-700">OIB: {document.clientOib}</p>}
                   {document.clientPhone && <p className="text-gray-700">Tel: {document.clientPhone}</p>}
                   {document.clientEmail && <p className="text-gray-700">Email: {document.clientEmail}</p>}
+                  {document.contactPerson && <p className="text-gray-700">Kontakt: {document.contactPerson}</p>}
+                  {document.deliveryAddress && (
+                    <div className="mt-2">
+                      <p className="text-sm font-medium text-gray-500">Adresa isporuke:</p>
+                      <p className="text-gray-700">{document.deliveryAddress}</p>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-xl font-bold text-gray-900">{documentTypeLabels[document.type].toUpperCase()}</p>
@@ -220,7 +227,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   {document.deliveryDays && template?.show_delivery_days && (
                     <p className="text-sm text-gray-600">Rok isporuke: {document.deliveryDays} dana</p>
                   )}
-                  {document.paymentMethod && template?.show_payment_method && (
+                  {document.paymentMethod && (
                     <p className="text-sm text-gray-600">Način plaćanja: {document.paymentMethod}</p>
                   )}
                 </div>
@@ -304,6 +311,34 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded text-sm">
                   <p className="font-medium text-gray-700 mb-1">Napomene:</p>
                   <p className="text-gray-600">{document.notes}</p>
+                </div>
+              )}
+
+              {/* Prepared by & Signature Section for Ponuda */}
+              {document.type === 'ponuda' && (
+                <div className="mt-8 pt-6 border-t border-gray-300">
+                  <div className="flex justify-between items-end">
+                    <div className="flex-1">
+                      {document.preparedBy && (
+                        <div className="mb-4">
+                          <p className="text-sm text-gray-600">Ponudu izradio/la:</p>
+                          <p className="font-medium text-gray-900">{document.preparedBy}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-12">
+                      <div className="text-center">
+                        <div className="w-24 h-24 border border-gray-400 rounded flex items-center justify-center mb-2">
+                          <span className="text-xs text-gray-400">MP</span>
+                        </div>
+                        <p className="text-xs text-gray-500">Pečat</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="w-40 border-b border-gray-400 mb-2" style={{ height: '60px' }}></div>
+                        <p className="text-xs text-gray-500">Potpis</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

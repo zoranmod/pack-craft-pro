@@ -58,6 +58,8 @@ export function DocumentForm() {
     validityDays: 15,
     deliveryDays: 60,
     preparedBy: '',
+    contactPerson: '',
+    deliveryAddress: '',
   }));
 
   // Template state
@@ -251,6 +253,8 @@ export function DocumentForm() {
       validityDays: formData.validityDays,
       deliveryDays: formData.deliveryDays,
       preparedBy: formData.preparedBy || undefined,
+      contactPerson: formData.contactPerson || undefined,
+      deliveryAddress: formData.deliveryAddress || undefined,
     });
 
     // If it's a contract, save the contract articles
@@ -453,6 +457,26 @@ export function DocumentForm() {
                   className="mt-1.5"
                 />
               </div>
+              <div>
+                <Label htmlFor="contactPerson">Kontakt osoba</Label>
+                <Input
+                  id="contactPerson"
+                  value={formData.contactPerson}
+                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                  placeholder="Ime i prezime kontakt osobe"
+                  className="mt-1.5"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="deliveryAddress">Adresa isporuke</Label>
+                <Input
+                  id="deliveryAddress"
+                  value={formData.deliveryAddress}
+                  onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
+                  placeholder="Adresa za isporuku (ako je različita od adrese klijenta)"
+                  className="mt-1.5"
+                />
+              </div>
             </div>
           </div>
 
@@ -644,6 +668,42 @@ export function DocumentForm() {
               ))}
             </div>
           </div>
+
+          {/* Additional Details for Ponuda */}
+          {formData.type === 'ponuda' && (
+            <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
+              <h2 className="font-semibold text-foreground mb-4">Detalji ponude</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="paymentMethod">Način plaćanja</Label>
+                  <Select
+                    value={formData.paymentMethod}
+                    onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue placeholder="Odaberite način plaćanja" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Transakcijski">Transakcijski</SelectItem>
+                      <SelectItem value="Gotovinski">Gotovinski</SelectItem>
+                      <SelectItem value="Karticama">Karticama</SelectItem>
+                      <SelectItem value="Plaćeno po ponudi">Plaćeno po ponudi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="preparedBy">Ponudu izradio/la</Label>
+                  <Input
+                    id="preparedBy"
+                    value={formData.preparedBy}
+                    onChange={(e) => setFormData({ ...formData, preparedBy: e.target.value })}
+                    placeholder="Ime i prezime"
+                    className="mt-1.5"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Notes */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
