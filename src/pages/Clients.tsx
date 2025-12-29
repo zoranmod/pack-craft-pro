@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, User, Phone, Mail, MapPin } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, User, Phone, Mail, MapPin, Building2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +35,8 @@ const emptyForm: CreateClientData = {
   phone: '',
   email: '',
   notes: '',
+  client_type: 'company',
+  default_pdv: 25,
 };
 
 const Clients = () => {
@@ -70,6 +74,8 @@ const Clients = () => {
       phone: client.phone || '',
       email: client.email || '',
       notes: client.notes || '',
+      client_type: client.client_type || 'company',
+      default_pdv: client.default_pdv ?? 25,
     });
     setIsDialogOpen(true);
   };
@@ -136,10 +142,19 @@ const Clients = () => {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-5 w-5 text-primary" />
+                      {client.client_type === 'company' ? (
+                        <Building2 className="h-5 w-5 text-primary" />
+                      ) : (
+                        <User className="h-5 w-5 text-primary" />
+                      )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">{client.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground">{client.name}</h3>
+                        <Badge variant={client.client_type === 'company' ? 'default' : 'secondary'} className="text-xs">
+                          {client.client_type === 'company' ? 'Pravna osoba' : 'Privatna osoba'}
+                        </Badge>
+                      </div>
                       {client.oib && (
                         <p className="text-xs text-muted-foreground">OIB: {client.oib}</p>
                       )}
@@ -189,13 +204,44 @@ const Clients = () => {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
+              {/* Client Type Selection */}
+              <div className="sm:col-span-2">
+                <Label className="mb-3 block">Tip klijenta</Label>
+                <RadioGroup
+                  value={formData.client_type || 'company'}
+                  onValueChange={(value: 'private' | 'company') => {
+                    setFormData({
+                      ...formData,
+                      client_type: value,
+                      default_pdv: value === 'private' ? 0 : 25,
+                    });
+                  }}
+                  className="flex gap-4"
+                >
+                  <div className="flex items-center space-x-2 flex-1 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <RadioGroupItem value="private" id="private" />
+                    <Label htmlFor="private" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      Privatna osoba
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 flex-1 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <RadioGroupItem value="company" id="company" />
+                    <Label htmlFor="company" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      Pravna osoba
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
               <div className="sm:col-span-2">
                 <Label htmlFor="name">Naziv *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Naziv tvrtke ili ime"
+                  placeholder={formData.client_type === 'company' ? 'Naziv tvrtke' : 'Ime i prezime'}
                   className="mt-1.5"
                   required
                 />

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Plus, User } from 'lucide-react';
+import { Search, Plus, User, Building2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useClients, Client } from '@/hooks/useClients';
 import { cn } from '@/lib/utils';
 
@@ -79,9 +80,18 @@ export function ClientAutocomplete({
                   onClick={() => handleSelect(client)}
                   className="w-full px-3 py-2 text-left hover:bg-accent transition-colors flex items-start gap-3"
                 >
-                  <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <div className="font-medium text-foreground truncate">{client.name}</div>
+                  {client.client_type === 'company' ? (
+                    <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-foreground truncate">{client.name}</span>
+                      <Badge variant={client.client_type === 'company' ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
+                        {client.client_type === 'company' ? 'Pravna' : 'Privatna'}
+                      </Badge>
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">
                       {[client.address, client.city].filter(Boolean).join(', ')}
                       {client.oib && ` • OIB: ${client.oib}`}
