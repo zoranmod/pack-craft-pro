@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Employee } from '@/types/employee';
 import { User, Mail, Phone, MapPin, Briefcase, Calendar } from 'lucide-react';
+import { EmployeePermissionsSummary } from './EmployeePermissionsSummary';
 
 interface EmployeeInfoTabProps {
   employee: Employee;
@@ -115,6 +116,9 @@ export function EmployeeInfoTab({ employee }: EmployeeInfoTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Permissions Summary */}
+      <EmployeePermissionsSummary employeeId={employee.id} hasAccount={!!employee.auth_user_id} />
 
       {employee.notes && (
         <Card className="md:col-span-2">
