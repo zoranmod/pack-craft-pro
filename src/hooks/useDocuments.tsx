@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { Document, DocumentItem, DocumentType, DocumentStatus, DocumentContractArticle } from '@/types/document';
 import { toast } from 'sonner';
+import { useLogActivity } from './useActivityLogs';
 
 export interface CreateDocumentData {
   type: DocumentType;
@@ -62,7 +63,7 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
 });
 
 // Generate document number based on type with sequential counter
-const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
+const generateDocumentNumber = async (type: DocumentType, userId: string): Promise<string> => {
   const prefixes: Record<DocumentType, string> = {
     'otpremnica': 'OTP',
     'ponuda': 'PON',
@@ -73,10 +74,11 @@ const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
   const year = new Date().getFullYear();
   const prefix = `${prefixes[type]}-${year}-`;
   
-  // Get the highest existing number for this type and year
+  // Get the highest existing number for this type, year, and user
   const { data: existingDocs } = await supabase
     .from('documents')
     .select('number')
+    .eq('user_id', userId)
     .like('number', `${prefix}%`)
     .order('number', { ascending: false })
     .limit(1);
@@ -171,6 +173,7 @@ export function useDocument(id: string) {
 export function useCreateDocument() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async (data: CreateDocumentData) => {
@@ -179,7 +182,7 @@ export function useCreateDocument() {
       const totalAmount = data.items.reduce((sum, item) => sum + item.total, 0);
 
       // Generate sequential document number
-      const documentNumber = await generateDocumentNumber(data.type);
+      const documentNumber = await generateDocumentNumber(data.type, user.id);
 
       // Create document
       const { data: doc, error: docError } = await supabase
@@ -227,9 +230,16 @@ export function useCreateDocument() {
 
       return doc;
     },
-    onSuccess: () => {
+    onSuccess: (doc) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       toast.success('Dokument uspješno kreiran!');
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'document',
+        entity_id: doc.id,
+        entity_name: doc.number,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri kreiranju dokumenta: ' + error.message);
@@ -239,19 +249,28 @@ export function useCreateDocument() {
 
 export function useUpdateDocumentStatus() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: DocumentStatus }) => {
+    mutationFn: async ({ id, status, number }: { id: string; status: DocumentStatus; number?: string }) => {
       const { error } = await supabase
         .from('documents')
         .update({ status })
         .eq('id', id);
 
       if (error) throw error;
+      return { id, status, number };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       toast.success('Status dokumenta ažuriran');
+      
+      logActivity.mutate({
+        action_type: 'update',
+        entity_type: 'document',
+        entity_id: data.id,
+        entity_name: data.number || data.id,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri ažuriranju statusa: ' + error.message);
@@ -261,19 +280,28 @@ export function useUpdateDocumentStatus() {
 
 export function useDeleteDocument() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id, number }: { id: string; number?: string }) => {
       const { error } = await supabase
         .from('documents')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      return { id, number };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       toast.success('Dokument obrisan');
+      
+      logActivity.mutate({
+        action_type: 'delete',
+        entity_type: 'document',
+        entity_id: data.id,
+        entity_name: data.number || data.id,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri brisanju dokumenta: ' + error.message);
@@ -285,6 +313,7 @@ export function useDeleteDocument() {
 export function useConvertDocument() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async ({ 
@@ -299,7 +328,7 @@ export function useConvertDocument() {
       const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
 
       // Generate sequential document number
-      const documentNumber = await generateDocumentNumber(targetType);
+      const documentNumber = await generateDocumentNumber(targetType, user.id);
 
       // Create new document with data from source
       const { data: doc, error: docError } = await supabase
@@ -342,7 +371,7 @@ export function useConvertDocument() {
 
       return doc;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (doc, variables) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       const typeLabel = {
         'ponuda': 'Ponuda',
@@ -352,6 +381,13 @@ export function useConvertDocument() {
         'nalog-dostava-montaza': 'Nalog',
       }[variables.targetType];
       toast.success(`${typeLabel} uspješno kreiran!`);
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'document',
+        entity_id: doc.id,
+        entity_name: doc.number,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri konverziji dokumenta: ' + error.message);

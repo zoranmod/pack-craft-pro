@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { useLogActivity } from './useActivityLogs';
 
 export interface Client {
   id: string;
@@ -54,6 +55,7 @@ export function useClients() {
 export function useCreateClient() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async (clientData: CreateClientData) => {
@@ -80,9 +82,16 @@ export function useCreateClient() {
       if (error) throw error;
       return data as Client;
     },
-    onSuccess: () => {
+    onSuccess: (client) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast.success('Klijent uspješno kreiran');
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'client',
+        entity_id: client.id,
+        entity_name: client.name,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri kreiranju klijenta: ' + error.message);
@@ -92,6 +101,7 @@ export function useCreateClient() {
 
 export function useUpdateClient() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async ({ id, ...clientData }: CreateClientData & { id: string }) => {
@@ -116,9 +126,16 @@ export function useUpdateClient() {
       if (error) throw error;
       return data as Client;
     },
-    onSuccess: () => {
+    onSuccess: (client) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast.success('Klijent uspješno ažuriran');
+      
+      logActivity.mutate({
+        action_type: 'update',
+        entity_type: 'client',
+        entity_id: client.id,
+        entity_name: client.name,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri ažuriranju klijenta: ' + error.message);
@@ -128,19 +145,31 @@ export function useUpdateClient() {
 
 export function useDeleteClient() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (idOrData: string | { id: string; name?: string }) => {
+      const id = typeof idOrData === 'string' ? idOrData : idOrData.id;
+      const name = typeof idOrData === 'string' ? undefined : idOrData.name;
+      
       const { error } = await supabase
         .from('clients')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      return { id, name };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast.success('Klijent uspješno obrisan');
+      
+      logActivity.mutate({
+        action_type: 'delete',
+        entity_type: 'client',
+        entity_id: data.id,
+        entity_name: data.name || data.id,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri brisanju klijenta: ' + error.message);

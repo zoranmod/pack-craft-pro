@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { useLogActivity } from './useActivityLogs';
 
 export interface Article {
   id: string;
@@ -93,6 +94,7 @@ export function useArticles(params: ArticlesParams = {}) {
 export function useCreateArticle() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async (articleData: CreateArticleData) => {
@@ -119,9 +121,16 @@ export function useCreateArticle() {
       if (error) throw error;
       return data as Article;
     },
-    onSuccess: () => {
+    onSuccess: (article) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
       toast.success('Artikl uspješno kreiran');
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'article',
+        entity_id: article.id,
+        entity_name: article.name,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri kreiranju artikla: ' + error.message);
@@ -131,6 +140,7 @@ export function useCreateArticle() {
 
 export function useUpdateArticle() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async ({ id, ...articleData }: CreateArticleData & { id: string }) => {
@@ -155,9 +165,16 @@ export function useUpdateArticle() {
       if (error) throw error;
       return data as Article;
     },
-    onSuccess: () => {
+    onSuccess: (article) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
       toast.success('Artikl uspješno ažuriran');
+      
+      logActivity.mutate({
+        action_type: 'update',
+        entity_type: 'article',
+        entity_id: article.id,
+        entity_name: article.name,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri ažuriranju artikla: ' + error.message);
@@ -167,19 +184,31 @@ export function useUpdateArticle() {
 
 export function useDeleteArticle() {
   const queryClient = useQueryClient();
+  const logActivity = useLogActivity();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (idOrData: string | { id: string; name?: string }) => {
+      const id = typeof idOrData === 'string' ? idOrData : idOrData.id;
+      const name = typeof idOrData === 'string' ? undefined : idOrData.name;
+      
       const { error } = await supabase
         .from('articles')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      return { id, name };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
       toast.success('Artikl uspješno obrisan');
+      
+      logActivity.mutate({
+        action_type: 'delete',
+        entity_type: 'article',
+        entity_id: data.id,
+        entity_name: data.name || data.id,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri brisanju artikla: ' + error.message);
@@ -211,6 +240,7 @@ export function useArticleTemplates() {
 export function useSaveAsTemplate() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const logActivity = useLogActivity();
 
   return useMutation({
     mutationFn: async (templateData: Omit<CreateArticleData, 'is_template'>) => {
@@ -237,10 +267,17 @@ export function useSaveAsTemplate() {
       if (error) throw error;
       return data as Article;
     },
-    onSuccess: () => {
+    onSuccess: (article) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
       queryClient.invalidateQueries({ queryKey: ['article-templates'] });
       toast.success('Šablona uspješno spremljena');
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'article',
+        entity_id: article.id,
+        entity_name: article.name,
+      });
     },
     onError: (error) => {
       toast.error('Greška pri spremanju šablone: ' + error.message);
