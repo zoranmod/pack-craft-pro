@@ -193,13 +193,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               <ContractDocumentView 
                 ref={printRef} 
                 document={document} 
-                companySettings={companySettings} 
               />
             </div>
           ) : (
             <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-8" style={{ fontFamily: template?.font_family || 'Arial' }}>
               {/* Memorandum Header - identical for all documents */}
-              <MemorandumHeader companySettings={companySettings} />
+              <MemorandumHeader />
 
               {/* Document Title & Client Info */}
               <div className="flex justify-between items-start mb-6">
@@ -309,12 +308,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               )}
 
               {/* Memorandum Footer - identical for all documents */}
-              <MemorandumFooter 
-                companySettings={companySettings}
-                showPreparedBy={template?.show_prepared_by ?? true}
-                preparedByLabel={template?.prepared_by_label}
-                preparedByName={document.preparedBy}
-              />
+              <MemorandumFooter />
             </div>
           )}
         </div>
