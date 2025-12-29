@@ -792,6 +792,7 @@ export type Database = {
     Functions: {
       get_employee_admin: { Args: { _user_id: string }; Returns: string }
       get_employee_id: { Args: { _user_id: string }; Returns: string }
+      get_employee_owner: { Args: { _user_id: string }; Returns: string }
       has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -804,6 +805,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_employee_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "employee"

@@ -73,6 +73,8 @@ export function useCurrentEmployee() {
     enabled: !!user,
   });
 
+  const hasFullAccess = data?.isAdmin || data?.permissions?.can_manage_employees || false;
+
   return {
     employee: data?.employee ?? null,
     permissions: data?.permissions ?? null,
@@ -80,5 +82,6 @@ export function useCurrentEmployee() {
     isLoading,
     error,
     isEmployee: !!data?.employee,
+    hasFullAccess,
   };
 }

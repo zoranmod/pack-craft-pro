@@ -18,13 +18,20 @@ import { EmployeePortalDashboard } from '@/components/employee-portal/EmployeePo
 
 export default function EmployeePortal() {
   const { user, loading: authLoading } = useAuth();
-  const { employee, permissions, isLoading: employeeLoading, isEmployee } = useCurrentEmployee();
+  const { employee, permissions, isLoading: employeeLoading, isEmployee, hasFullAccess } = useCurrentEmployee();
   const navigate = useNavigate();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect admin employees to main application
+  useEffect(() => {
+    if (user && isEmployee && hasFullAccess) {
+      navigate('/');
+    }
+  }, [user, isEmployee, hasFullAccess, navigate]);
 
   // If user is logged in but not an employee, show message
   const isLoggedInButNotEmployee = user && !employeeLoading && !isEmployee;
