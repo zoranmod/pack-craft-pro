@@ -4,6 +4,7 @@ import { Document } from '@/types/document';
 import { Separator } from '@/components/ui/separator';
 import { MemorandumHeader } from './MemorandumHeader';
 import { MemorandumFooter } from './MemorandumFooter';
+import { formatDateHR } from '@/lib/utils';
 
 interface ContractDocumentViewProps {
   document: Document;
@@ -46,13 +47,6 @@ const replacePlaceholders = (
   return result;
 };
 
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}.`;
-};
 
 export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentViewProps>(
   ({ document, companySettings }, ref) => {
@@ -78,7 +72,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
         {/* Intro */}
         <div className="mb-8 text-sm leading-relaxed">
           <p className="mb-4">
-            U Zagrebu, dana {formatDate(document.date)} godine, sklapaju:
+            U Zagrebu, dana {formatDateHR(document.date)} godine, sklapaju:
           </p>
         </div>
 

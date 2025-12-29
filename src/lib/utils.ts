@@ -7,7 +7,20 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDateHR(date: string | Date | undefined | null): string {
   if (!date) return '-';
-  const d = new Date(date);
+  
+  let d: Date;
+  if (typeof date === 'string') {
+    // Handle YYYY-MM-DD format without timezone issues
+    const parts = date.split('T')[0].split('-');
+    if (parts.length === 3) {
+      d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    } else {
+      d = new Date(date);
+    }
+  } else {
+    d = date;
+  }
+  
   const day = d.getDate().toString().padStart(2, '0');
   const month = (d.getMonth() + 1).toString().padStart(2, '0');
   const year = d.getFullYear();

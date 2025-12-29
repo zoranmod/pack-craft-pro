@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { FileText, ArrowRight } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels } from '@/types/document';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatDateHR } from '@/lib/utils';
 
 interface RecentDocumentsProps {
   documents: Document[];
@@ -52,7 +52,7 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
               <p className="font-medium text-foreground">
                 {doc.totalAmount.toLocaleString('hr-HR')} €
               </p>
-              <p className="text-sm text-muted-foreground">{doc.date}</p>
+              <p className="text-sm text-muted-foreground">{formatDateHR(doc.date)}</p>
             </div>
           </Link>
         ))}
