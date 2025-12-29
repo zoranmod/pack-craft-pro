@@ -39,6 +39,11 @@ export interface Document {
   createdAt: string;
   updatedAt: string;
   contractArticles?: DocumentContractArticle[];
+  templateId?: string;
+  paymentMethod?: string;
+  validityDays?: number;
+  deliveryDays?: number;
+  preparedBy?: string;
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {

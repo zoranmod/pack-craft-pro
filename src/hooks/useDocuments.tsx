@@ -13,6 +13,11 @@ export interface CreateDocumentData {
   clientEmail?: string;
   notes?: string;
   items: Omit<DocumentItem, 'id'>[];
+  templateId?: string;
+  paymentMethod?: string;
+  validityDays?: number;
+  deliveryDays?: number;
+  preparedBy?: string;
 }
 
 // Convert database row to Document type
@@ -27,6 +32,11 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   clientPhone: row.client_phone,
   clientEmail: row.client_email,
   clientOib: row.client_oib,
+  templateId: row.template_id,
+  paymentMethod: row.payment_method,
+  validityDays: row.validity_days,
+  deliveryDays: row.delivery_days,
+  preparedBy: row.prepared_by,
   items: items.map(item => ({
     id: item.id,
     name: item.name,
@@ -185,6 +195,11 @@ export function useCreateDocument() {
           client_email: data.clientEmail,
           notes: data.notes,
           total_amount: totalAmount,
+          template_id: data.templateId,
+          payment_method: data.paymentMethod,
+          validity_days: data.validityDays,
+          delivery_days: data.deliveryDays,
+          prepared_by: data.preparedBy,
         })
         .select()
         .single();

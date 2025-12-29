@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark, FileCheck } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
 import { toast } from 'sonner';
@@ -23,6 +23,7 @@ import { ContractArticlesEditor } from '@/components/contracts/ContractArticlesE
 import { QuickTemplates } from '@/components/articles/QuickTemplates';
 import { Client } from '@/hooks/useClients';
 import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
+import { useDefaultTemplate, useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 
 // Helper function to calculate item totals
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -53,12 +54,42 @@ export function DocumentForm() {
     clientPhone: '',
     clientEmail: '',
     notes: '',
+    paymentMethod: '',
+    validityDays: 15,
+    deliveryDays: 60,
+    preparedBy: '',
   }));
+
+  // Template state
+  const { data: defaultTemplate, isLoading: isLoadingTemplate } = useDefaultTemplate(formData.type);
+  const { data: allTemplates = [] } = useDocumentTemplates(formData.type);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  
+  // Get the active template (selected or default)
+  const activeTemplate = selectedTemplateId 
+    ? allTemplates.find(t => t.id === selectedTemplateId) 
+    : defaultTemplate;
+
+  // Apply default template values when template loads
+  useEffect(() => {
+    if (activeTemplate && !selectedTemplateId) {
+      setSelectedTemplateId(activeTemplate.id);
+      setFormData(prev => ({
+        ...prev,
+        paymentMethod: activeTemplate.default_payment_method || prev.paymentMethod,
+        validityDays: activeTemplate.default_validity_days || prev.validityDays,
+        deliveryDays: activeTemplate.default_delivery_days || prev.deliveryDays,
+      }));
+    }
+  }, [activeTemplate, selectedTemplateId]);
 
   // When switching between "Nova ponuda / otpremnica / ..." we stay on /documents/new,
   // only the query param changes. Sync form type with URL.
   useEffect(() => {
-    setFormData((prev) => (prev.type === typeFromUrl ? prev : { ...prev, type: typeFromUrl }));
+    if (formData.type !== typeFromUrl) {
+      setFormData(prev => ({ ...prev, type: typeFromUrl }));
+      setSelectedTemplateId(null); // Reset template when type changes
+    }
   }, [typeFromUrl]);
 
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
@@ -215,6 +246,11 @@ export function DocumentForm() {
       clientEmail: formData.clientEmail || undefined,
       notes: formData.notes || undefined,
       items,
+      templateId: selectedTemplateId || undefined,
+      paymentMethod: formData.paymentMethod || undefined,
+      validityDays: formData.validityDays,
+      deliveryDays: formData.deliveryDays,
+      preparedBy: formData.preparedBy || undefined,
     });
 
     // If it's a contract, save the contract articles
@@ -284,6 +320,51 @@ export function DocumentForm() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Template Selection */}
+            {allTemplates.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <Label className="text-muted-foreground">Predložak dokumenta</Label>
+                <Select
+                  value={selectedTemplateId || ''}
+                  onValueChange={(value) => {
+                    setSelectedTemplateId(value);
+                    const template = allTemplates.find(t => t.id === value);
+                    if (template) {
+                      setFormData(prev => ({
+                        ...prev,
+                        paymentMethod: template.default_payment_method || prev.paymentMethod,
+                        validityDays: template.default_validity_days || prev.validityDays,
+                        deliveryDays: template.default_delivery_days || prev.deliveryDays,
+                      }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Odaberite predložak" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allTemplates.map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        <div className="flex items-center gap-2">
+                          <FileCheck className="h-4 w-4 text-muted-foreground" />
+                          {template.name}
+                          {template.is_default && (
+                            <span className="text-xs text-primary">(zadani)</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {activeTemplate && (
+                  <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
+                    <FileCheck className="h-3 w-3" />
+                    Koristi predložak: {activeTemplate.name}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Client Info */}
