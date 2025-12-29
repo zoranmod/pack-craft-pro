@@ -18,6 +18,10 @@ export interface ActivityLog {
     first_name: string;
     last_name: string;
   } | null;
+  user_profile?: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
 }
 
 interface CreateActivityLogData {
@@ -104,7 +108,19 @@ export function useActivityLogs(limit = 50) {
         .limit(limit);
 
       if (error) throw error;
-      return (data || []) as ActivityLog[];
+
+      // Fetch user profile for owner name
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('first_name, last_name')
+        .eq('user_id', ownerUserId)
+        .maybeSingle();
+
+      // Attach user profile to logs without employee
+      return (data || []).map(log => ({
+        ...log,
+        user_profile: !log.employee_id ? userProfile : null,
+      })) as ActivityLog[];
     },
     enabled: !!user,
   });
@@ -157,13 +173,13 @@ export function useLogActivity() {
 }
 
 // Helper function to format activity message
-export function formatActivityMessage(log: ActivityLog, fallbackName?: string): string {
+export function formatActivityMessage(log: ActivityLog): string {
   let actorName = 'Korisnik';
   
   if (log.employee) {
     actorName = `${log.employee.first_name} ${log.employee.last_name}`;
-  } else if (fallbackName) {
-    actorName = fallbackName;
+  } else if (log.user_profile?.first_name || log.user_profile?.last_name) {
+    actorName = `${log.user_profile.first_name || ''} ${log.user_profile.last_name || ''}`.trim();
   }
   
   const action = ACTION_LABELS[log.action_type] || log.action_type;
