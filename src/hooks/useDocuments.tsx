@@ -68,6 +68,7 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
 });
 
 // Generate document number based on type with sequential counter
+// Format: PON-0001/25 (PREFIX-NNNN/YY)
 const generateDocumentNumber = async (type: DocumentType, userId: string): Promise<string> => {
   const prefixes: Record<DocumentType, string> = {
     'otpremnica': 'OTP',
@@ -77,27 +78,35 @@ const generateDocumentNumber = async (type: DocumentType, userId: string): Promi
     'ugovor': 'UGO',
   };
   const year = new Date().getFullYear();
-  const prefix = `${prefixes[type]}-${year}-`;
+  const yearSuffix = year.toString().slice(-2); // e.g., "25" for 2025
+  const prefix = prefixes[type];
   
-  // Get the highest existing number for this type, year, and user
+  // Pattern to match: PREFIX-NNNN/YY (e.g., PON-0001/25)
+  const searchPattern = `${prefix}-%/${yearSuffix}`;
+  
+  // Get all documents for this type, year, and user to find the highest number
   const { data: existingDocs } = await supabase
     .from('documents')
     .select('number')
     .eq('user_id', userId)
-    .like('number', `${prefix}%`)
+    .like('number', searchPattern)
     .order('number', { ascending: false })
     .limit(1);
   
   let nextNumber = 1;
   if (existingDocs && existingDocs.length > 0) {
     const lastNumber = existingDocs[0].number;
-    const lastSequence = parseInt(lastNumber.replace(prefix, ''), 10);
-    if (!isNaN(lastSequence)) {
-      nextNumber = lastSequence + 1;
+    // Extract number from format PON-0001/25
+    const match = lastNumber.match(new RegExp(`^${prefix}-(\\d+)/${yearSuffix}$`));
+    if (match) {
+      const lastSequence = parseInt(match[1], 10);
+      if (!isNaN(lastSequence)) {
+        nextNumber = lastSequence + 1;
+      }
     }
   }
   
-  return `${prefix}${nextNumber.toString().padStart(4, '0')}`;
+  return `${prefix}-${nextNumber.toString().padStart(4, '0')}/${yearSuffix}`;
 };
 
 export function useDocuments() {
