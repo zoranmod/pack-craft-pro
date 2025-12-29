@@ -339,7 +339,7 @@ export function DocumentForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 -mx-4 px-4 border-b border-border/50 flex items-center justify-between">
+      <div className="sticky top-0 z-50 bg-background py-4 -mx-4 px-4 border-b border-border shadow-sm flex items-center justify-between">
         <Button
           type="button"
           variant="ghost"
