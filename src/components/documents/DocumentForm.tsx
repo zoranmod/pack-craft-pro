@@ -790,6 +790,32 @@ export function DocumentForm() {
                 </span>
               </div>
               
+              {/* Validity and Delivery Days - editable */}
+              {formData.type === 'ponuda' && (
+                <div className="border-t border-border pt-3 mt-3 space-y-3">
+                  <div>
+                    <Label className="text-muted-foreground text-xs">Rok valjanosti ponude (dana)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={formData.validityDays}
+                      onChange={(e) => setFormData({ ...formData, validityDays: parseInt(e.target.value) || 15 })}
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground text-xs">Rok isporuke (dana)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={formData.deliveryDays}
+                      onChange={(e) => setFormData({ ...formData, deliveryDays: parseInt(e.target.value) || 60 })}
+                      className="mt-1 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+              )}
+              
               {hasPrices && (
                 <div className="border-t border-border pt-3 mt-4 space-y-2">
                   <div className="flex justify-between text-sm">

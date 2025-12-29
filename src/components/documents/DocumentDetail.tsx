@@ -60,23 +60,81 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         <head>
           <title>${DOMPurify.sanitize(document?.number || 'Dokument')}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+            @page {
+              size: A4;
+              margin: 15mm;
+            }
+            * { box-sizing: border-box; }
+            body { 
+              font-family: Arial, sans-serif; 
+              color: #333; 
+              margin: 0;
+              padding: 0;
+              width: 210mm;
+              min-height: 297mm;
+            }
+            .print-container {
+              width: 100%;
+              padding: 0;
+            }
+            img { max-width: 100%; height: auto; }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px; }
+            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
             th { font-weight: 600; color: #666; }
-            .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
-            .total-section { text-align: right; margin-top: 20px; }
-            .notes { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 30px; }
-            @media print { body { print-color-adjust: exact; } }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .font-bold { font-weight: bold; }
+            .font-semibold { font-weight: 600; }
+            .font-medium { font-weight: 500; }
+            .text-sm { font-size: 11px; }
+            .text-xs { font-size: 10px; }
+            .text-xl { font-size: 18px; }
+            .text-base { font-size: 13px; }
+            .mb-1 { margin-bottom: 4px; }
+            .mb-2 { margin-bottom: 8px; }
+            .mb-4 { margin-bottom: 16px; }
+            .mb-6 { margin-bottom: 24px; }
+            .mb-8 { margin-bottom: 32px; }
+            .mt-2 { margin-top: 8px; }
+            .mt-4 { margin-top: 16px; }
+            .mt-8 { margin-top: 32px; }
+            .pt-2 { padding-top: 8px; }
+            .pt-6 { padding-top: 24px; }
+            .pt-8 { padding-top: 32px; }
+            .py-1 { padding-top: 4px; padding-bottom: 4px; }
+            .py-2 { padding-top: 8px; padding-bottom: 8px; }
+            .p-3 { padding: 12px; }
+            .border-t { border-top: 1px solid #ddd; }
+            .border-b { border-bottom: 1px solid #ddd; }
+            .border-t-2 { border-top: 2px solid #333; }
+            .border-b-2 { border-bottom: 2px solid #333; }
+            .rounded { border-radius: 4px; }
+            .bg-gray-50 { background-color: #f9fafb; }
+            .text-gray-500 { color: #6b7280; }
+            .text-gray-600 { color: #4b5563; }
+            .text-gray-700 { color: #374151; }
+            .text-gray-900 { color: #111827; }
+            .space-y-1 > * + * { margin-top: 4px; }
+            .w-72 { width: 288px; }
+            .w-48 { width: 192px; }
+            .flex { display: flex; }
+            .justify-between { justify-content: space-between; }
+            .justify-end { justify-content: flex-end; }
+            .items-start { align-items: flex-start; }
+            @media print { 
+              body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            }
           </style>
         </head>
         <body>
-          ${sanitizedContent}
+          <div class="print-container">
+            ${sanitizedContent}
+          </div>
         </body>
       </html>
     `);
     printWindow.document.close();
-    printWindow.print();
+    setTimeout(() => printWindow.print(), 250);
   };
 
   const handleDownloadPdf = async () => {
@@ -86,14 +144,26 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     toast.info('Generiram PDF...');
     
     try {
+      // A4 dimensions in mm: 210 x 297
+      const a4WidthMm = 210;
+      const a4HeightMm = 297;
+      const marginMm = 15;
+      const contentWidthMm = a4WidthMm - (marginMm * 2);
+      
+      // Calculate proper scale for A4
+      const elementWidth = printRef.current.offsetWidth;
+      const scaleFactor = (contentWidthMm / 25.4 * 96) / elementWidth; // Convert mm to pixels at 96 DPI
+      
       const canvas = await html2canvas(printRef.current, {
-        scale: 2,
+        scale: 2 * scaleFactor, // Higher scale for better quality
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
+        width: elementWidth,
+        windowWidth: elementWidth,
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -101,14 +171,49 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       });
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
+      const imgWidthMm = contentWidthMm;
+      const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
+      const imgX = marginMm;
+      const imgY = marginMm;
       
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      // Handle multi-page if content is longer than A4
+      const pageContentHeight = a4HeightMm - (marginMm * 2);
+      
+      if (imgHeightMm <= pageContentHeight) {
+        // Single page
+        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidthMm, imgHeightMm);
+      } else {
+        // Multi-page
+        let remainingHeight = imgHeightMm;
+        let sourceY = 0;
+        let pageNum = 0;
+        
+        while (remainingHeight > 0) {
+          if (pageNum > 0) {
+            pdf.addPage();
+          }
+          
+          const sliceHeight = Math.min(pageContentHeight, remainingHeight);
+          const sliceRatio = sliceHeight / imgHeightMm;
+          const sourceHeight = canvas.height * sliceRatio;
+          
+          // Create a canvas slice for this page
+          const sliceCanvas = window.document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sourceHeight;
+          const ctx = sliceCanvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
+            const sliceData = sliceCanvas.toDataURL('image/png', 1.0);
+            pdf.addImage(sliceData, 'PNG', imgX, imgY, imgWidthMm, sliceHeight);
+          }
+          
+          sourceY += sourceHeight;
+          remainingHeight -= sliceHeight;
+          pageNum++;
+        }
+      }
+      
       pdf.save(`${document.number}.pdf`);
       
       toast.success('PDF uspješno generiran!');
@@ -196,7 +301,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-8" style={{ fontFamily: template?.font_family || 'Arial' }}>
+            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-8" style={{ fontFamily: template?.font_family || 'Arial', maxWidth: '210mm', margin: '0 auto' }}>
               {/* Memorandum Header - identical for all documents */}
               <MemorandumHeader />
 
