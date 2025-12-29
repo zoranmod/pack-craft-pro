@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import DOMPurify from 'dompurify';
 import { Document } from '@/types/document';
 import { Separator } from '@/components/ui/separator';
 
@@ -119,8 +120,14 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
               <div 
                 className="leading-relaxed whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ 
-                  __html: replacePlaceholders(article.content, document, companySettings)
-                    .replace(/\n/g, '<br />') 
+                  __html: DOMPurify.sanitize(
+                    replacePlaceholders(article.content, document, companySettings)
+                      .replace(/\n/g, '<br />'),
+                    {
+                      ALLOWED_TAGS: ['br', 'p', 'strong', 'em', 'b', 'i', 'u', 'span'],
+                      ALLOWED_ATTR: []
+                    }
+                  )
                 }}
               />
             </div>
