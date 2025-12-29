@@ -435,12 +435,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   <div className="flex justify-end">
                     <div className="text-right">
                       {document.preparedBy && (
-                        <div className="mb-2">
+                        <div className="mb-8">
                           <p className="text-sm text-gray-600">Ponudu izradio/la:</p>
                           <p className="text-sm font-medium text-gray-900">{document.preparedBy}</p>
                         </div>
                       )}
-                      <div className="mt-4">
+                      <div className="mt-10">
                         <div className="w-48 border-b border-gray-400 mb-1"></div>
                         <p className="text-sm text-gray-500">(Potpis)</p>
                       </div>
