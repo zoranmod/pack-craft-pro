@@ -43,13 +43,25 @@ export function useCurrentEmployee() {
       const isAdmin = roles?.some(r => r.role === 'admin') || false;
 
       // Check if this user is an employee (has auth_user_id linked)
-      const { data: employee, error: empError } = await supabase
+      let { data: employee, error: empError } = await supabase
         .from('employees')
         .select('*')
         .eq('auth_user_id', user.id)
         .maybeSingle();
 
       if (empError) throw empError;
+
+      // Fallback: if no employee found by auth_user_id, try by user_id (for owners/admins)
+      if (!employee) {
+        const { data: ownerEmployee, error: ownerError } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (ownerError) throw ownerError;
+        employee = ownerEmployee;
+      }
 
       if (!employee) {
         return { employee: null, permissions: null, isAdmin };

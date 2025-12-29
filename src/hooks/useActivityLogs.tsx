@@ -157,10 +157,14 @@ export function useLogActivity() {
 }
 
 // Helper function to format activity message
-export function formatActivityMessage(log: ActivityLog): string {
-  const actorName = log.employee 
-    ? `${log.employee.first_name} ${log.employee.last_name}` 
-    : 'Korisnik';
+export function formatActivityMessage(log: ActivityLog, fallbackName?: string): string {
+  let actorName = 'Korisnik';
+  
+  if (log.employee) {
+    actorName = `${log.employee.first_name} ${log.employee.last_name}`;
+  } else if (fallbackName) {
+    actorName = fallbackName;
+  }
   
   const action = ACTION_LABELS[log.action_type] || log.action_type;
   const entity = ENTITY_LABELS[log.entity_type] || log.entity_type;
