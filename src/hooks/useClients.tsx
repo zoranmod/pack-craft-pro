@@ -14,6 +14,8 @@ export interface Client {
   phone: string | null;
   email: string | null;
   notes: string | null;
+  client_type: 'private' | 'company';
+  default_pdv: number;
   created_at: string;
   updated_at: string;
 }
@@ -27,6 +29,8 @@ export interface CreateClientData {
   phone?: string;
   email?: string;
   notes?: string;
+  client_type?: 'private' | 'company';
+  default_pdv?: number;
 }
 
 export function useClients() {
@@ -67,6 +71,8 @@ export function useCreateClient() {
           phone: clientData.phone || null,
           email: clientData.email || null,
           notes: clientData.notes || null,
+          client_type: clientData.client_type || 'company',
+          default_pdv: clientData.default_pdv ?? 25,
         })
         .select()
         .single();
@@ -100,6 +106,8 @@ export function useUpdateClient() {
           phone: clientData.phone || null,
           email: clientData.email || null,
           notes: clientData.notes || null,
+          client_type: clientData.client_type || 'company',
+          default_pdv: clientData.default_pdv ?? 25,
         })
         .eq('id', id)
         .select()

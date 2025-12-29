@@ -266,6 +266,14 @@ export function DocumentForm() {
                       clientPhone: client.phone || '',
                       clientEmail: client.email || '',
                     });
+                    // Apply client's default PDV to all items
+                    if (hasPrices) {
+                      setItems(prevItems => prevItems.map(item => {
+                        const updatedItem = { ...item, pdv: client.default_pdv };
+                        const { subtotal, total } = calculateItemTotals(updatedItem);
+                        return { ...updatedItem, subtotal, total };
+                      }));
+                    }
                   }}
                   placeholder="Pretraži postojeće klijente..."
                 />
