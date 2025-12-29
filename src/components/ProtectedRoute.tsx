@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -9,8 +10,9 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
+  const { isLoading: employeeLoading, isEmployee, hasFullAccess } = useCurrentEmployee();
 
-  if (loading) {
+  if (loading || (user && employeeLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -20,6 +22,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // If user is an employee without full access, redirect to employee portal
+  if (isEmployee && !hasFullAccess) {
+    return <Navigate to="/employee-portal" replace />;
   }
 
   return <>{children}</>;
