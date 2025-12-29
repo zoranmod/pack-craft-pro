@@ -22,6 +22,7 @@ import {
 import { useCreateDocument, type CreateDocumentData } from '@/hooks/useDocuments';
 import { ContractArticleFormData } from '@/types/contractArticle';
 import { toast } from 'sonner';
+import { formatDateHR } from '@/lib/utils';
 
 interface DocumentItem {
   id: string;
@@ -158,7 +159,7 @@ export default function ContractEditor() {
         ukupna_cijena: ukupnaCijena.toFixed(2),
         ostatak: ostatak.toFixed(2),
         adresa_kupca: headerData.buyer.address,
-        datum_ugovora: new Date(headerData.date).toLocaleDateString('hr-HR'),
+        datum_ugovora: formatDateHR(headerData.date),
         mjesto_ugovora: headerData.place,
         ugradbeni_aparati: appliancesText,
       };

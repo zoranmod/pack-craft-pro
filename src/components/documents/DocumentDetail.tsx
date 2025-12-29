@@ -4,7 +4,7 @@ import { Document, documentTypeLabels, documentStatusLabels } from '@/types/docu
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+import { cn, formatDateHR } from '@/lib/utils';
 import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -213,7 +213,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <div className="text-right">
                   <p className="text-xl font-bold text-gray-900">{documentTypeLabels[document.type].toUpperCase()}</p>
                   <p className="text-lg font-semibold text-gray-700">{document.number}</p>
-                  <p className="text-sm text-gray-600 mt-2">Datum: {document.date}</p>
+                  <p className="text-sm text-gray-600 mt-2">Datum: {formatDateHR(document.date)}</p>
                   {document.validityDays && template?.show_validity_days && (
                     <p className="text-sm text-gray-600">Rok valjanosti: {document.validityDays} dana</p>
                   )}
@@ -327,27 +327,11 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Kreirano</span>
-                <span className="text-foreground">
-                  {(() => {
-                    const d = new Date(document.createdAt);
-                    const day = d.getDate().toString().padStart(2, '0');
-                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const year = d.getFullYear();
-                    return `${day}.${month}.${year}.`;
-                  })()}
-                </span>
+                <span className="text-foreground">{formatDateHR(document.createdAt)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Ažurirano</span>
-                <span className="text-foreground">
-                  {(() => {
-                    const d = new Date(document.updatedAt);
-                    const day = d.getDate().toString().padStart(2, '0');
-                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const year = d.getFullYear();
-                    return `${day}.${month}.${year}.`;
-                  })()}
-                </span>
+                <span className="text-foreground">{formatDateHR(document.updatedAt)}</span>
               </div>
             </div>
           </div>

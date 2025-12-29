@@ -3,6 +3,7 @@ import { CreateDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { documentTypeLabels, DocumentType } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
 import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
+import { formatDateHR } from '@/lib/utils';
 
 interface TemplatePreviewProps {
   template: CreateDocumentTemplate;
@@ -51,7 +52,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
           {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
         </h2>
         <p className="text-gray-600 mt-1">Broj: {template.document_type.toUpperCase().slice(0,3)}-2025-0001</p>
-        <p className="text-gray-600">Datum: {new Date().toLocaleDateString('hr-HR')}</p>
+        <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
       </div>
 
       {/* Client Info */}

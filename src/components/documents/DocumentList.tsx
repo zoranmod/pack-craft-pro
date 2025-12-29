@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import { cn, formatDateHR } from '@/lib/utils';
 import { useConvertDocument } from '@/hooks/useDocuments';
 
 interface DocumentListProps {
@@ -111,7 +111,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                   </p>
                 </td>
                 <td className="px-6 py-4 text-muted-foreground">
-                  {doc.date}
+                  {formatDateHR(doc.date)}
                 </td>
                 <td className="px-6 py-4">
                   <Badge variant="outline" className={cn("text-xs", statusStyles[doc.status])}>
