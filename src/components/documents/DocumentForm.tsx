@@ -4,6 +4,7 @@ import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark, FileCheck }
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
 import { toast } from 'sonner';
+import { round2, formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,13 +26,13 @@ import { Client } from '@/hooks/useClients';
 import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
 import { useDefaultTemplate, useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 
-// Helper function to calculate item totals
+// Helper function to calculate item totals with rounding
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
-  const subtotal = item.quantity * item.price;
-  const discountAmount = subtotal * (item.discount / 100);
-  const afterDiscount = subtotal - discountAmount;
-  const pdvAmount = afterDiscount * (item.pdv / 100);
-  const total = afterDiscount + pdvAmount;
+  const subtotal = round2(item.quantity * item.price);
+  const discountAmount = round2(subtotal * (item.discount / 100));
+  const afterDiscount = round2(subtotal - discountAmount);
+  const pdvAmount = round2(afterDiscount * (item.pdv / 100));
+  const total = round2(afterDiscount + pdvAmount);
   return { subtotal, total };
 };
 
@@ -171,13 +172,13 @@ export function DocumentForm() {
   const isContract = formData.type === 'ugovor';
 
   // Calculate totals BEFORE the useEffect that uses them
-  const subtotalAmount = hasPrices ? items.reduce((sum, item) => sum + item.subtotal, 0) : 0;
-  const totalDiscount = hasPrices ? items.reduce((sum, item) => sum + (item.subtotal * (item.discount / 100)), 0) : 0;
-  const totalPdv = hasPrices ? items.reduce((sum, item) => {
-    const afterDiscount = item.subtotal - (item.subtotal * (item.discount / 100));
-    return sum + (afterDiscount * (item.pdv / 100));
-  }, 0) : 0;
-  const totalAmount = hasPrices ? items.reduce((sum, item) => sum + item.total, 0) : 0;
+  const subtotalAmount = hasPrices ? round2(items.reduce((sum, item) => sum + item.subtotal, 0)) : 0;
+  const totalDiscount = hasPrices ? round2(items.reduce((sum, item) => sum + round2(item.subtotal * (item.discount / 100)), 0)) : 0;
+  const totalPdv = hasPrices ? round2(items.reduce((sum, item) => {
+    const afterDiscount = round2(item.subtotal - round2(item.subtotal * (item.discount / 100)));
+    return sum + round2(afterDiscount * (item.pdv / 100));
+  }, 0)) : 0;
+  const totalAmount = hasPrices ? round2(items.reduce((sum, item) => sum + item.total, 0)) : 0;
 
   // Update placeholder values based on form data
   useEffect(() => {
@@ -655,13 +656,13 @@ export function DocumentForm() {
                       <div className="sm:col-span-2 text-right">
                         <Label className="text-muted-foreground">Osnovica</Label>
                         <p className="mt-1.5 py-2 text-sm text-muted-foreground">
-                          {item.subtotal.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                          {formatCurrency(item.subtotal)} €
                         </p>
                       </div>
                       <div className="sm:col-span-2 text-right">
                         <Label>Ukupno</Label>
                         <p className="mt-1.5 py-2 font-semibold text-foreground">
-                          {item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                          {formatCurrency(item.total)} €
                         </p>
                       </div>
                       <div className="sm:col-span-1 flex gap-1">
@@ -821,27 +822,27 @@ export function DocumentForm() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Osnovica</span>
                     <span className="text-foreground">
-                      {subtotalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      {formatCurrency(subtotalAmount)} €
                     </span>
                   </div>
                   {totalDiscount > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Rabat</span>
                       <span className="text-success">
-                        -{totalDiscount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                        -{formatCurrency(totalDiscount)} €
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">PDV</span>
                     <span className="text-foreground">
-                      {totalPdv.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      {formatCurrency(totalPdv)} €
                     </span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-border">
                     <span className="font-medium text-foreground">Ukupno</span>
                     <span className="text-2xl font-bold text-primary">
-                      {totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      {formatCurrency(totalAmount)} €
                     </span>
                   </div>
                 </div>
