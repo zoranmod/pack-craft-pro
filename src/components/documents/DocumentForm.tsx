@@ -535,7 +535,7 @@ export function DocumentForm() {
 
           {/* Items */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="sticky top-20 z-40 bg-card -mx-6 px-6 py-3 mb-4 border-b border-border/50 flex items-center justify-between">
               <h2 className="font-semibold text-foreground">Stavke</h2>
               <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-2">
                 <Plus className="h-4 w-4" />

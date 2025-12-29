@@ -147,20 +147,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       // A4 dimensions in mm: 210 x 297
       const a4WidthMm = 210;
       const a4HeightMm = 297;
-      const marginMm = 15;
+      const marginMm = 10;
       const contentWidthMm = a4WidthMm - (marginMm * 2);
       
-      // Calculate proper scale for A4
-      const elementWidth = printRef.current.offsetWidth;
-      const scaleFactor = (contentWidthMm / 25.4 * 96) / elementWidth; // Convert mm to pixels at 96 DPI
-      
+      // Use a fixed scale for consistent quality
       const canvas = await html2canvas(printRef.current, {
-        scale: 2 * scaleFactor, // Higher scale for better quality
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: elementWidth,
-        windowWidth: elementWidth,
       });
       
       const imgData = canvas.toDataURL('image/png', 1.0);
@@ -170,7 +165,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         format: 'a4',
       });
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
+      // Calculate dimensions to fit content width to A4 width
       const imgWidthMm = contentWidthMm;
       const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
       const imgX = marginMm;
@@ -180,7 +175,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       const pageContentHeight = a4HeightMm - (marginMm * 2);
       
       if (imgHeightMm <= pageContentHeight) {
-        // Single page
+        // Single page - center vertically if there's space
         pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidthMm, imgHeightMm);
       } else {
         // Multi-page
