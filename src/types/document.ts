@@ -5,6 +5,7 @@ export type DocumentStatus = 'draft' | 'pending' | 'completed' | 'cancelled';
 export interface DocumentItem {
   id: string;
   name: string;
+  code?: string; // šifra artikla
   quantity: number;
   unit: string;
   price: number;

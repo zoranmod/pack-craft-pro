@@ -359,7 +359,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                     {document.items.map((item, index) => (
                       <tr key={item.id} className="border-b border-gray-300">
                         <td className="py-1" style={{ color: '#000' }}>{index + 1}.</td>
-                        <td className="py-1" style={{ color: '#000' }}>{(item as any).code || ''}</td>
+                        <td className="py-1" style={{ color: '#000' }}>{item.code || ''}</td>
                         <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
                         <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
                         <td className="py-1 text-center" style={{ color: '#000' }}>{item.quantity}</td>
@@ -448,7 +448,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Legal Notice */}
               <div className="mt-6 text-center">
-                <p style={{ color: '#dc2626', fontSize: '10px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
+                <p style={{ color: '#000', fontSize: '10px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
               </div>
 
               {/* Memorandum Footer - identical for all documents */}

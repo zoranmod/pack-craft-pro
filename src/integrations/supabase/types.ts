@@ -314,6 +314,7 @@ export type Database = {
       }
       document_items: {
         Row: {
+          code: string | null
           created_at: string
           discount: number
           document_id: string
@@ -327,6 +328,7 @@ export type Database = {
           unit: string
         }
         Insert: {
+          code?: string | null
           created_at?: string
           discount?: number
           document_id: string
@@ -340,6 +342,7 @@ export type Database = {
           unit?: string
         }
         Update: {
+          code?: string | null
           created_at?: string
           discount?: number
           document_id?: string
