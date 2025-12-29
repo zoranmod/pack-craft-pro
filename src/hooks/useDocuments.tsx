@@ -253,6 +253,90 @@ export function useCreateDocument() {
   });
 }
 
+export function useUpdateDocument() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const logActivity = useLogActivity();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: CreateDocumentData }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const totalAmount = data.items.reduce((sum, item) => sum + item.total, 0);
+
+      // Update document
+      const { data: doc, error: docError } = await supabase
+        .from('documents')
+        .update({
+          type: data.type,
+          client_name: data.clientName,
+          client_oib: data.clientOib,
+          client_address: data.clientAddress,
+          client_phone: data.clientPhone,
+          client_email: data.clientEmail,
+          notes: data.notes,
+          total_amount: totalAmount,
+          template_id: data.templateId,
+          payment_method: data.paymentMethod,
+          validity_days: data.validityDays,
+          delivery_days: data.deliveryDays,
+          prepared_by: data.preparedBy,
+          contact_person: data.contactPerson,
+          delivery_address: data.deliveryAddress,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (docError) throw docError;
+
+      // Delete existing items
+      const { error: deleteError } = await supabase
+        .from('document_items')
+        .delete()
+        .eq('document_id', id);
+
+      if (deleteError) throw deleteError;
+
+      // Insert new items
+      const itemsToInsert = data.items.map(item => ({
+        document_id: id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: item.price,
+        discount: item.discount,
+        pdv: item.pdv,
+        subtotal: item.subtotal,
+        total: item.total,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('document_items')
+        .insert(itemsToInsert);
+
+      if (itemsError) throw itemsError;
+
+      return doc;
+    },
+    onSuccess: (doc) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['document', doc.id] });
+      toast.success('Dokument uspješno ažuriran!');
+      
+      logActivity.mutate({
+        action_type: 'update',
+        entity_type: 'document',
+        entity_id: doc.id,
+        entity_name: doc.number,
+      });
+    },
+    onError: (error) => {
+      toast.error('Greška pri ažuriranju dokumenta: ' + error.message);
+    },
+  });
+}
+
 export function useUpdateDocumentStatus() {
   const queryClient = useQueryClient();
   const logActivity = useLogActivity();

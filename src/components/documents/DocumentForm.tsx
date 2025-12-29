@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark, FileCheck } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCreateDocument } from '@/hooks/useDocuments';
+import { useCreateDocument, useDocument, useUpdateDocument } from '@/hooks/useDocuments';
 import { useContractArticleTemplates, useSaveDocumentContractArticles, useInitializeDefaultTemplates } from '@/hooks/useContractArticles';
 import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
 import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
@@ -37,7 +37,9 @@ const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
 
 export function DocumentForm() {
   const navigate = useNavigate();
+  const { id: documentId } = useParams();
   const [searchParams] = useSearchParams();
+  const isEditMode = !!documentId;
 
   const typeParam = searchParams.get('type');
   const typeFromUrl: DocumentType = typeParam && typeParam in documentTypeLabels
@@ -45,6 +47,8 @@ export function DocumentForm() {
     : 'ponuda';
 
   const createDocument = useCreateDocument();
+  const updateDocument = useUpdateDocument();
+  const { data: existingDocument, isLoading: isLoadingDocument } = useDocument(documentId || '');
 
   const [formData, setFormData] = useState(() => ({
     type: typeFromUrl,
@@ -97,6 +101,40 @@ export function DocumentForm() {
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
   ]);
+
+  // Load existing document data when in edit mode
+  useEffect(() => {
+    if (isEditMode && existingDocument) {
+      setFormData({
+        type: existingDocument.type,
+        clientName: existingDocument.clientName,
+        clientOib: existingDocument.clientOib || '',
+        clientAddress: existingDocument.clientAddress,
+        clientPhone: existingDocument.clientPhone || '',
+        clientEmail: existingDocument.clientEmail || '',
+        notes: existingDocument.notes || '',
+        paymentMethod: existingDocument.paymentMethod || '',
+        validityDays: existingDocument.validityDays || 15,
+        deliveryDays: existingDocument.deliveryDays || 60,
+        preparedBy: existingDocument.preparedBy || '',
+        contactPerson: existingDocument.contactPerson || '',
+        deliveryAddress: existingDocument.deliveryAddress || '',
+      });
+      setItems(existingDocument.items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: item.price,
+        discount: item.discount,
+        pdv: item.pdv,
+        subtotal: item.subtotal,
+        total: item.total,
+      })));
+      if (existingDocument.templateId) {
+        setSelectedTemplateId(existingDocument.templateId);
+      }
+    }
+  }, [isEditMode, existingDocument]);
 
   // Contract articles state
   const { data: articleTemplates = [] } = useContractArticleTemplates();
@@ -238,8 +276,7 @@ export function DocumentForm() {
       return;
     }
 
-    // Create the document first
-    const document = await createDocument.mutateAsync({
+    const documentData = {
       type: formData.type as DocumentType,
       clientName: formData.clientName,
       clientOib: formData.clientOib || undefined,
@@ -255,7 +292,12 @@ export function DocumentForm() {
       preparedBy: formData.preparedBy || undefined,
       contactPerson: formData.contactPerson || undefined,
       deliveryAddress: formData.deliveryAddress || undefined,
-    });
+    };
+
+    // Update or create the document
+    const document = isEditMode && documentId
+      ? await updateDocument.mutateAsync({ id: documentId, data: documentData })
+      : await createDocument.mutateAsync(documentData);
 
     // If it's a contract, save the contract articles
     if (isContract && document?.id) {
@@ -284,6 +326,16 @@ export function DocumentForm() {
     navigate('/documents');
   };
 
+  const isSaving = createDocument.isPending || updateDocument.isPending;
+
+  if (isEditMode && isLoadingDocument) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Header */}
@@ -297,9 +349,9 @@ export function DocumentForm() {
           <ArrowLeft className="h-4 w-4" />
           Natrag
         </Button>
-        <Button type="submit" className="gap-2 btn-float" disabled={createDocument.isPending}>
-          {createDocument.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Spremi dokument
+        <Button type="submit" className="gap-2 btn-float" disabled={isSaving}>
+          {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {isEditMode ? 'Spremi promjene' : 'Spremi dokument'}
         </Button>
       </div>
 
