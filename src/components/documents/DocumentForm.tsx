@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -189,11 +190,18 @@ export function DocumentForm() {
     e.preventDefault();
     
     // Validation
-    if (!formData.clientName || !formData.clientAddress) {
+    if (!formData.clientName) {
+      toast.error('Molimo unesite naziv klijenta');
+      return;
+    }
+    
+    if (!formData.clientAddress) {
+      toast.error('Molimo unesite adresu klijenta');
       return;
     }
 
     if (items.some(item => !item.name)) {
+      toast.error('Molimo unesite naziv za sve stavke');
       return;
     }
 
