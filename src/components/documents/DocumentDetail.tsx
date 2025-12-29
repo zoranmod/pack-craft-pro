@@ -1,11 +1,11 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Download, Printer, Mail, Trash2 } from 'lucide-react';
-import { Document, documentTypeLabels, documentStatusLabels } from '@/types/document';
+import { Document, documentTypeLabels, documentStatusLabels, DocumentItem } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
 import { MemorandumFooter } from './MemorandumFooter';
+import { useArticles } from '@/hooks/useArticles';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -35,8 +36,27 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
+  const { data: articlesData } = useArticles({ pageSize: 1000 });
   
   const isContract = document?.type === 'ugovor';
+
+  // Enrich items with codes from articles if not already present
+  const enrichedItems = useMemo(() => {
+    if (!document?.items) return [];
+    if (!articlesData?.articles) return document.items;
+    
+    const articleCodeMap = new Map<string, string>();
+    articlesData.articles.forEach(article => {
+      if (article.code) {
+        articleCodeMap.set(article.name.toLowerCase(), article.code);
+      }
+    });
+    
+    return document.items.map(item => ({
+      ...item,
+      code: item.code || articleCodeMap.get(item.name.toLowerCase()) || ''
+    }));
+  }, [document?.items, articlesData?.articles]);
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -356,7 +376,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {document.items.map((item, index) => (
+                    {enrichedItems.map((item, index) => (
                       <tr key={item.id} className="border-b border-gray-300">
                         <td className="py-1" style={{ color: '#000' }}>{index + 1}.</td>
                         <td className="py-1" style={{ color: '#000' }}>{item.code || ''}</td>
