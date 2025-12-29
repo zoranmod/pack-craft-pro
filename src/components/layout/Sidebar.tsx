@@ -14,10 +14,12 @@ import {
   UserCircle,
   FileSignature,
   Receipt,
-  BookText
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 const menuItems = [
   // Početna
@@ -39,10 +41,107 @@ const menuItems = [
   { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
+  const handleLinkClick = () => {
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
+  const sidebarContent = (
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex h-16 items-center justify-between border-b border-border px-4">
+        {(!collapsed || isMobile) && (
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
+            <span className="font-semibold text-foreground">Akord</span>
+          </div>
+        )}
+        {collapsed && !isMobile && (
+          <img src={logo} alt="Akord logo" className="h-7 w-7 object-contain mx-auto" />
+        )}
+        {isMobile ? (
+          <button
+            onClick={() => onOpenChange?.(false)}
+            className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        ) : (
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+          >
+            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          </button>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
+        {menuItems.map((item) => {
+          const currentFullPath = location.pathname + location.search;
+          const isActive = item.path === '/' 
+            ? location.pathname === '/'
+            : item.path.includes('?')
+              ? currentFullPath === item.path
+              : location.pathname === item.path;
+          
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={handleLinkClick}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              <item.icon className={cn("h-5 w-5 flex-shrink-0", !isMobile && collapsed && "mx-auto")} />
+              {(isMobile || !collapsed) && <span>{item.label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Settings */}
+      <div className="border-t border-border p-3">
+        <Link
+          to="/settings"
+          onClick={handleLinkClick}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        >
+          <Settings className={cn("h-5 w-5 flex-shrink-0", !isMobile && collapsed && "mx-auto")} />
+          {(isMobile || !collapsed) && <span>Postavke</span>}
+        </Link>
+      </div>
+    </div>
+  );
+
+  // Mobile: use Sheet drawer
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className="p-0 w-64">
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: fixed sidebar
   return (
     <aside
       className={cn(
@@ -50,65 +149,7 @@ export function Sidebar() {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between border-b border-border px-4">
-          {!collapsed && (
-            <div className="flex items-center gap-2">
-              <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
-              <span className="font-semibold text-foreground">Akord</span>
-            </div>
-          )}
-          {collapsed && (
-            <img src={logo} alt="Akord logo" className="h-7 w-7 object-contain mx-auto" />
-          )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-          >
-            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-3">
-          {menuItems.map((item) => {
-            const currentFullPath = location.pathname + location.search;
-            const isActive = item.path === '/' 
-              ? location.pathname === '/'
-              : item.path.includes('?')
-                ? currentFullPath === item.path
-                : location.pathname === item.path;
-            
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                )}
-              >
-                <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "mx-auto")} />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Settings */}
-        <div className="border-t border-border p-3">
-          <Link
-            to="/settings"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-          >
-            <Settings className={cn("h-5 w-5 flex-shrink-0", collapsed && "mx-auto")} />
-            {!collapsed && <span>Postavke</span>}
-          </Link>
-        </div>
-      </div>
+      {sidebarContent}
     </aside>
   );
 }
