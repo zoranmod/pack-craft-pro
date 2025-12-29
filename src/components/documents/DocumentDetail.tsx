@@ -13,8 +13,8 @@ import DOMPurify from 'dompurify';
 import { ContractDocumentView } from './ContractDocumentView';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
-import { ProfessionalDocumentHeader } from './ProfessionalDocumentHeader';
-import { ProfessionalDocumentFooter } from './ProfessionalDocumentFooter';
+import { MemorandumHeader } from './MemorandumHeader';
+import { MemorandumFooter } from './MemorandumFooter';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -198,13 +198,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             </div>
           ) : (
             <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-8" style={{ fontFamily: template?.font_family || 'Arial' }}>
-              {/* Professional Document Header */}
-              <ProfessionalDocumentHeader 
-                companySettings={companySettings}
-                showLogo={template?.show_logo ?? true}
-                showIbanInHeader={template?.show_iban_in_header ?? true}
-                showSecondIban={template?.show_second_iban ?? false}
-              />
+              {/* Memorandum Header - identical for all documents */}
+              <MemorandumHeader companySettings={companySettings} />
 
               {/* Document Title & Client Info */}
               <div className="flex justify-between items-start mb-6">
@@ -313,19 +308,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 </div>
               )}
 
-              {/* Professional Document Footer */}
-              <ProfessionalDocumentFooter 
+              {/* Memorandum Footer - identical for all documents */}
+              <MemorandumFooter 
                 companySettings={companySettings}
                 showPreparedBy={template?.show_prepared_by ?? true}
                 preparedByLabel={template?.prepared_by_label}
                 preparedByName={document.preparedBy}
-                showSignatureLine={template?.show_signature_line ?? true}
-                showStampPlaceholder={template?.show_stamp_placeholder ?? true}
-                showDirectorSignature={template?.show_director_signature ?? true}
-                showCertificates={template?.show_certificates ?? false}
-                showFooterContacts={template?.show_footer_contacts ?? true}
-                showRegistrationInfo={template?.show_registration_info ?? true}
-                footerNote={template?.footer_note}
               />
             </div>
           )}

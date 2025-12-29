@@ -1,8 +1,8 @@
 import { useCompanySettings } from '@/hooks/useSettings';
 import { CreateDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { documentTypeLabels, DocumentType } from '@/types/document';
-import { ProfessionalDocumentHeader } from '@/components/documents/ProfessionalDocumentHeader';
-import { ProfessionalDocumentFooter } from '@/components/documents/ProfessionalDocumentFooter';
+import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
+import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
 
 interface TemplatePreviewProps {
   template: CreateDocumentTemplate;
@@ -42,13 +42,8 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         fontSize: `${template.body_font_size}px` 
       }}
     >
-      {/* Professional Header */}
-      <ProfessionalDocumentHeader
-        companySettings={companySettings}
-        showLogo={template.show_logo}
-        showIbanInHeader={template.show_iban_in_header}
-        showSecondIban={template.show_second_iban}
-      />
+      {/* Memorandum Header - identical for all documents */}
+      <MemorandumHeader companySettings={companySettings} />
 
       {/* Document Title */}
       <div className="text-center mb-6">
@@ -137,18 +132,11 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         </div>
       </div>
 
-      {/* Professional Footer */}
-      <ProfessionalDocumentFooter
+      {/* Memorandum Footer - identical for all documents */}
+      <MemorandumFooter 
         companySettings={companySettings}
-        showCertificates={template.show_certificates}
-        showFooterContacts={template.show_footer_contacts}
-        showRegistrationInfo={template.show_registration_info}
-        footerNote={template.footer_note}
-        preparedByLabel={template.prepared_by_label}
         showPreparedBy={template.show_prepared_by}
-        showSignatureLine={template.show_signature_line}
-        showStampPlaceholder={template.show_stamp_placeholder}
-        showDirectorSignature={template.show_director_signature}
+        preparedByLabel={template.prepared_by_label}
       />
     </div>
   );

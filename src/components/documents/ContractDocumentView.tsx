@@ -2,6 +2,8 @@ import { forwardRef } from 'react';
 import DOMPurify from 'dompurify';
 import { Document } from '@/types/document';
 import { Separator } from '@/components/ui/separator';
+import { MemorandumHeader } from './MemorandumHeader';
+import { MemorandumFooter } from './MemorandumFooter';
 
 interface ContractDocumentViewProps {
   document: Document;
@@ -60,12 +62,15 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
 
     return (
       <div ref={ref} className="bg-white text-black p-8 min-h-[297mm] font-serif" style={{ width: '210mm' }}>
-        {/* Header */}
+        {/* Memorandum Header - identical for all documents */}
+        <MemorandumHeader companySettings={companySettings} />
+
+        {/* Contract Title */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold uppercase tracking-wide mb-6">
+          <h1 className="text-2xl font-bold uppercase tracking-wide mb-4">
             Ugovor o kupoprodaji
           </h1>
-          <p className="text-sm mb-8">
+          <p className="text-sm">
             Broj ugovora: <span className="font-semibold">{document.number}</span>
           </p>
         </div>
@@ -202,6 +207,9 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
             <p className="text-sm">{document.notes}</p>
           </div>
         )}
+
+        {/* Memorandum Footer - identical for all documents */}
+        <MemorandumFooter companySettings={companySettings} />
       </div>
     );
   }
