@@ -307,7 +307,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
 
               {/* Client Info & Document Details */}
-              <div className="flex justify-between items-start mb-4" style={{ fontSize: '10px' }}>
+              <div className="flex justify-between items-start mb-4" style={{ fontSize: '12px' }}>
                 <div>
                   <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
                   <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
@@ -415,7 +415,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               {/* Notes */}
               {document.notes && (
                 <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{ fontSize: '10px' }}>
-                  <p className="font-medium mb-1" style={{ color: '#000' }}>Napomene:</p>
+                  <p className="font-medium mb-1" style={{ color: '#000' }}>Napomena</p>
                   <p style={{ color: '#000' }}>{document.notes}</p>
                 </div>
               )}
