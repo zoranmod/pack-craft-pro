@@ -51,8 +51,8 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   })),
 });
 
-// Generate document number based on type
-const generateDocumentNumber = (type: DocumentType) => {
+// Generate document number based on type with sequential counter
+const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
   const prefixes: Record<DocumentType, string> = {
     'otpremnica': 'OTP',
     'ponuda': 'PON',
@@ -61,8 +61,26 @@ const generateDocumentNumber = (type: DocumentType) => {
     'ugovor': 'UGO',
   };
   const year = new Date().getFullYear();
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `${prefixes[type]}-${year}-${random}`;
+  const prefix = `${prefixes[type]}-${year}-`;
+  
+  // Get the highest existing number for this type and year
+  const { data: existingDocs } = await supabase
+    .from('documents')
+    .select('number')
+    .like('number', `${prefix}%`)
+    .order('number', { ascending: false })
+    .limit(1);
+  
+  let nextNumber = 1;
+  if (existingDocs && existingDocs.length > 0) {
+    const lastNumber = existingDocs[0].number;
+    const lastSequence = parseInt(lastNumber.replace(prefix, ''), 10);
+    if (!isNaN(lastSequence)) {
+      nextNumber = lastSequence + 1;
+    }
+  }
+  
+  return `${prefix}${nextNumber.toString().padStart(4, '0')}`;
 };
 
 export function useDocuments() {
@@ -79,19 +97,23 @@ export function useDocuments() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      if (!documents || documents.length === 0) return [];
 
-      // Fetch items for each document
-      const documentsWithItems = await Promise.all(
-        documents.map(async (doc) => {
-          const { data: items } = await supabase
-            .from('document_items')
-            .select('*')
-            .eq('document_id', doc.id);
-          return mapDbToDocument(doc, items || []);
-        })
-      );
+      // Fetch all items at once instead of N+1 queries
+      const documentIds = documents.map(doc => doc.id);
+      const { data: allItems } = await supabase
+        .from('document_items')
+        .select('*')
+        .in('document_id', documentIds);
 
-      return documentsWithItems;
+      // Group items by document_id
+      const itemsByDocId = (allItems || []).reduce((acc, item) => {
+        if (!acc[item.document_id]) acc[item.document_id] = [];
+        acc[item.document_id].push(item);
+        return acc;
+      }, {} as Record<string, typeof allItems>);
+
+      return documents.map(doc => mapDbToDocument(doc, itemsByDocId[doc.id] || []));
     },
     enabled: !!user,
   });
@@ -146,13 +168,16 @@ export function useCreateDocument() {
 
       const totalAmount = data.items.reduce((sum, item) => sum + item.total, 0);
 
+      // Generate sequential document number
+      const documentNumber = await generateDocumentNumber(data.type);
+
       // Create document
       const { data: doc, error: docError } = await supabase
         .from('documents')
         .insert({
           user_id: user.id,
           type: data.type,
-          number: generateDocumentNumber(data.type),
+          number: documentNumber,
           client_name: data.clientName,
           client_oib: data.clientOib,
           client_address: data.clientAddress,
@@ -258,13 +283,16 @@ export function useConvertDocument() {
 
       const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
 
+      // Generate sequential document number
+      const documentNumber = await generateDocumentNumber(targetType);
+
       // Create new document with data from source
       const { data: doc, error: docError } = await supabase
         .from('documents')
         .insert({
           user_id: user.id,
           type: targetType,
-          number: generateDocumentNumber(targetType),
+          number: documentNumber,
           client_name: sourceDocument.clientName,
           client_oib: sourceDocument.clientOib,
           client_address: sourceDocument.clientAddress,
