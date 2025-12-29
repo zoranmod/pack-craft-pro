@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, User, LogOut } from 'lucide-react';
+import { Search, User, LogOut, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,9 +15,11 @@ import { NotificationDropdown } from './NotificationDropdown';
 interface HeaderProps {
   title: string;
   subtitle?: string;
+  onMenuClick?: () => void;
+  showMenuButton?: boolean;
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,10 +37,17 @@ export function Header({ title, subtitle }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="flex h-16 items-center justify-between px-6">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+      <div className="flex h-16 items-center justify-between px-3 md:px-6">
+        <div className="flex items-center gap-3">
+          {showMenuButton && (
+            <Button variant="ghost" size="icon" onClick={onMenuClick}>
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+          <div>
+            <h1 className="text-lg md:text-xl font-semibold text-foreground">{title}</h1>
+            {subtitle && <p className="text-xs md:text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
