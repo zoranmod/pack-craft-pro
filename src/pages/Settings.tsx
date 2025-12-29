@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Building2, User, Bell, Database, Loader2, Upload, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Building2, User, Bell, Database, Loader2, Upload, X, FileText } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ import {
 } from '@/hooks/useSettings';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   
   // Company settings
@@ -314,6 +316,28 @@ const Settings = () => {
               </div>
               <Switch />
             </div>
+          </div>
+        </div>
+
+        {/* Document Templates */}
+        <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <FileText className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">Predlošci dokumenata</h2>
+              <p className="text-sm text-muted-foreground">Prilagodite izgled ponuda, ugovora i ostalih dokumenata</p>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <Button onClick={() => navigate('/settings/templates')}>
+              Upravljanje predlošcima
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Kreirajte vlastite predloške s prilagođenim zaglavljem, tablicom i podnožjem
+            </p>
           </div>
         </div>
 
