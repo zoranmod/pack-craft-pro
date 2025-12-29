@@ -441,8 +441,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                         </div>
                       )}
                       <div className="mt-10 text-center">
-                        <p className="text-sm text-gray-500 mb-1">(Potpis)</p>
-                        <div className="w-48 border-b border-gray-400 mx-auto"></div>
+                        <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
+                        <p className="text-sm text-gray-500">(Potpis)</p>
                       </div>
                     </div>
                   </div>
