@@ -200,27 +200,31 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               {/* Memorandum Header - identical for all documents */}
               <MemorandumHeader />
 
-              {/* Document Title & Client Info */}
+              {/* Document Title - Centered */}
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">{documentTypeLabels[document.type].toUpperCase()}</h2>
+                <p className="text-base font-semibold text-gray-700">{document.number}</p>
+              </div>
+
+              {/* Client Info & Document Details */}
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-1">KUPAC / NARUČITELJ</h3>
-                  <p className="font-semibold text-gray-900">{document.clientName}</p>
-                  <p className="text-gray-700">{document.clientAddress}</p>
-                  {document.clientOib && <p className="text-gray-700">OIB: {document.clientOib}</p>}
-                  {document.clientPhone && <p className="text-gray-700">Tel: {document.clientPhone}</p>}
-                  {document.clientEmail && <p className="text-gray-700">Email: {document.clientEmail}</p>}
-                  {document.contactPerson && <p className="text-gray-700">Kontakt: {document.contactPerson}</p>}
+                  <p className="text-sm font-semibold text-gray-900">{document.clientName}</p>
+                  <p className="text-sm text-gray-700">{document.clientAddress}</p>
+                  {document.clientOib && <p className="text-sm text-gray-700">OIB: {document.clientOib}</p>}
+                  {document.clientPhone && <p className="text-sm text-gray-700">Tel: {document.clientPhone}</p>}
+                  {document.clientEmail && <p className="text-sm text-gray-700">Email: {document.clientEmail}</p>}
+                  {document.contactPerson && <p className="text-sm text-gray-700">Kontakt: {document.contactPerson}</p>}
                   {document.deliveryAddress && (
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-500">Adresa isporuke:</p>
-                      <p className="text-gray-700">{document.deliveryAddress}</p>
+                      <p className="text-sm text-gray-700">{document.deliveryAddress}</p>
                     </div>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-gray-900">{documentTypeLabels[document.type].toUpperCase()}</p>
-                  <p className="text-lg font-semibold text-gray-700">{document.number}</p>
-                  <p className="text-sm text-gray-600 mt-2">Datum: {formatDateHR(document.date)}</p>
+                  <p className="text-sm text-gray-600">Datum: {formatDateHR(document.date)}</p>
                   {document.validityDays && template?.show_validity_days && (
                     <p className="text-sm text-gray-600">Rok valjanosti: {document.validityDays} dana</p>
                   )}
@@ -235,7 +239,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Items Table */}
               <div className="mb-6 overflow-x-auto">
-                <table className="w-full text-sm" style={{ fontSize: `${template?.body_font_size || 9}pt` }}>
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b-2 border-gray-800">
                       <th className="py-2 text-left font-semibold text-gray-700">R.br.</th>
@@ -314,28 +318,26 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 </div>
               )}
 
-              {/* Prepared by & Signature Section for Ponuda */}
+              {/* Stamp & Signature Section for Ponuda */}
               {document.type === 'ponuda' && (
                 <div className="mt-8 pt-6 border-t border-gray-300">
-                  <div className="flex justify-between items-end">
-                    <div className="flex-1">
+                  {/* Centered Stamp */}
+                  <div className="text-center mb-8">
+                    <p className="text-sm text-gray-500">M.P.</p>
+                  </div>
+                  
+                  {/* Right-aligned Prepared By & Signature */}
+                  <div className="flex justify-end">
+                    <div className="text-right">
                       {document.preparedBy && (
-                        <div className="mb-4">
+                        <div className="mb-2">
                           <p className="text-sm text-gray-600">Ponudu izradio/la:</p>
-                          <p className="font-medium text-gray-900">{document.preparedBy}</p>
+                          <p className="text-sm font-medium text-gray-900">{document.preparedBy}</p>
                         </div>
                       )}
-                    </div>
-                    <div className="flex gap-12">
-                      <div className="text-center">
-                        <div className="w-24 h-24 border border-gray-400 rounded flex items-center justify-center mb-2">
-                          <span className="text-xs text-gray-400">MP</span>
-                        </div>
-                        <p className="text-xs text-gray-500">Pečat</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="w-40 border-b border-gray-400 mb-2" style={{ height: '60px' }}></div>
-                        <p className="text-xs text-gray-500">Potpis</p>
+                      <div className="mt-4">
+                        <div className="w-48 border-b border-gray-400 mb-1"></div>
+                        <p className="text-sm text-gray-500">(Potpis)</p>
                       </div>
                     </div>
                   </div>
