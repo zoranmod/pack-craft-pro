@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
@@ -11,14 +12,34 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  href?: string;
 }
 
-export function StatCard({ title, value, subtitle, icon: Icon, trend, className }: StatCardProps) {
+export function StatCard({ title, value, subtitle, icon: Icon, trend, className, href }: StatCardProps) {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (href) {
+      navigate(href);
+    }
+  };
+
   return (
-    <div className={cn(
-      "bg-card rounded-xl p-6 shadow-card card-hover border border-border/50",
-      className
-    )}>
+    <div 
+      className={cn(
+        "bg-card rounded-xl p-6 shadow-card card-hover border border-border/50",
+        href && "cursor-pointer hover:border-primary/50 transition-colors",
+        className
+      )}
+      onClick={handleClick}
+      role={href ? "button" : undefined}
+      tabIndex={href ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (href && (e.key === 'Enter' || e.key === ' ')) {
+          handleClick();
+        }
+      }}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>

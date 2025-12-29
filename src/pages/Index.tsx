@@ -29,18 +29,21 @@ const Index = () => {
           value={isLoading ? '...' : stats.totalDocuments}
           icon={FileText}
           trend={{ value: 12, isPositive: true }}
+          href="/documents"
         />
         <StatCard
           title="Na čekanju"
           value={isLoading ? '...' : stats.pendingDocuments}
           icon={Package}
           subtitle="Dokumenata za obradu"
+          href="/documents?status=pending"
         />
         <StatCard
           title="Završeno ovaj mjesec"
           value={isLoading ? '...' : stats.completedThisMonth}
           icon={Truck}
           trend={{ value: 8, isPositive: true }}
+          href="/documents?status=completed"
         />
         <StatCard
           title="Ukupni promet"
