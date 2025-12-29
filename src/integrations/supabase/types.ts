@@ -65,6 +65,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_template: boolean
           name: string
           pdv: number
           price: number
@@ -80,6 +81,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_template?: boolean
           name: string
           pdv?: number
           price?: number
@@ -95,6 +97,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_template?: boolean
           name?: string
           pdv?: number
           price?: number
