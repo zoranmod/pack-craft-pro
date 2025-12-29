@@ -26,3 +26,13 @@ export function formatDateHR(date: string | Date | undefined | null): string {
   const year = d.getFullYear();
   return `${day}.${month}.${year}.`;
 }
+
+// Round number to 2 decimal places
+export function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+// Format currency with 2 decimal places
+export function formatCurrency(value: number): string {
+  return round2(value).toLocaleString('hr-HR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}

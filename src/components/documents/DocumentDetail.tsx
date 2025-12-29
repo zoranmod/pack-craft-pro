@@ -4,7 +4,7 @@ import { Document, documentTypeLabels, documentStatusLabels } from '@/types/docu
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { cn, formatDateHR } from '@/lib/utils';
+import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -366,12 +366,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                         <td className="py-2 text-gray-900">{item.name}</td>
                         <td className="py-2 text-center text-gray-700">{item.unit}</td>
                         <td className="py-2 text-center text-gray-900">{item.quantity}</td>
-                        <td className="py-2 text-right text-gray-900">{item.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
+                        <td className="py-2 text-right text-gray-900">{formatCurrency(item.price)} €</td>
                         {template?.show_discount_column !== false && (
-                          <td className="py-2 text-right text-gray-700">{item.discount > 0 ? `${item.discount}%` : '-'}</td>
+                          <td className="py-2 text-right text-gray-700">{item.discount > 0 ? `${round2(item.discount)}%` : '-'}</td>
                         )}
-                        <td className="py-2 text-right text-gray-700">{item.pdv}%</td>
-                        <td className="py-2 text-right font-medium text-gray-900">{item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €</td>
+                        <td className="py-2 text-right text-gray-700">{round2(item.pdv)}%</td>
+                        <td className="py-2 text-right font-medium text-gray-900">{formatCurrency(item.total)} €</td>
                       </tr>
                     ))}
                   </tbody>
@@ -384,14 +384,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Osnovica:</span>
                     <span className="text-gray-900">
-                      {document.items.reduce((sum, item) => sum + item.subtotal, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      {formatCurrency(document.items.reduce((sum, item) => sum + item.subtotal, 0))} €
                     </span>
                   </div>
                   {document.items.some(item => item.discount > 0) && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Rabat:</span>
                       <span className="text-green-600">
-                        -{document.items.reduce((sum, item) => sum + (item.subtotal * item.discount / 100), 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                        -{formatCurrency(document.items.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0))} €
                       </span>
                     </div>
                   )}
@@ -399,17 +399,17 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                     <div className="flex justify-between">
                       <span className="text-gray-600">PDV (25%):</span>
                       <span className="text-gray-900">
-                        {document.items.reduce((sum, item) => {
-                          const afterDiscount = item.subtotal - (item.subtotal * item.discount / 100);
-                          return sum + (afterDiscount * item.pdv / 100);
-                        }, 0).toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                        {formatCurrency(document.items.reduce((sum, item) => {
+                          const afterDiscount = round2(item.subtotal - round2(item.subtotal * item.discount / 100));
+                          return sum + round2(afterDiscount * item.pdv / 100);
+                        }, 0))} €
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between pt-2 border-t-2 border-gray-800">
                     <span className="font-bold text-gray-900">UKUPNO:</span>
                     <span className="font-bold text-gray-900">
-                      {document.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
+                      {formatCurrency(document.totalAmount)} €
                     </span>
                   </div>
                 </div>
