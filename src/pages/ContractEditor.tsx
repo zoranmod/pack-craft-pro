@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, FileText } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { ContractHeaderEditor } from '@/components/contracts/ContractHeaderEditor';
 import { ContractArticlesEditor } from '@/components/contracts/ContractArticlesEditor';
 import { ContractTemplateManager } from '@/components/contracts/ContractTemplateManager';
+import { AppliancesEditor, Appliance } from '@/components/contracts/AppliancesEditor';
 import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
 import { useCompanySettings } from '@/hooks/useSettings';
 import {
@@ -20,7 +21,6 @@ import {
 } from '@/hooks/useContractArticles';
 import { useCreateDocument, type CreateDocumentData } from '@/hooks/useDocuments';
 import { ContractArticleFormData } from '@/types/contractArticle';
-import { DocumentType } from '@/types/document';
 import { toast } from 'sonner';
 
 interface DocumentItem {
@@ -43,10 +43,10 @@ export default function ContractEditor() {
   const createDocument = useCreateDocument();
   const saveContractArticles = useSaveDocumentContractArticles();
 
-  // Header data
+  // Header data - default Županja and UGOVOR
   const [headerData, setHeaderData] = useState({
-    title: 'UGOVOR O KUPOPRODAJI',
-    place: 'Zagreb',
+    title: 'UGOVOR',
+    place: 'Županja',
     date: new Date().toISOString().split('T')[0],
     seller: {
       name: '',
@@ -65,10 +65,15 @@ export default function ContractEditor() {
 
   // Contract articles
   const [articles, setArticles] = useState<ContractArticleFormData[]>([]);
-  const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({});
+  const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({
+    predujam: '0',
+  });
 
   // Document items (for price calculation)
   const [items, setItems] = useState<DocumentItem[]>([]);
+
+  // Appliances
+  const [appliances, setAppliances] = useState<Appliance[]>([]);
 
   // Signature section
   const [signatureText, setSignatureText] = useState(
@@ -132,19 +137,33 @@ export default function ContractEditor() {
     return { subtotal, discountAmount, afterDiscount, vatAmount, total };
   }, [items]);
 
-  // Update placeholder values based on totals
+  // Format appliances for placeholder
+  const appliancesText = useMemo(() => {
+    if (appliances.length === 0) return '';
+    return appliances
+      .filter((a) => a.name)
+      .map((a) => `- ${a.name} (garancija: ${a.warrantyMonths} mjeseci)`)
+      .join('\n');
+  }, [appliances]);
+
+  // Update placeholder values based on totals and other data
   useEffect(() => {
-    setPlaceholderValues((prev) => ({
-      ...prev,
-      ukupna_cijena: totals.total.toFixed(2),
-      ostatak: (
-        totals.total - parseFloat(prev.predujam || '0')
-      ).toFixed(2),
-      adresa_kupca: headerData.buyer.address,
-      datum_ugovora: new Date(headerData.date).toLocaleDateString('hr-HR'),
-      mjesto_ugovora: headerData.place,
-    }));
-  }, [totals, headerData]);
+    setPlaceholderValues((prev) => {
+      const predujam = parseFloat(prev.predujam || '0');
+      const ukupnaCijena = totals.total;
+      const ostatak = Math.max(0, ukupnaCijena - predujam);
+
+      return {
+        ...prev,
+        ukupna_cijena: ukupnaCijena.toFixed(2),
+        ostatak: ostatak.toFixed(2),
+        adresa_kupca: headerData.buyer.address,
+        datum_ugovora: new Date(headerData.date).toLocaleDateString('hr-HR'),
+        mjesto_ugovora: headerData.place,
+        ugradbeni_aparati: appliancesText,
+      };
+    });
+  }, [totals.total, headerData.buyer.address, headerData.date, headerData.place, appliancesText]);
 
   const handlePlaceholderChange = (key: string, value: string) => {
     setPlaceholderValues((prev) => {
@@ -323,10 +342,11 @@ export default function ContractEditor() {
 
         {/* Editor Tabs */}
         <Tabs defaultValue="header" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="header">Zaglavlje</TabsTrigger>
             <TabsTrigger value="articles">Članci</TabsTrigger>
             <TabsTrigger value="items">Stavke</TabsTrigger>
+            <TabsTrigger value="appliances">Aparati</TabsTrigger>
             <TabsTrigger value="signature">Potpisi</TabsTrigger>
           </TabsList>
 
@@ -486,6 +506,10 @@ export default function ContractEditor() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="appliances" className="space-y-6">
+            <AppliancesEditor appliances={appliances} onChange={setAppliances} />
           </TabsContent>
 
           <TabsContent value="signature" className="space-y-6">

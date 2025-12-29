@@ -1,9 +1,15 @@
+import { useState } from 'react';
+import { format, parse } from 'date-fns';
+import { hr } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
-
+import { cn } from '@/lib/utils';
 interface ContractHeaderData {
   title: string;
   place: string;
@@ -85,14 +91,37 @@ export function ContractHeaderEditor({ data, onChange }: ContractHeaderEditorPro
               />
             </div>
             <div>
-              <Label htmlFor="date">Datum sklapanja</Label>
-              <Input
-                id="date"
-                type="date"
-                value={data.date}
-                onChange={(e) => updateField('date', e.target.value)}
-                className="mt-1.5"
-              />
+              <Label>Datum sklapanja</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal mt-1.5",
+                      !data.date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {data.date
+                      ? format(new Date(data.date), "dd.MM.yyyy.", { locale: hr })
+                      : "Odaberi datum"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={data.date ? new Date(data.date) : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        updateField('date', date.toISOString().split('T')[0]);
+                      }
+                    }}
+                    locale={hr}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </CardContent>
