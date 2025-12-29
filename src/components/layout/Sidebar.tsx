@@ -28,7 +28,7 @@ const menuItems = [
   
   // Dokumenti - kreiranje (logičan poslovni tok: ponuda → ugovor → otpremnica → dostava → račun)
   { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
-  { icon: FileSignature, label: 'Novi ugovor', path: '/documents/new?type=ugovor' },
+  { icon: FileSignature, label: 'Novi ugovor', path: '/contracts/new' },
   { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },
   { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
   { icon: Receipt, label: 'Novi račun', path: '/documents/new?type=racun' },
@@ -37,7 +37,6 @@ const menuItems = [
   { icon: Users, label: 'Klijenti', path: '/clients' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
   { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },
-  { icon: BookText, label: 'Predlošci ugovora', path: '/contract-templates' },
 ];
 
 export function Sidebar() {
