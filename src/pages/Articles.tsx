@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, Search, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,8 @@ import {
 } from '@/components/ui/tooltip';
 import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, Article, CreateArticleData } from '@/hooks/useArticles';
 import { ArticleImportDialog } from '@/components/articles/ArticleImportDialog';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const emptyForm: CreateArticleData = {
   code: '',
@@ -55,6 +57,7 @@ const emptyForm: CreateArticleData = {
   barcode: '',
   purchase_price: 0,
   stock: 0,
+  is_template: false,
 };
 
 const Articles = () => {
@@ -105,6 +108,7 @@ const Articles = () => {
       barcode: article.barcode || '',
       purchase_price: article.purchase_price,
       stock: article.stock,
+      is_template: article.is_template,
     });
     setIsDialogOpen(true);
   };
@@ -221,16 +225,24 @@ const Articles = () => {
                         </Tooltip>
                       </TableCell>
                       <TableCell className="font-medium min-w-[150px] max-w-[300px]">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="block whitespace-normal break-words cursor-default">
-                              {article.name}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-[400px]">
-                            <p>{article.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="block whitespace-normal break-words cursor-default">
+                                {article.name}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[400px]">
+                              <p>{article.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          {article.is_template && (
+                            <Badge variant="secondary" className="gap-1 shrink-0">
+                              <Bookmark className="h-3 w-3" />
+                              Šablona
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="font-mono text-muted-foreground text-xs min-w-[100px] max-w-[150px]">
                         <Tooltip>
@@ -429,6 +441,17 @@ const Articles = () => {
                   rows={3}
                   className="mt-1.5"
                 />
+              </div>
+              <div className="sm:col-span-2 flex items-center gap-2 pt-2">
+                <Checkbox
+                  id="is_template"
+                  checked={formData.is_template}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_template: checked === true })}
+                />
+                <Label htmlFor="is_template" className="cursor-pointer flex items-center gap-2">
+                  <Bookmark className="h-4 w-4" />
+                  Koristi kao brzu šablonu
+                </Label>
               </div>
             </div>
             <DialogFooter>

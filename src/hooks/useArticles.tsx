@@ -15,6 +15,7 @@ export interface Article {
   barcode: string | null;
   purchase_price: number;
   stock: number;
+  is_template: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -29,6 +30,7 @@ export interface CreateArticleData {
   barcode?: string;
   purchase_price?: number;
   stock?: number;
+  is_template?: boolean;
 }
 
 export interface ArticlesParams {
@@ -109,6 +111,7 @@ export function useCreateArticle() {
           barcode: articleData.barcode || null,
           purchase_price: articleData.purchase_price || 0,
           stock: articleData.stock || 0,
+          is_template: articleData.is_template || false,
         })
         .select()
         .single();
@@ -143,6 +146,7 @@ export function useUpdateArticle() {
           barcode: articleData.barcode || null,
           purchase_price: articleData.purchase_price || 0,
           stock: articleData.stock || 0,
+          is_template: articleData.is_template || false,
         })
         .eq('id', id)
         .select()
@@ -179,6 +183,67 @@ export function useDeleteArticle() {
     },
     onError: (error) => {
       toast.error('Greška pri brisanju artikla: ' + error.message);
+    },
+  });
+}
+
+// Hook for fetching only templates
+export function useArticleTemplates() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['article-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('is_template', true)
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return data as Article[];
+    },
+    enabled: !!user,
+  });
+}
+
+// Hook to save an item as template
+export function useSaveAsTemplate() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (templateData: Omit<CreateArticleData, 'is_template'>) => {
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('articles')
+        .insert({
+          user_id: user.id,
+          code: templateData.code || null,
+          name: templateData.name,
+          unit: templateData.unit || 'kom',
+          price: templateData.price || 0,
+          pdv: templateData.pdv || 25,
+          description: templateData.description || null,
+          barcode: templateData.barcode || null,
+          purchase_price: templateData.purchase_price || 0,
+          stock: 0,
+          is_template: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as Article;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+      queryClient.invalidateQueries({ queryKey: ['article-templates'] });
+      toast.success('Šablona uspješno spremljena');
+    },
+    onError: (error) => {
+      toast.error('Greška pri spremanju šablone: ' + error.message);
     },
   });
 }

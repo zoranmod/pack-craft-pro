@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
 import { Button } from '@/components/ui/button';
@@ -19,8 +19,9 @@ import { useContractArticleTemplates, useSaveDocumentContractArticles, useInitia
 import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
 import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
 import { ContractArticlesEditor } from '@/components/contracts/ContractArticlesEditor';
+import { QuickTemplates } from '@/components/articles/QuickTemplates';
 import { Client } from '@/hooks/useClients';
-import { Article } from '@/hooks/useArticles';
+import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
 
 // Helper function to calculate item totals
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -67,6 +68,7 @@ export function DocumentForm() {
   const { data: articleTemplates = [] } = useContractArticleTemplates();
   const initializeTemplates = useInitializeDefaultTemplates();
   const saveDocumentArticles = useSaveDocumentContractArticles();
+  const saveAsTemplate = useSaveAsTemplate();
   const [contractArticles, setContractArticles] = useState<ContractArticleFormData[]>([]);
   const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({});
 
@@ -120,6 +122,35 @@ export function DocumentForm() {
 
   const addItem = () => {
     setItems([...items, { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 }]);
+  };
+
+  const addTemplateItem = (template: Article) => {
+    const newItem: Omit<DocumentItem, 'id'> = {
+      name: template.name,
+      quantity: 1,
+      unit: template.unit,
+      price: template.price,
+      discount: 0,
+      pdv: template.pdv,
+      subtotal: 0,
+      total: 0,
+    };
+    if (hasPrices) {
+      const { subtotal, total } = calculateItemTotals(newItem);
+      newItem.subtotal = subtotal;
+      newItem.total = total;
+    }
+    setItems([...items, newItem]);
+  };
+
+  const saveItemAsTemplate = (item: Omit<DocumentItem, 'id'>) => {
+    if (!item.name) return;
+    saveAsTemplate.mutate({
+      name: item.name,
+      unit: item.unit,
+      price: item.price,
+      pdv: item.pdv,
+    });
   };
 
   const removeItem = (index: number) => {
@@ -345,6 +376,12 @@ export function DocumentForm() {
                 Dodaj stavku
               </Button>
             </div>
+
+            {/* Quick Templates */}
+            <QuickTemplates 
+              onSelectTemplate={addTemplateItem} 
+              className="mb-4 pb-4 border-b border-border/50"
+            />
             
             <div className="space-y-4">
               {items.map((item, index) => (
@@ -462,7 +499,18 @@ export function DocumentForm() {
                           {item.total.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                         </p>
                       </div>
-                      <div className="sm:col-span-1">
+                      <div className="sm:col-span-1 flex gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => saveItemAsTemplate(item)}
+                          disabled={!item.name || saveAsTemplate.isPending}
+                          className="text-muted-foreground hover:text-primary"
+                          title="Spremi kao šablonu"
+                        >
+                          <Bookmark className="h-4 w-4" />
+                        </Button>
                         <Button
                           type="button"
                           variant="ghost"
@@ -477,9 +525,20 @@ export function DocumentForm() {
                     </div>
                   )}
 
-                  {/* Delete button for non-price types with multiple items */}
+                  {/* Action buttons for non-price types */}
                   {!hasPrices && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => saveItemAsTemplate(item)}
+                        disabled={!item.name || saveAsTemplate.isPending}
+                        className="text-muted-foreground hover:text-primary"
+                        title="Spremi kao šablonu"
+                      >
+                        <Bookmark className="h-4 w-4" />
+                      </Button>
                       <Button
                         type="button"
                         variant="ghost"
