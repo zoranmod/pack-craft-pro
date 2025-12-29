@@ -31,6 +31,14 @@ const mockItems = [
 export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
   const { data: companySettings } = useCompanySettings();
 
+  // Otpremnica i nalog za dostavu/montažu ne bi trebali prikazivati novčane iznose
+  const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(template.document_type as DocumentType);
+  const visibleColumns = hasPrices
+    ? template.table_columns
+    : template.table_columns.filter(
+        (col) => !['cijena', 'rabat', 'cijena_s_rabatom', 'pdv', 'pdv_iznos', 'ukupno'].includes(col)
+      );
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('hr-HR', { style: 'currency', currency: 'EUR' }).format(value);
   };
@@ -89,7 +97,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
       <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: template.primary_color, color: 'white' }}>
-            {template.table_columns.map((col) => (
+            {visibleColumns.map((col) => (
               <th key={col} className="p-2 text-left border border-gray-300 font-semibold">
                 {columnLabels[col] || col}
               </th>
@@ -99,7 +107,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         <tbody>
           {mockItems.map((item, index) => (
             <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-              {template.table_columns.map((col) => (
+              {visibleColumns.map((col) => (
                 <td key={col} className="p-2 border border-gray-300">
                   {col === 'cijena' || col === 'cijena_s_rabatom' || col === 'pdv_iznos' || col === 'ukupno'
                     ? formatCurrency(item[col as keyof typeof item] as number)
@@ -114,24 +122,26 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
       </table>
 
       {/* Totals */}
-      <div className="flex justify-end mb-6">
-        <div className="w-56 text-sm">
-          <div className="flex justify-between py-1.5 border-b border-gray-300">
-            <span className="text-gray-600">Osnovica:</span>
-            <span>{formatCurrency(380)}</span>
-          </div>
-          {template.show_pdv_breakdown && (
+      {hasPrices && (
+        <div className="flex justify-end mb-6">
+          <div className="w-56 text-sm">
             <div className="flex justify-between py-1.5 border-b border-gray-300">
-              <span className="text-gray-600">PDV (25%):</span>
-              <span>{formatCurrency(95)}</span>
+              <span className="text-gray-600">Osnovica:</span>
+              <span>{formatCurrency(380)}</span>
             </div>
-          )}
-          <div className="flex justify-between py-2 font-bold text-base" style={{ color: template.primary_color }}>
-            <span>UKUPNO:</span>
-            <span>{formatCurrency(475)}</span>
+            {template.show_pdv_breakdown && (
+              <div className="flex justify-between py-1.5 border-b border-gray-300">
+                <span className="text-gray-600">PDV (25%):</span>
+                <span>{formatCurrency(95)}</span>
+              </div>
+            )}
+            <div className="flex justify-between py-2 font-bold text-base" style={{ color: template.primary_color }}>
+              <span>UKUPNO:</span>
+              <span>{formatCurrency(475)}</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Memorandum Footer - identical for all documents */}
       <MemorandumFooter />
