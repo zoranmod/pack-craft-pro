@@ -296,77 +296,79 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-8" style={{ fontFamily: template?.font_family || 'Arial', maxWidth: '210mm', margin: '0 auto' }}>
+            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6" style={{ fontFamily: template?.font_family || 'Arial', maxWidth: '210mm', margin: '0 auto', fontSize: '10px', color: '#000' }}>
               {/* Memorandum Header - identical for all documents */}
               <MemorandumHeader />
 
               {/* Document Title - Centered */}
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">{documentTypeLabels[document.type].toUpperCase()}</h2>
-                <p className="text-base font-semibold text-gray-700">{document.number}</p>
+              <div className="text-center mb-4">
+                <h2 className="text-base font-bold" style={{ color: '#000' }}>{documentTypeLabels[document.type].toUpperCase()}</h2>
+                <p className="text-sm font-semibold" style={{ color: '#000' }}>{document.number}</p>
               </div>
 
               {/* Client Info & Document Details */}
-              <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start mb-4" style={{ fontSize: '10px' }}>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">KUPAC / NARUČITELJ</h3>
-                  <p className="text-sm font-semibold text-gray-900">{document.clientName}</p>
-                  <p className="text-sm text-gray-700">{document.clientAddress}</p>
-                  {document.clientOib && <p className="text-sm text-gray-700">OIB: {document.clientOib}</p>}
-                  {document.clientPhone && <p className="text-sm text-gray-700">Tel: {document.clientPhone}</p>}
-                  {document.clientEmail && <p className="text-sm text-gray-700">Email: {document.clientEmail}</p>}
-                  {document.contactPerson && <p className="text-sm text-gray-700">Kontakt: {document.contactPerson}</p>}
+                  <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
+                  <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
+                  <p style={{ color: '#000' }}>{document.clientAddress}</p>
+                  {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
+                  {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
+                  {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
+                  {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
                   {document.deliveryAddress && (
-                    <div className="mt-2">
-                      <p className="text-sm font-medium text-gray-500">Adresa isporuke:</p>
-                      <p className="text-sm text-gray-700">{document.deliveryAddress}</p>
+                    <div className="mt-1">
+                      <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
+                      <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
                     </div>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-600">Datum: {formatDateHR(document.date)}</p>
+                  <p style={{ color: '#000' }}>Datum: {formatDateHR(document.date)}</p>
                   {document.validityDays && template?.show_validity_days && (
-                    <p className="text-sm text-gray-600">Rok valjanosti: {document.validityDays} dana</p>
+                    <p style={{ color: '#000' }}>Rok valjanosti: {document.validityDays} dana</p>
                   )}
                   {document.deliveryDays && template?.show_delivery_days && (
-                    <p className="text-sm text-gray-600">Rok isporuke: {document.deliveryDays} dana</p>
+                    <p style={{ color: '#000' }}>Rok isporuke: {document.deliveryDays} dana</p>
                   )}
                   {document.paymentMethod && (
-                    <p className="text-sm text-gray-600">Način plaćanja: {document.paymentMethod}</p>
+                    <p style={{ color: '#000' }}>Način plaćanja: {document.paymentMethod}</p>
                   )}
                 </div>
               </div>
 
               {/* Items Table */}
-              <div className="mb-6 overflow-x-auto">
-                <table className="w-full text-sm">
+              <div className="mb-4 overflow-x-auto">
+                <table className="w-full" style={{ fontSize: '10px' }}>
                   <thead>
                     <tr className="border-b-2 border-gray-800">
-                      <th className="py-2 text-left font-semibold text-gray-700">R.br.</th>
-                      <th className="py-2 text-left font-semibold text-gray-700">Naziv</th>
-                      <th className="py-2 text-center font-semibold text-gray-700">Jed.</th>
-                      <th className="py-2 text-center font-semibold text-gray-700">Kol.</th>
-                      <th className="py-2 text-right font-semibold text-gray-700">Cijena</th>
+                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>R.br.</th>
+                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Šifra</th>
+                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Naziv</th>
+                      <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Jed.</th>
+                      <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Kol.</th>
+                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
                       {template?.show_discount_column !== false && (
-                        <th className="py-2 text-right font-semibold text-gray-700">Rabat</th>
+                        <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Rabat</th>
                       )}
-                      <th className="py-2 text-right font-semibold text-gray-700">PDV</th>
-                      <th className="py-2 text-right font-semibold text-gray-700">Ukupno</th>
+                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>PDV</th>
+                      <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Ukupno</th>
                     </tr>
                   </thead>
                   <tbody>
                     {document.items.map((item, index) => (
                       <tr key={item.id} className="border-b border-gray-300">
-                        <td className="py-2 text-gray-700">{index + 1}.</td>
-                        <td className="py-2 text-gray-900">{item.name}</td>
-                        <td className="py-2 text-center text-gray-700">{item.unit}</td>
-                        <td className="py-2 text-center text-gray-900">{item.quantity}</td>
-                        <td className="py-2 text-right text-gray-900">{formatCurrency(item.price)} €</td>
+                        <td className="py-1" style={{ color: '#000' }}>{index + 1}.</td>
+                        <td className="py-1" style={{ color: '#000' }}>{(item as any).code || ''}</td>
+                        <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
+                        <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
+                        <td className="py-1 text-center" style={{ color: '#000' }}>{item.quantity}</td>
+                        <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
                         {template?.show_discount_column !== false && (
-                          <td className="py-2 text-right text-gray-700">{item.discount > 0 ? `${round2(item.discount)}%` : '-'}</td>
+                          <td className="py-1 text-right" style={{ color: '#000' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
                         )}
-                        <td className="py-2 text-right text-gray-700">{round2(item.pdv)}%</td>
-                        <td className="py-2 text-right font-medium text-gray-900">{formatCurrency(item.total)} €</td>
+                        <td className="py-1 text-right" style={{ color: '#000' }}>{round2(item.pdv)}%</td>
+                        <td className="py-1 text-right font-medium" style={{ color: '#000' }}>{formatCurrency(item.total)} €</td>
                       </tr>
                     ))}
                   </tbody>
@@ -374,26 +376,26 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
 
               {/* Totals */}
-              <div className="flex justify-end mb-8">
-                <div className="w-72 space-y-1 text-sm">
+              <div className="flex justify-end mb-6">
+                <div className="w-64 space-y-1" style={{ fontSize: '10px' }}>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Osnovica:</span>
-                    <span className="text-gray-900">
+                    <span style={{ color: '#000' }}>Osnovica:</span>
+                    <span style={{ color: '#000' }}>
                       {formatCurrency(document.items.reduce((sum, item) => sum + item.subtotal, 0))} €
                     </span>
                   </div>
                   {document.items.some(item => item.discount > 0) && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Rabat:</span>
-                      <span className="text-green-600">
+                      <span style={{ color: '#000' }}>Rabat:</span>
+                      <span style={{ color: '#000' }}>
                         -{formatCurrency(document.items.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0))} €
                       </span>
                     </div>
                   )}
                   {template?.show_pdv_breakdown !== false && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">PDV (25%):</span>
-                      <span className="text-gray-900">
+                      <span style={{ color: '#000' }}>PDV (25%):</span>
+                      <span style={{ color: '#000' }}>
                         {formatCurrency(document.items.reduce((sum, item) => {
                           const afterDiscount = round2(item.subtotal - round2(item.subtotal * item.discount / 100));
                           return sum + round2(afterDiscount * item.pdv / 100);
@@ -401,9 +403,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between pt-2 border-t-2 border-gray-800">
-                    <span className="font-bold text-gray-900">UKUPNO:</span>
-                    <span className="font-bold text-gray-900">
+                  <div className="flex justify-between pt-1 border-t-2 border-gray-800">
+                    <span className="font-bold" style={{ color: '#000' }}>UKUPNO:</span>
+                    <span className="font-bold" style={{ color: '#000' }}>
                       {formatCurrency(document.totalAmount)} €
                     </span>
                   </div>
@@ -412,37 +414,42 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Notes */}
               {document.notes && (
-                <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded text-sm">
-                  <p className="font-medium text-gray-700 mb-1">Napomene:</p>
-                  <p className="text-gray-600">{document.notes}</p>
+                <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{ fontSize: '10px' }}>
+                  <p className="font-medium mb-1" style={{ color: '#000' }}>Napomene:</p>
+                  <p style={{ color: '#000' }}>{document.notes}</p>
                 </div>
               )}
 
               {/* Stamp & Signature Section for Ponuda */}
               {document.type === 'ponuda' && (
-                <div className="mt-8 pt-6 border-t border-gray-300">
+                <div className="mt-6 pt-4 border-t border-gray-300">
                   {/* Centered Stamp */}
-                  <div className="text-center mb-8">
-                    <p className="text-sm text-gray-500">M.P.</p>
+                  <div className="text-center mb-6">
+                    <p style={{ color: '#000', fontSize: '10px' }}>M.P.</p>
                   </div>
                   
                   {/* Right-aligned Prepared By & Signature */}
                   <div className="flex justify-end">
                     <div className="text-right">
                       {document.preparedBy && (
-                        <div className="mb-8">
-                          <p className="text-sm text-gray-600">Ponudu izradio/la:</p>
-                          <p className="text-sm font-medium text-gray-900">{document.preparedBy}</p>
+                        <div className="mb-6">
+                          <p style={{ color: '#000', fontSize: '10px' }}>Ponudu izradio/la:</p>
+                          <p className="font-medium" style={{ color: '#000', fontSize: '10px' }}>{document.preparedBy}</p>
                         </div>
                       )}
-                      <div className="mt-10 text-center">
-                        <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
-                        <p className="text-sm text-gray-500">(Potpis)</p>
+                      <div className="mt-8 text-center">
+                        <div className="w-40 border-b border-gray-400 mx-auto mb-1"></div>
+                        <p style={{ color: '#000', fontSize: '10px' }}>(Potpis)</p>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Legal Notice */}
+              <div className="mt-6 text-center">
+                <p style={{ color: '#dc2626', fontSize: '10px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
+              </div>
 
               {/* Memorandum Footer - identical for all documents */}
               <MemorandumFooter />
