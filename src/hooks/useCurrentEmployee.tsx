@@ -34,16 +34,28 @@ export function useCurrentEmployee() {
     queryFn: async (): Promise<CurrentEmployeeData> => {
       if (!user) return { employee: null, permissions: null, isAdmin: false };
 
-      // Check if user is admin (has role 'admin' or owns employees)
-      const { data: roles } = await supabase
+      // Roles
+      const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id);
 
-      const isAdmin = roles?.some(r => r.role === 'admin') || false;
+      if (rolesError) throw rolesError;
 
-      // Check if this user is an employee (has auth_user_id linked)
-      let { data: employee, error: empError } = await supabase
+      // Owner check (user who created employees)
+      const { data: ownedEmployees, error: ownedError } = await supabase
+        .from('employees')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (ownedError) throw ownedError;
+
+      const isOwner = (ownedEmployees?.length ?? 0) > 0;
+      const isAdmin = roles?.some((r) => r.role === 'admin') || isOwner || false;
+
+      // Current employee account (linked via auth_user_id)
+      const { data: employee, error: empError } = await supabase
         .from('employees')
         .select('*')
         .eq('auth_user_id', user.id)
@@ -51,18 +63,7 @@ export function useCurrentEmployee() {
 
       if (empError) throw empError;
 
-      // Fallback: if no employee found by auth_user_id, try by user_id (for owners/admins)
-      if (!employee) {
-        const { data: ownerEmployee, error: ownerError } = await supabase
-          .from('employees')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (ownerError) throw ownerError;
-        employee = ownerEmployee;
-      }
-
+      // If user is not an employee (e.g. owner/admin), we still return isAdmin/isOwner.
       if (!employee) {
         return { employee: null, permissions: null, isAdmin };
       }
@@ -83,6 +84,8 @@ export function useCurrentEmployee() {
       };
     },
     enabled: !!user,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   const hasFullAccess = data?.isAdmin || data?.permissions?.can_manage_employees || false;
