@@ -55,3 +55,31 @@ export const documentStatusLabels: Record<DocumentStatus, string> = {
   'completed': 'Završeno',
   'cancelled': 'Otkazano',
 };
+
+// Document flow: Ponuda → Ugovor → Otpremnica → Račun
+export const documentFlowOrder: DocumentType[] = ['ponuda', 'ugovor', 'otpremnica', 'racun'];
+
+// Get the next document type in the flow (nalog-dostava-montaza maps to otpremnica flow)
+export const getNextDocumentType = (currentType: DocumentType): DocumentType | null => {
+  const effectiveType = currentType === 'nalog-dostava-montaza' ? 'otpremnica' : currentType;
+  const currentIndex = documentFlowOrder.indexOf(effectiveType);
+  if (currentIndex === -1 || currentIndex === documentFlowOrder.length - 1) {
+    return null;
+  }
+  return documentFlowOrder[currentIndex + 1];
+};
+
+// Get label for next document action
+export const getNextDocumentLabel = (currentType: DocumentType): string | null => {
+  const nextType = getNextDocumentType(currentType);
+  if (!nextType) return null;
+  
+  const labels: Record<DocumentType, string> = {
+    'ponuda': 'Kreiraj ponudu',
+    'ugovor': 'Kreiraj ugovor',
+    'otpremnica': 'Kreiraj otpremnicu',
+    'racun': 'Kreiraj račun',
+    'nalog-dostava-montaza': 'Kreiraj nalog',
+  };
+  return labels[nextType];
+};
