@@ -109,12 +109,15 @@ export function useUploadCompanyLogo() {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Get signed URL (valid for 1 year)
+      const { data: signedUrlData, error: urlError } = await supabase.storage
         .from('company-logos')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
 
-      // Update company settings with logo URL
+      if (urlError) throw urlError;
+      const signedUrl = signedUrlData.signedUrl;
+
+      // Update company settings with signed URL
       const { data: existing } = await supabase
         .from('company_settings')
         .select('id')
@@ -124,15 +127,15 @@ export function useUploadCompanyLogo() {
       if (existing) {
         await supabase
           .from('company_settings')
-          .update({ logo_url: publicUrl })
+          .update({ logo_url: signedUrl })
           .eq('user_id', user.id);
       } else {
         await supabase
           .from('company_settings')
-          .insert({ user_id: user.id, logo_url: publicUrl });
+          .insert({ user_id: user.id, logo_url: signedUrl });
       }
 
-      return publicUrl;
+      return signedUrl;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-settings'] });
