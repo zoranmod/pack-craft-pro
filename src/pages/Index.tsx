@@ -2,6 +2,7 @@ import { FileText, Package, Truck, Wrench } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
+import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { useDocuments } from '@/hooks/useDocuments';
 
 const Index = () => {
@@ -50,7 +51,10 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <RecentDocuments documents={documents} />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RecentDocuments documents={documents} />
+        <ActivityLogList limit={20} maxHeight="350px" />
+      </div>
     </MainLayout>
   );
 };
