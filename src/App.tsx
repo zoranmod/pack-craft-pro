@@ -19,6 +19,8 @@ import Employees from "./pages/Employees";
 import EmployeeDetail from "./pages/EmployeeDetail";
 import EmployeePortal from "./pages/EmployeePortal";
 import ContractEditor from "./pages/ContractEditor";
+import DocumentTemplates from "./pages/DocumentTemplates";
+import TemplateEditor from "./pages/TemplateEditor";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,9 @@ const App = () => (
               <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
               <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
               <Route path="/contracts/new" element={<ProtectedRoute><ContractEditor /></ProtectedRoute>} />
+              <Route path="/settings/templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
+              <Route path="/settings/templates/new" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
+              <Route path="/settings/templates/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

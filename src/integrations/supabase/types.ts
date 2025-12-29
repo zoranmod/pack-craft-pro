@@ -163,36 +163,81 @@ export type Database = {
       company_settings: {
         Row: {
           address: string | null
+          bank_name_1: string | null
+          bank_name_2: string | null
+          capital_amount: string | null
           company_name: string | null
           created_at: string
+          director_name: string | null
+          email_info: string | null
           iban: string | null
+          iban_2: string | null
           id: string
           logo_url: string | null
           oib: string | null
+          pdv_id: string | null
+          phone_accounting: string | null
+          phone_main: string | null
+          phone_sales: string | null
+          registration_court: string | null
+          registration_number: string | null
+          swift_1: string | null
+          swift_2: string | null
           updated_at: string
           user_id: string
+          website: string | null
         }
         Insert: {
           address?: string | null
+          bank_name_1?: string | null
+          bank_name_2?: string | null
+          capital_amount?: string | null
           company_name?: string | null
           created_at?: string
+          director_name?: string | null
+          email_info?: string | null
           iban?: string | null
+          iban_2?: string | null
           id?: string
           logo_url?: string | null
           oib?: string | null
+          pdv_id?: string | null
+          phone_accounting?: string | null
+          phone_main?: string | null
+          phone_sales?: string | null
+          registration_court?: string | null
+          registration_number?: string | null
+          swift_1?: string | null
+          swift_2?: string | null
           updated_at?: string
           user_id: string
+          website?: string | null
         }
         Update: {
           address?: string | null
+          bank_name_1?: string | null
+          bank_name_2?: string | null
+          capital_amount?: string | null
           company_name?: string | null
           created_at?: string
+          director_name?: string | null
+          email_info?: string | null
           iban?: string | null
+          iban_2?: string | null
           id?: string
           logo_url?: string | null
           oib?: string | null
+          pdv_id?: string | null
+          phone_accounting?: string | null
+          phone_main?: string | null
+          phone_sales?: string | null
+          registration_court?: string | null
+          registration_number?: string | null
+          swift_1?: string | null
+          swift_2?: string | null
           updated_at?: string
           user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -317,6 +362,123 @@ export type Database = {
           },
         ]
       }
+      document_templates: {
+        Row: {
+          body_font_size: number | null
+          certificate_images: Json | null
+          created_at: string | null
+          default_delivery_days: number | null
+          default_payment_method: string | null
+          default_validity_days: number | null
+          document_type: string
+          font_family: string | null
+          footer_note: string | null
+          header_font_size: number | null
+          header_layout: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          prepared_by_label: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          show_certificates: boolean | null
+          show_company_info: boolean | null
+          show_delivery_days: boolean | null
+          show_director_signature: boolean | null
+          show_discount_column: boolean | null
+          show_footer_contacts: boolean | null
+          show_iban_in_header: boolean | null
+          show_logo: boolean | null
+          show_payment_method: boolean | null
+          show_pdv_breakdown: boolean | null
+          show_prepared_by: boolean | null
+          show_registration_info: boolean | null
+          show_second_iban: boolean | null
+          show_signature_line: boolean | null
+          show_stamp_placeholder: boolean | null
+          show_validity_days: boolean | null
+          table_columns: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          body_font_size?: number | null
+          certificate_images?: Json | null
+          created_at?: string | null
+          default_delivery_days?: number | null
+          default_payment_method?: string | null
+          default_validity_days?: number | null
+          document_type: string
+          font_family?: string | null
+          footer_note?: string | null
+          header_font_size?: number | null
+          header_layout?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          prepared_by_label?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          show_certificates?: boolean | null
+          show_company_info?: boolean | null
+          show_delivery_days?: boolean | null
+          show_director_signature?: boolean | null
+          show_discount_column?: boolean | null
+          show_footer_contacts?: boolean | null
+          show_iban_in_header?: boolean | null
+          show_logo?: boolean | null
+          show_payment_method?: boolean | null
+          show_pdv_breakdown?: boolean | null
+          show_prepared_by?: boolean | null
+          show_registration_info?: boolean | null
+          show_second_iban?: boolean | null
+          show_signature_line?: boolean | null
+          show_stamp_placeholder?: boolean | null
+          show_validity_days?: boolean | null
+          table_columns?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          body_font_size?: number | null
+          certificate_images?: Json | null
+          created_at?: string | null
+          default_delivery_days?: number | null
+          default_payment_method?: string | null
+          default_validity_days?: number | null
+          document_type?: string
+          font_family?: string | null
+          footer_note?: string | null
+          header_font_size?: number | null
+          header_layout?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          prepared_by_label?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          show_certificates?: boolean | null
+          show_company_info?: boolean | null
+          show_delivery_days?: boolean | null
+          show_director_signature?: boolean | null
+          show_discount_column?: boolean | null
+          show_footer_contacts?: boolean | null
+          show_iban_in_header?: boolean | null
+          show_logo?: boolean | null
+          show_payment_method?: boolean | null
+          show_pdv_breakdown?: boolean | null
+          show_prepared_by?: boolean | null
+          show_registration_info?: boolean | null
+          show_second_iban?: boolean | null
+          show_signature_line?: boolean | null
+          show_stamp_placeholder?: boolean | null
+          show_validity_days?: boolean | null
+          table_columns?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           client_address: string
@@ -326,14 +488,19 @@ export type Database = {
           client_phone: string | null
           created_at: string
           date: string
+          delivery_days: number | null
           id: string
           notes: string | null
           number: string
+          payment_method: string | null
+          prepared_by: string | null
           status: string
+          template_id: string | null
           total_amount: number
           type: string
           updated_at: string
           user_id: string
+          validity_days: number | null
         }
         Insert: {
           client_address: string
@@ -343,14 +510,19 @@ export type Database = {
           client_phone?: string | null
           created_at?: string
           date?: string
+          delivery_days?: number | null
           id?: string
           notes?: string | null
           number: string
+          payment_method?: string | null
+          prepared_by?: string | null
           status?: string
+          template_id?: string | null
           total_amount?: number
           type: string
           updated_at?: string
           user_id: string
+          validity_days?: number | null
         }
         Update: {
           client_address?: string
@@ -360,16 +532,29 @@ export type Database = {
           client_phone?: string | null
           created_at?: string
           date?: string
+          delivery_days?: number | null
           id?: string
           notes?: string | null
           number?: string
+          payment_method?: string | null
+          prepared_by?: string | null
           status?: string
+          template_id?: string | null
           total_amount?: number
           type?: string
           updated_at?: string
           user_id?: string
+          validity_days?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "document_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employee_documents: {
         Row: {
