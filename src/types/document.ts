@@ -44,6 +44,8 @@ export interface Document {
   validityDays?: number;
   deliveryDays?: number;
   preparedBy?: string;
+  contactPerson?: string;
+  deliveryAddress?: string;
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {

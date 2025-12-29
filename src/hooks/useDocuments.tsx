@@ -19,6 +19,8 @@ export interface CreateDocumentData {
   validityDays?: number;
   deliveryDays?: number;
   preparedBy?: string;
+  contactPerson?: string;
+  deliveryAddress?: string;
 }
 
 // Convert database row to Document type
@@ -38,6 +40,8 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   validityDays: row.validity_days,
   deliveryDays: row.delivery_days,
   preparedBy: row.prepared_by,
+  contactPerson: row.contact_person,
+  deliveryAddress: row.delivery_address,
   items: items.map(item => ({
     id: item.id,
     name: item.name,
@@ -203,6 +207,8 @@ export function useCreateDocument() {
           validity_days: data.validityDays,
           delivery_days: data.deliveryDays,
           prepared_by: data.preparedBy,
+          contact_person: data.contactPerson,
+          delivery_address: data.deliveryAddress,
         })
         .select()
         .single();
