@@ -2,15 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
-
-interface CompanySettings {
-  id?: string;
-  company_name: string;
-  address: string;
-  oib: string;
-  iban: string;
-  logo_url?: string;
-}
+import { CompanySettings } from '@/types/companySettings';
 
 interface UserProfile {
   id?: string;
@@ -33,7 +25,7 @@ export function useCompanySettings() {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as CompanySettings | null;
     },
     enabled: !!user,
   });
@@ -53,16 +45,33 @@ export function useSaveCompanySettings() {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      const settingsData = {
+        company_name: settings.company_name,
+        address: settings.address,
+        oib: settings.oib,
+        iban: settings.iban,
+        logo_url: settings.logo_url,
+        pdv_id: settings.pdv_id,
+        iban_2: settings.iban_2,
+        swift_1: settings.swift_1,
+        swift_2: settings.swift_2,
+        bank_name_1: settings.bank_name_1,
+        bank_name_2: settings.bank_name_2,
+        phone_main: settings.phone_main,
+        phone_sales: settings.phone_sales,
+        phone_accounting: settings.phone_accounting,
+        website: settings.website,
+        email_info: settings.email_info,
+        registration_court: settings.registration_court,
+        registration_number: settings.registration_number,
+        capital_amount: settings.capital_amount,
+        director_name: settings.director_name,
+      };
+
       if (existing) {
         const { error } = await supabase
           .from('company_settings')
-          .update({
-            company_name: settings.company_name,
-            address: settings.address,
-            oib: settings.oib,
-            iban: settings.iban,
-            logo_url: settings.logo_url,
-          })
+          .update(settingsData)
           .eq('user_id', user.id);
 
         if (error) throw error;
@@ -71,11 +80,7 @@ export function useSaveCompanySettings() {
           .from('company_settings')
           .insert({
             user_id: user.id,
-            company_name: settings.company_name,
-            address: settings.address,
-            oib: settings.oib,
-            iban: settings.iban,
-            logo_url: settings.logo_url,
+            ...settingsData,
           });
 
         if (error) throw error;
