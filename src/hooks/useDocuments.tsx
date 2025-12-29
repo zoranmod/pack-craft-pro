@@ -45,6 +45,7 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   items: items.map(item => ({
     id: item.id,
     name: item.name,
+    code: item.code || undefined,
     quantity: Number(item.quantity),
     unit: item.unit,
     price: Number(item.price),
@@ -219,6 +220,7 @@ export function useCreateDocument() {
       const itemsToInsert = data.items.map(item => ({
         document_id: doc.id,
         name: item.name,
+        code: item.code || null,
         quantity: item.quantity,
         unit: item.unit,
         price: item.price,
@@ -302,6 +304,7 @@ export function useUpdateDocument() {
       const itemsToInsert = data.items.map(item => ({
         document_id: id,
         name: item.name,
+        code: item.code || null,
         quantity: item.quantity,
         unit: item.unit,
         price: item.price,

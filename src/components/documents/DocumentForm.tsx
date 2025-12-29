@@ -565,6 +565,7 @@ export function DocumentForm() {
                             newItems[index] = {
                               ...newItems[index],
                               name: article.name,
+                              code: article.code || undefined,
                               unit: article.unit,
                               price: article.price,
                               pdv: article.pdv,
