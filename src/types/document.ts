@@ -75,6 +75,32 @@ export const getNextQuoteStatus = (current: DocumentStatus): DocumentStatus | nu
   return quoteStatusFlow[currentIndex + 1];
 };
 
+// Status workflow for contracts (ugovor)
+export const contractStatusFlow: DocumentStatus[] = ['draft', 'sent', 'accepted'];
+
+// Status workflow for delivery notes (otpremnica/nalog)
+export const deliveryStatusFlow: DocumentStatus[] = ['draft', 'pending', 'completed'];
+
+// Status workflow for invoices (racun)
+export const invoiceStatusFlow: DocumentStatus[] = ['draft', 'sent', 'completed'];
+
+// Get status flow for a document type
+export const getStatusFlowForType = (type: DocumentType): DocumentStatus[] => {
+  switch (type) {
+    case 'ponuda':
+      return quoteStatusFlow;
+    case 'ugovor':
+      return contractStatusFlow;
+    case 'otpremnica':
+    case 'nalog-dostava-montaza':
+      return deliveryStatusFlow;
+    case 'racun':
+      return invoiceStatusFlow;
+    default:
+      return ['draft'];
+  }
+};
+
 // Document flow: Ponuda → Ugovor → Otpremnica → Račun
 export const documentFlowOrder: DocumentType[] = ['ponuda', 'ugovor', 'otpremnica', 'racun'];
 
@@ -86,6 +112,22 @@ export const getNextDocumentType = (currentType: DocumentType): DocumentType | n
     return null;
   }
   return documentFlowOrder[currentIndex + 1];
+};
+
+// Get available conversion targets for a document type
+export const getConversionTargets = (currentType: DocumentType, status: DocumentStatus): DocumentType[] => {
+  const targets: DocumentType[] = [];
+  
+  // Only allow conversion from accepted/completed documents
+  if (currentType === 'ponuda' && status === 'accepted') {
+    targets.push('ugovor', 'otpremnica');
+  } else if (currentType === 'ugovor' && status === 'accepted') {
+    targets.push('otpremnica');
+  } else if ((currentType === 'otpremnica' || currentType === 'nalog-dostava-montaza') && status === 'completed') {
+    targets.push('racun');
+  }
+  
+  return targets;
 };
 
 // Get label for next document action

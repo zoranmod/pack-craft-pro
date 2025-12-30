@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
-import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark, FileCheck } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2, FileText, Bookmark, FileCheck, AlertCircle } from 'lucide-react';
 import { DocumentType, DocumentItem, documentTypeLabels } from '@/types/document';
 import { ContractArticleFormData } from '@/types/contractArticle';
 import { toast } from 'sonner';
-import { round2, formatCurrency } from '@/lib/utils';
+import { round2, formatCurrency, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { validateOIB, validateDocumentItems } from '@/lib/validation';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -66,6 +67,14 @@ export function DocumentForm() {
     contactPerson: '',
     deliveryAddress: '',
   }));
+
+  // Validation errors state
+  const [validationErrors, setValidationErrors] = useState<{
+    clientName?: string;
+    clientAddress?: string;
+    clientOib?: string;
+    items?: { index: number; message: string }[];
+  }>({});
 
   // Template state
   const { data: defaultTemplate, isLoading: isLoadingTemplate } = useDefaultTemplate(formData.type);
@@ -261,19 +270,47 @@ export function DocumentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!formData.clientName) {
-      toast.error('Molimo unesite naziv klijenta');
-      return;
+    // Reset validation errors
+    const errors: typeof validationErrors = {};
+    
+    // Client name validation
+    if (!formData.clientName || formData.clientName.trim() === '') {
+      errors.clientName = 'Naziv klijenta je obavezan';
     }
     
-    if (!formData.clientAddress) {
-      toast.error('Molimo unesite adresu klijenta');
-      return;
+    // Client address validation
+    if (!formData.clientAddress || formData.clientAddress.trim() === '') {
+      errors.clientAddress = 'Adresa klijenta je obavezna';
     }
-
-    if (items.some(item => !item.name)) {
-      toast.error('Molimo unesite naziv za sve stavke');
+    
+    // OIB validation
+    const oibValidation = validateOIB(formData.clientOib);
+    if (!oibValidation.valid) {
+      errors.clientOib = oibValidation.message;
+    }
+    
+    // Items validation
+    const itemsValidation = validateDocumentItems(
+      items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        pdv: item.pdv,
+        discount: item.discount,
+      })),
+      hasPrices
+    );
+    
+    if (!itemsValidation.valid && itemsValidation.itemIndex !== undefined) {
+      errors.items = [{ index: itemsValidation.itemIndex, message: itemsValidation.message }];
+    }
+    
+    // Set errors and show toast if any
+    setValidationErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      const firstError = errors.clientName || errors.clientAddress || errors.clientOib || errors.items?.[0]?.message;
+      toast.error(firstError || 'Molimo ispravite greške u obrascu');
       return;
     }
 
@@ -459,35 +496,75 @@ export function DocumentForm() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="clientName">Naziv klijenta *</Label>
+                <Label htmlFor="clientName" className={validationErrors.clientName ? 'text-destructive' : ''}>
+                  Naziv klijenta *
+                </Label>
                 <Input
                   id="clientName"
                   value={formData.clientName}
-                  onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, clientName: e.target.value });
+                    if (validationErrors.clientName) {
+                      setValidationErrors(prev => ({ ...prev, clientName: undefined }));
+                    }
+                  }}
                   placeholder="Unesite naziv klijenta"
-                  className="mt-1.5"
+                  className={cn("mt-1.5", validationErrors.clientName && "border-destructive focus-visible:ring-destructive")}
                 />
+                {validationErrors.clientName && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {validationErrors.clientName}
+                  </p>
+                )}
               </div>
               <div>
-                <Label htmlFor="clientOib">OIB</Label>
+                <Label htmlFor="clientOib" className={validationErrors.clientOib ? 'text-destructive' : ''}>
+                  OIB
+                </Label>
                 <Input
                   id="clientOib"
                   value={formData.clientOib}
-                  onChange={(e) => setFormData({ ...formData, clientOib: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    setFormData({ ...formData, clientOib: value });
+                    if (validationErrors.clientOib) {
+                      setValidationErrors(prev => ({ ...prev, clientOib: undefined }));
+                    }
+                  }}
                   placeholder="12345678901"
                   maxLength={11}
-                  className="mt-1.5"
+                  className={cn("mt-1.5", validationErrors.clientOib && "border-destructive focus-visible:ring-destructive")}
                 />
+                {validationErrors.clientOib && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {validationErrors.clientOib}
+                  </p>
+                )}
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="clientAddress">Adresa *</Label>
+                <Label htmlFor="clientAddress" className={validationErrors.clientAddress ? 'text-destructive' : ''}>
+                  Adresa *
+                </Label>
                 <Input
                   id="clientAddress"
                   value={formData.clientAddress}
-                  onChange={(e) => setFormData({ ...formData, clientAddress: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, clientAddress: e.target.value });
+                    if (validationErrors.clientAddress) {
+                      setValidationErrors(prev => ({ ...prev, clientAddress: undefined }));
+                    }
+                  }}
                   placeholder="Unesite adresu"
-                  className="mt-1.5"
+                  className={cn("mt-1.5", validationErrors.clientAddress && "border-destructive focus-visible:ring-destructive")}
                 />
+                {validationErrors.clientAddress && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {validationErrors.clientAddress}
+                  </p>
+                )}
               </div>
               <div>
                 <Label htmlFor="clientPhone">Telefon</Label>
