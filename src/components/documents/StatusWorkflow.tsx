@@ -91,7 +91,7 @@ export function StatusWorkflow({ document }: StatusWorkflowProps) {
   // Get status action label
   const getStatusActionLabel = (status: DocumentStatus): string => {
     const labels: Record<DocumentStatus, string> = {
-      draft: 'Označi kao nacrt',
+      draft: 'Označi kao u pripremi',
       sent: 'Označi kao poslano',
       accepted: 'Označi kao prihvaćeno',
       rejected: 'Označi kao odbijeno',

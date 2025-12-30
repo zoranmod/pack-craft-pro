@@ -58,7 +58,7 @@ export const documentTypeLabels: Record<DocumentType, string> = {
 };
 
 export const documentStatusLabels: Record<DocumentStatus, string> = {
-  'draft': 'Nacrt',
+  'draft': 'U pripremi',
   'sent': 'Poslano',
   'accepted': 'Prihvaćeno',
   'rejected': 'Odbijeno',
