@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy } from 'lucide-react';
-import { Document, DocumentType, documentTypeLabels, documentStatusLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
-import { Badge } from '@/components/ui/badge';
+import { Document, DocumentType, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,16 +18,6 @@ interface DocumentListProps {
   documents: Document[];
   filter?: DocumentType | 'all';
 }
-
-const statusStyles: Record<string, string> = {
-  draft: 'bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800/60 dark:text-zinc-400 dark:border-zinc-700',
-  sent: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-  accepted: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-  rejected: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-  pending: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
-  completed: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
-  cancelled: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-};
 
 const typeIcons: Record<DocumentType, string> = {
   'otpremnica': '📦',
@@ -125,9 +115,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                   {formatDateHR(doc.date)}
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant="outline" className={cn("text-xs font-medium px-2.5 py-0.5 rounded-full", statusStyles[doc.status])}>
-                    {documentStatusLabels[doc.status]}
-                  </Badge>
+                  <StatusBadge status={doc.status} />
                 </td>
                 <td className="px-6 py-4 text-right font-medium text-foreground">
                   {doc.totalAmount.toLocaleString('hr-HR')} €
