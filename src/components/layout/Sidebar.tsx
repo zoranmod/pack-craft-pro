@@ -2,16 +2,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   FileText, 
-  FilePlus, 
   Truck, 
   Settings,
-  Package,
   Users,
   PackageSearch,
-  UserCircle,
   FileSignature,
   Receipt,
-  X
+  X,
+  Calendar,
+  ClipboardList,
+  Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -20,24 +20,17 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useTheme } from '@/hooks/useTheme';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
+// Module-based sidebar navigation (list views only, no creation actions)
 const menuItems = [
-  // Početna
-  { icon: LayoutDashboard, label: 'Početna stranica', path: '/' },
-  
-  // Dokumenti - pregled
-  { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
-  
-  // Dokumenti - kreiranje (logičan poslovni tok: ponuda → ugovor → otpremnica → dostava → račun)
-  { icon: FilePlus, label: 'Nova ponuda', path: '/documents/new?type=ponuda' },
-  { icon: FileSignature, label: 'Novi ugovor', path: '/contracts/new' },
-  { icon: Package, label: 'Nova otpremnica', path: '/documents/new?type=otpremnica' },
-  { icon: Truck, label: 'Nalog za dostavu i montažu', path: '/documents/new?type=nalog-dostava-montaza' },
-  { icon: Receipt, label: 'Novi račun', path: '/documents/new?type=racun' },
-  
-  // Matični podaci
-  { icon: Users, label: 'Klijenti', path: '/clients' },
+  { icon: LayoutDashboard, label: 'Početna', path: '/' },
+  { icon: FileText, label: 'Ponude', path: '/ponude' },
+  { icon: FileSignature, label: 'Ugovori', path: '/ugovori' },
+  { icon: Package, label: 'Otpremnice', path: '/otpremnice' },
+  { icon: Truck, label: 'Nalozi dostave i montaže', path: '/nalozi' },
+  { icon: Receipt, label: 'Računi', path: '/racuni' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
-  { icon: UserCircle, label: 'Zaposlenici', path: '/employees' },
+  { icon: Users, label: 'Klijenti', path: '/clients' },
+  { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
 ];
 
 interface SidebarProps {
