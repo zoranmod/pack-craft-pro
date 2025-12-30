@@ -393,3 +393,124 @@ table tr:hover {
   background: var(--bg-dark);
   color: #fff;
 }
+/* ================================
+   DARK MODE PATCH
+   ================================ */
+
+.dark,
+.dark body {
+  background: var(--bg-dark) !important;
+  color: #e6e6e6 !important;
+}
+
+/* Cards / container */
+.dark .card,
+.dark .panel,
+.dark .box,
+.dark .container,
+.dark section,
+.dark .stat-card {
+  background: #1a1b20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+}
+
+.dark .card:hover,
+.dark .panel:hover,
+.dark .box:hover,
+.dark .stat-card:hover {
+  background: #202127 !important;
+  transform: translateY(-2px);
+}
+
+/* Sidebar */
+.dark .sidebar,
+.dark nav {
+  background: #131316 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark .sidebar a,
+.dark nav a {
+  color: #d9d9d9 !important;
+}
+
+.dark .sidebar a:hover {
+  background: #1f1f24;
+}
+
+/* Top header */
+.dark header,
+.dark .topbar,
+.dark .navbar {
+  background: #121214 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Buttons */
+.dark button.primary,
+.dark .btn-primary {
+  background: var(--accent) !important;
+  color: #000 !important;
+}
+
+.dark button.secondary,
+.dark .btn-secondary {
+  background: #26262d !important;
+  border-color: #2d2d34 !important;
+  color: #ddd !important;
+}
+
+.dark .action:hover,
+.dark .btn:hover {
+  opacity: 0.85;
+}
+
+/* Input fields */
+.dark input,
+.dark select,
+.dark textarea {
+  background: #1b1c21 !important;
+  border-color: #2a2b31 !important;
+  color: #fff !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(243, 179, 38, 0.25) !important;
+}
+
+/* Lists */
+.dark .row-item {
+  background: #1b1c21 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .row-item:hover {
+  background: #22232a !important;
+}
+
+.dark .activity-item:hover {
+  background: #202127 !important;
+}
+
+/* Table */
+.dark table tr:hover {
+  background: #23242a !important;
+}
+
+/* Badges */
+.dark .badge-green {
+  background: #153a22;
+  color: #58d992;
+}
+.dark .badge-red {
+  background: #3d1b1b;
+  color: #ff7b7b;
+}
+.dark .badge-blue {
+  background: #1c2946;
+  color: #6da8ff;
+}
