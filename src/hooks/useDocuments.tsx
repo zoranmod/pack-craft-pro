@@ -434,6 +434,12 @@ export function useConvertDocument() {
       // Generate sequential document number
       const documentNumber = await generateDocumentNumber(targetType, user.id);
 
+      // Build notes with source document reference
+      const sourceNote = `Kreirano iz dokumenta: ${sourceDocument.number}`;
+      const combinedNotes = sourceDocument.notes 
+        ? `${sourceDocument.notes}\n\n${sourceNote}`
+        : sourceNote;
+
       // Create new document with data from source
       const { data: doc, error: docError } = await supabase
         .from('documents')
@@ -441,23 +447,33 @@ export function useConvertDocument() {
           user_id: user.id,
           type: targetType,
           number: documentNumber,
+          status: 'draft',
           client_name: sourceDocument.clientName,
           client_oib: sourceDocument.clientOib,
           client_address: sourceDocument.clientAddress,
           client_phone: sourceDocument.clientPhone,
           client_email: sourceDocument.clientEmail,
-          notes: sourceDocument.notes,
+          contact_person: sourceDocument.contactPerson,
+          delivery_address: sourceDocument.deliveryAddress,
+          notes: combinedNotes,
           total_amount: totalAmount,
+          payment_method: sourceDocument.paymentMethod,
+          validity_days: sourceDocument.validityDays,
+          delivery_days: sourceDocument.deliveryDays,
+          prepared_by: sourceDocument.preparedBy,
+          template_id: sourceDocument.templateId,
+          source_document_id: sourceDocument.id,
         })
         .select()
         .single();
 
       if (docError) throw docError;
 
-      // Copy items
+      // Copy items with code
       const itemsToInsert = sourceDocument.items.map(item => ({
         document_id: doc.id,
         name: item.name,
+        code: item.code,
         quantity: item.quantity,
         unit: item.unit,
         price: item.price,
@@ -473,6 +489,21 @@ export function useConvertDocument() {
 
       if (itemsError) throw itemsError;
 
+      // Copy contract articles if source has them and target is ugovor
+      if (targetType === 'ugovor' && sourceDocument.contractArticles?.length) {
+        const articlesToInsert = sourceDocument.contractArticles.map(article => ({
+          document_id: doc.id,
+          article_number: article.articleNumber,
+          title: article.title,
+          content: article.content,
+          sort_order: article.sortOrder,
+        }));
+
+        await supabase
+          .from('document_contract_articles')
+          .insert(articlesToInsert);
+      }
+
       return doc;
     },
     onSuccess: (doc, variables) => {
@@ -484,13 +515,18 @@ export function useConvertDocument() {
         'racun': 'Račun',
         'nalog-dostava-montaza': 'Nalog',
       }[variables.targetType];
-      toast.success(`${typeLabel} uspješno kreiran!`);
+      toast.success(`${typeLabel} uspješno kreiran iz dokumenta ${variables.sourceDocument.number}!`);
       
       logActivity.mutate({
-        action_type: 'create',
+        action_type: 'convert',
         entity_type: 'document',
         entity_id: doc.id,
         entity_name: doc.number,
+        details: {
+          sourceDocumentId: variables.sourceDocument.id,
+          sourceDocumentNumber: variables.sourceDocument.number,
+          targetType: variables.targetType,
+        },
       });
     },
     onError: (error) => {

@@ -499,6 +499,7 @@ export type Database = {
           number: string
           payment_method: string | null
           prepared_by: string | null
+          source_document_id: string | null
           status: string
           template_id: string | null
           total_amount: number
@@ -523,6 +524,7 @@ export type Database = {
           number: string
           payment_method?: string | null
           prepared_by?: string | null
+          source_document_id?: string | null
           status?: string
           template_id?: string | null
           total_amount?: number
@@ -547,6 +549,7 @@ export type Database = {
           number?: string
           payment_method?: string | null
           prepared_by?: string | null
+          source_document_id?: string | null
           status?: string
           template_id?: string | null
           total_amount?: number
@@ -556,6 +559,13 @@ export type Database = {
           validity_days?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "documents_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "documents_template_id_fkey"
             columns: ["template_id"]

@@ -16,7 +16,8 @@ import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
 import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
-import { useCopyDocument, useUpdateDocumentStatus } from '@/hooks/useDocuments';
+import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
+import { DocumentType } from '@/types/document';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +50,22 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: articlesData } = useArticles({ pageSize: 1000 });
   const copyDocument = useCopyDocument();
   const updateStatus = useUpdateDocumentStatus();
+  const convertDocument = useConvertDocument();
+  
+  const handleConvertDocument = async (targetType: DocumentType) => {
+    if (!document) return;
+    try {
+      const newDoc = await convertDocument.mutateAsync({
+        sourceDocument: document,
+        targetType,
+      });
+      if (newDoc?.id) {
+        navigate(`/documents/${newDoc.id}/edit`);
+      }
+    } catch (error) {
+      // Error is handled in the hook
+    }
+  };
   
   // All available statuses for the dropdown
   const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'completed', 'cancelled'];
@@ -643,30 +660,33 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
-                  onClick={() => toast.info('Pretvaranje u račun - uskoro dostupno')}
+                  onClick={() => handleConvertDocument('racun')}
+                  disabled={convertDocument.isPending}
                 >
                   <FileText className="mr-3 h-4 w-4 text-primary" />
-                  Račun
+                  {convertDocument.isPending ? 'Kreiram...' : 'Račun'}
                 </Button>
               )}
-              {document.type !== 'otpremnica' && (
+              {document.type !== 'otpremnica' && document.type !== 'nalog-dostava-montaza' && (
                 <Button 
                   variant="outline" 
                   className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
-                  onClick={() => toast.info('Pretvaranje u otpremnicu - uskoro dostupno')}
+                  onClick={() => handleConvertDocument('otpremnica')}
+                  disabled={convertDocument.isPending}
                 >
                   <Truck className="mr-3 h-4 w-4 text-primary" />
-                  Otpremnica
+                  {convertDocument.isPending ? 'Kreiram...' : 'Otpremnica'}
                 </Button>
               )}
               {document.type !== 'ugovor' && (
                 <Button 
                   variant="outline" 
                   className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
-                  onClick={() => toast.info('Pretvaranje u ugovor - uskoro dostupno')}
+                  onClick={() => handleConvertDocument('ugovor')}
+                  disabled={convertDocument.isPending}
                 >
                   <ScrollText className="mr-3 h-4 w-4 text-primary" />
-                  Ugovor
+                  {convertDocument.isPending ? 'Kreiram...' : 'Ugovor'}
                 </Button>
               )}
             </div>
