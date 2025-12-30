@@ -54,7 +54,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b border-border px-4">
+      <div className="flex h-14 items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4">
         <div className="flex items-center gap-2">
           <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
           <span className="font-semibold text-foreground">Akord</span>
