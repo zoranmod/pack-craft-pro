@@ -6,6 +6,20 @@ import { hr } from 'date-fns/locale';
 import { useEmployeeDocuments } from '@/hooks/useEmployees';
 import { Button } from '@/components/ui/button';
 
+// Helper function to sanitize URL for safe rendering
+const getSafeUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url;
+    }
+  } catch {
+    // Invalid URL
+  }
+  return null;
+};
+
 interface EmployeeDocumentsSectionProps {
   employeeId: string;
 }
@@ -138,9 +152,9 @@ export function EmployeeDocumentsSection({ employeeId }: EmployeeDocumentsSectio
                       {expiryStatus && (
                         <Badge variant={expiryStatus.variant}>{expiryStatus.label}</Badge>
                       )}
-                      {doc.file_url && (
+                      {getSafeUrl(doc.file_url) && (
                         <Button variant="ghost" size="icon" asChild>
-                          <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                          <a href={getSafeUrl(doc.file_url)!} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4" />
                           </a>
                         </Button>
