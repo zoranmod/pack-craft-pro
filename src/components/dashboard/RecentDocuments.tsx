@@ -1,22 +1,13 @@
 import { Link } from 'react-router-dom';
 import { FileText, ArrowRight } from 'lucide-react';
-import { Document, documentTypeLabels, documentStatusLabels } from '@/types/document';
-import { Badge } from '@/components/ui/badge';
+import { Document, documentTypeLabels } from '@/types/document';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { cn, formatDateHR } from '@/lib/utils';
 
 interface RecentDocumentsProps {
   documents: Document[];
   maxHeight?: string;
 }
-
-const statusStyles: Record<string, string> = {
-  draft: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400',
-  sent: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  accepted: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  pending: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  cancelled: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-};
 
 export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }: RecentDocumentsProps) {
   const recentDocs = documents.slice(0, 20);
@@ -50,17 +41,7 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
                 {doc.clientName}
               </p>
             </div>
-            <span className={cn(
-              "ml-4 px-2.5 py-1 rounded-full text-[11px] font-medium flex-shrink-0",
-              statusStyles[doc.status] || statusStyles.draft
-            )}>
-              {doc.status === 'draft' && 'U pripremi'}
-              {doc.status === 'sent' && 'Poslano'}
-              {doc.status === 'pending' && 'Na čekanju'}
-              {doc.status === 'accepted' && 'Prihvaćeno'}
-              {doc.status === 'completed' && 'Završeno'}
-              {doc.status === 'cancelled' && 'Otkazano'}
-            </span>
+            <StatusBadge status={doc.status} className="ml-4 flex-shrink-0" />
           </Link>
         ))}
         {recentDocs.length === 0 && (
