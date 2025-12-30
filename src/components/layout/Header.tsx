@@ -98,9 +98,9 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
           {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
-                <div className="h-7 w-7 rounded-full gradient-primary flex items-center justify-center">
-                  <User className="h-3.5 w-3.5 text-primary-foreground" />
+              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 hover:bg-accent dark:hover:bg-zinc-800">
+                <div className="h-7 w-7 rounded-full bg-primary dark:bg-zinc-700 flex items-center justify-center">
+                  <User className="h-3.5 w-3.5 text-primary-foreground dark:text-white" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
