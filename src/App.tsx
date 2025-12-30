@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
@@ -27,34 +28,36 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <ErrorBoundary>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/employee-portal" element={<EmployeePortal />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-              <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
-              <Route path="/documents/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
-              <Route path="/documents/:id/edit" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
-              <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
-              <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-              <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
-              <Route path="/contracts/new" element={<ProtectedRoute><ContractEditor /></ProtectedRoute>} />
-              <Route path="/settings/templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
-              <Route path="/settings/templates/new" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
-              <Route path="/settings/templates/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </ErrorBoundary>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <ErrorBoundary>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/employee-portal" element={<EmployeePortal />} />
+                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+                <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
+                <Route path="/documents/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
+                <Route path="/documents/:id/edit" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
+                <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+                <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+                <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
+                <Route path="/contracts/new" element={<ProtectedRoute><ContractEditor /></ProtectedRoute>} />
+                <Route path="/settings/templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
+                <Route path="/settings/templates/new" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
+                <Route path="/settings/templates/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </ErrorBoundary>
+        </TooltipProvider>
+      </ThemeProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

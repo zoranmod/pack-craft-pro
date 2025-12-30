@@ -2,6 +2,7 @@ import { FileText, Package, Truck } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
+import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { useDocuments } from '@/hooks/useDocuments';
 
@@ -16,11 +17,11 @@ const Index = () => {
 
   return (
     <MainLayout 
-      title="Početna stranica" 
-      subtitle="Dobrodošli u sustav"
+      title="Početna" 
+      subtitle="Dobrodošli"
     >
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-6">
         <StatCard
           title="Ukupno dokumenata"
           value={isLoading ? '...' : stats.totalDocuments}
@@ -36,7 +37,7 @@ const Index = () => {
           href="/documents?status=pending"
         />
         <StatCard
-          title="Završeno ovaj mjesec"
+          title="Završeno"
           value={isLoading ? '...' : stats.completedThisMonth}
           icon={Truck}
           trend={{ value: 8, isPositive: true }}
@@ -44,10 +45,16 @@ const Index = () => {
         />
       </div>
 
+      {/* Quick Actions */}
+      <div className="mb-6">
+        <h2 className="text-sm font-semibold text-foreground mb-3">Brze akcije</h2>
+        <QuickActions />
+      </div>
+
       {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <RecentDocuments documents={documents} />
-        <ActivityLogList limit={20} maxHeight="350px" />
+        <ActivityLogList limit={15} maxHeight="280px" />
       </div>
     </MainLayout>
   );

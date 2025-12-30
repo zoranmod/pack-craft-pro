@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, User, LogOut, Menu } from 'lucide-react';
+import { Search, User, LogOut, Menu, Sun, Moon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ interface HeaderProps {
 
 export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -36,8 +38,8 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="flex h-16 items-center justify-between px-3 md:px-6">
+    <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="flex h-14 items-center justify-between px-3 md:px-6">
         <div className="flex items-center gap-3">
           {showMenuButton && (
             <Button variant="ghost" size="icon" onClick={onMenuClick}>
@@ -45,24 +47,38 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
             </Button>
           )}
           <div>
-            <h1 className="text-lg md:text-xl font-semibold text-foreground">{title}</h1>
-            {subtitle && <p className="text-xs md:text-sm text-muted-foreground">{subtitle}</p>}
+            <h1 className="text-base md:text-lg font-semibold text-foreground">{title}</h1>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {/* Search */}
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Pretraži dokumente..."
+              placeholder="Pretraži..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-64 pl-9 bg-muted/50 border-0 focus-visible:ring-1"
+              className="w-48 pl-9 h-9 bg-card border-border text-sm"
             />
           </div>
+
+          {/* Theme Toggle */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            {theme === 'light' ? (
+              <Moon className="h-4 w-4" />
+            ) : (
+              <Sun className="h-4 w-4" />
+            )}
+          </Button>
 
           {/* Notifications */}
           <NotificationDropdown />
@@ -70,9 +86,9 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
           {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <div className="h-8 w-8 rounded-full gradient-primary flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-foreground" />
+              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
+                <div className="h-7 w-7 rounded-full gradient-primary flex items-center justify-center">
+                  <User className="h-3.5 w-3.5 text-primary-foreground" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
