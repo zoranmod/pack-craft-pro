@@ -7,9 +7,10 @@ interface MainLayoutProps {
   children: ReactNode;
   title: string;
   subtitle?: string;
+  showGlobalSearch?: boolean;
 }
 
-export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
+export function MainLayout({ children, title, subtitle, showGlobalSearch = false }: MainLayoutProps) {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -22,6 +23,7 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
           subtitle={subtitle} 
           onMenuClick={() => setSidebarOpen(true)}
           showMenuButton={isMobile}
+          showGlobalSearch={showGlobalSearch}
         />
         <main className={`${isMobile ? 'p-4' : 'px-5 py-5 2xl:px-6'} animate-fade-in`}>
           {children}

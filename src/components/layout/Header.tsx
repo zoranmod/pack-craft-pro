@@ -18,9 +18,10 @@ interface HeaderProps {
   subtitle?: string;
   onMenuClick?: () => void;
   showMenuButton?: boolean;
+  showGlobalSearch?: boolean;
 }
 
-export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderProps) {
+export function Header({ title, subtitle, onMenuClick, showMenuButton, showGlobalSearch = false }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -29,10 +30,10 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
 
   // Navigate when debounced search changes
   useEffect(() => {
-    if (debouncedSearch.trim()) {
+    if (showGlobalSearch && debouncedSearch.trim()) {
       navigate(`/documents?search=${encodeURIComponent(debouncedSearch.trim())}`);
     }
-  }, [debouncedSearch, navigate]);
+  }, [debouncedSearch, navigate, showGlobalSearch]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -57,27 +58,29 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Pretraži dokumente..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-48 pl-9 pr-9 h-9 bg-card border-border text-sm"
-            />
-            {searchQuery && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                onClick={clearSearch}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          {/* Global Search - only shown when enabled */}
+          {showGlobalSearch && (
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Pretraži sve dokumente..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-56 pl-9 pr-9 h-9 bg-card border-border text-sm"
+              />
+              {searchQuery && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={clearSearch}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Theme Toggle */}
           <Button 
