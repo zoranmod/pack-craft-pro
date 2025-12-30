@@ -73,6 +73,7 @@ export default {
         lg: "10px",
         md: "8px",
         sm: "6px",
+        xl: "12px",
       },
       keyframes: {
         "accordion-down": {
