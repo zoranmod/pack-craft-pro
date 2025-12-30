@@ -555,3 +555,5 @@ header {
 .dark .page-header {
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
+padding-bottom: 0.65rem
+padding-top: 0.85rem
