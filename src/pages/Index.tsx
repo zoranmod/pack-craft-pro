@@ -47,14 +47,14 @@ const Index = () => {
   return (
     <MainLayout title="Početna">
       {/* Greeting */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-foreground">
+      <div className="mb-6">
+        <h1 className="text-[26px] font-bold text-foreground">
           Dobro došli, {userName}!
         </h1>
       </div>
 
       {/* Stats Grid - 4 columns */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           title="Ukupno dokumenata"
           value={isLoading ? '...' : stats.totalDocuments}
@@ -85,31 +85,31 @@ const Index = () => {
       </div>
 
       {/* Quick Actions - Button Row */}
-      <div className="mb-8">
-        <h2 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">Brze akcije</h2>
-        <div className="flex flex-wrap gap-3">
+      <div className="mb-6">
+        <h2 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Brze akcije</h2>
+        <div className="flex flex-wrap gap-2.5">
           {quickActionButtons.map((action) => (
             <Button
               key={action.label}
               variant="outline"
-              className="h-11 px-5 bg-card hover:bg-accent/50 border-border hover:border-primary/40 transition-all"
+              className="h-11 px-4 bg-card hover:bg-card border-border hover:border-muted-foreground/30 transition-all duration-200 hover:scale-[0.98] active:scale-[0.96] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
               onClick={() => navigate(action.href)}
             >
-              <action.icon className="h-4 w-4 mr-2 text-primary" />
-              {action.label}
+              <action.icon className="h-4 w-4 mr-2.5 text-primary" />
+              <span className="font-medium">{action.label}</span>
             </Button>
           ))}
         </div>
       </div>
 
       {/* Recent Documents & Activities - Side by Side */}
-      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr] mb-8">
-        <RecentDocuments documents={documents} maxHeight="360px" />
-        <ActivityLogList limit={15} maxHeight="360px" />
+      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr] mb-6">
+        <RecentDocuments documents={documents} maxHeight="340px" />
+        <ActivityLogList limit={12} maxHeight="340px" />
       </div>
 
       {/* Bottom Sections - Deadlines & Analytics */}
-      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-2">
         <DeadlinesSection />
         <AnalyticsSection />
       </div>

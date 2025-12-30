@@ -22,33 +22,33 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
   const recentDocs = documents.slice(0, 20);
 
   return (
-    <div className="bg-card rounded-xl border border-border flex flex-col">
+    <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
       <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-        <h3 className="font-semibold text-foreground">Nedavni dokumenti</h3>
+        <h3 className="font-semibold text-foreground text-[15px]">Nedavni dokumenti</h3>
         <Link 
           to="/documents" 
-          className="text-sm text-primary hover:underline font-medium"
+          className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
         >
           Prikaži sve
         </Link>
       </div>
-      <div className="divide-y divide-border overflow-y-auto flex-1" style={{ maxHeight }}>
+      <div className="divide-y divide-border/60 overflow-y-auto flex-1" style={{ maxHeight }}>
         {recentDocs.map((doc) => (
           <Link
             key={doc.id}
             to={`/documents/${doc.id}`}
-            className="flex items-center justify-between px-6 py-4 hover:bg-accent/50 dark:hover:bg-white/5 transition-colors group"
+            className="flex items-center justify-between px-6 py-3 hover:bg-[hsl(220_14%_96%)] dark:hover:bg-white/5 transition-colors group"
           >
             <div className="min-w-0 flex-1">
               <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">
                 {doc.number}
               </p>
-              <p className="text-sm text-muted-foreground truncate mt-0.5">
+              <p className="text-[13px] text-muted-foreground truncate mt-0.5">
                 {doc.clientName}
               </p>
             </div>
             <span className={cn(
-              "ml-4 px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0",
+              "ml-4 px-2.5 py-1 rounded-full text-[11px] font-medium flex-shrink-0",
               statusStyles[doc.status] || statusStyles.draft
             )}>
               {doc.status === 'draft' && 'Nacrt'}
