@@ -2,3 +2,6 @@ project_id = "jelcasinntclyogwfgua"
 
 [functions.create-employee-account]
 verify_jwt = false
+
+[functions.database-backup]
+verify_jwt = false
