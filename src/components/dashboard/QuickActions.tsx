@@ -20,13 +20,8 @@ const actions = [
   },
   {
     icon: Truck,
-    label: 'Nalog dostava',
+    label: 'Nalog za dostavu i montažu',
     path: '/documents/new?type=nalog-dostava',
-  },
-  {
-    icon: Wrench,
-    label: 'Nalog montaža',
-    path: '/documents/new?type=nalog-montaza',
   },
   {
     icon: Plus,
