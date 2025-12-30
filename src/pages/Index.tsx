@@ -1,4 +1,5 @@
-import { FileText, Package, Truck, Users, Plus, FileSignature, ClipboardList } from 'lucide-react';
+import { FileText, FileEdit, Truck, Users, Plus, FileSignature, ClipboardList, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -13,9 +14,12 @@ import { useClients } from '@/hooks/useClients';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useSettings';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const { data: documents = [], isLoading } = useDocuments();
   const { data: clients = [] } = useClients();
   const { user } = useAuth();
@@ -32,7 +36,7 @@ const Index = () => {
 
   const stats = {
     totalDocuments: documents.length,
-    pendingDocuments: documents.filter(d => ['draft', 'sent', 'pending'].includes(d.status)).length,
+    draftDocuments: documents.filter(d => d.status === 'draft').length,
     completedThisMonth: documents.filter(d => ['accepted', 'completed'].includes(d.status)).length,
     totalClients: clients.length,
   };
@@ -53,36 +57,49 @@ const Index = () => {
         className="mb-5 -mt-1"
       />
 
-      {/* Stats Grid - 4 columns */}
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-7">
-        <StatCard
-          title="Ukupno dokumenata"
-          value={isLoading ? '...' : stats.totalDocuments}
-          icon={FileText}
-          trend={{ value: 12, isPositive: true }}
-          href="/documents"
-        />
-        <StatCard
-          title="Na čekanju"
-          value={isLoading ? '...' : stats.pendingDocuments}
-          icon={Package}
-          href="/documents?status=pending"
-        />
-        <StatCard
-          title="Završeno"
-          value={isLoading ? '...' : stats.completedThisMonth}
-          icon={Truck}
-          trend={{ value: 8, isPositive: true }}
-          href="/documents?status=completed"
-        />
-        <StatCard
-          title="Klijenti"
-          value={isLoading ? '...' : stats.totalClients}
-          icon={Users}
-          trend={{ value: 5, isPositive: true }}
-          href="/clients"
-        />
-      </div>
+      {/* Collapsible Summary Section */}
+      <Collapsible open={isSummaryOpen} onOpenChange={setIsSummaryOpen} className="mb-7">
+        <CollapsibleTrigger asChild>
+          <button className="flex items-center gap-2 w-full text-left group mb-3">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sažetak</h2>
+            <ChevronDown className={cn(
+              "h-4 w-4 text-muted-foreground transition-transform duration-200",
+              isSummaryOpen && "rotate-180"
+            )} />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+          <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              title="Ukupno dokumenata"
+              value={isLoading ? '...' : stats.totalDocuments}
+              icon={FileText}
+              trend={{ value: 12, isPositive: true }}
+              href="/documents"
+            />
+            <StatCard
+              title="U pripremi"
+              value={isLoading ? '...' : stats.draftDocuments}
+              icon={FileEdit}
+              href="/documents?status=draft"
+            />
+            <StatCard
+              title="Završeno"
+              value={isLoading ? '...' : stats.completedThisMonth}
+              icon={Truck}
+              trend={{ value: 8, isPositive: true }}
+              href="/documents?status=completed"
+            />
+            <StatCard
+              title="Klijenti"
+              value={isLoading ? '...' : stats.totalClients}
+              icon={Users}
+              trend={{ value: 5, isPositive: true }}
+              href="/clients"
+            />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Quick Actions - Button Row */}
       <div className="mb-7">
