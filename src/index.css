@@ -555,3 +555,27 @@ header {
 .dark .page-header {
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
+/* ===============================
+   FIX ALIGN HEADER & SIDEBAR LINE
+   =============================== */
+
+header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+aside {
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Header height matching sidebar top alignment */
+header .flex {
+  min-height: 64px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Remove white box around logo */
+aside img {
+  background: none !important;
+  box-shadow: none !important;
+}
