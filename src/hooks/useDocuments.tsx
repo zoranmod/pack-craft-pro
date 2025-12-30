@@ -364,8 +364,10 @@ export function useUpdateDocumentStatus() {
       return { id, status, number };
     },
     onSuccess: (data) => {
+      // Invalidate both the list and the specific document
       queryClient.invalidateQueries({ queryKey: ['documents'] });
-      toast.success('Status dokumenta ažuriran');
+      queryClient.invalidateQueries({ queryKey: ['document', data.id] });
+      toast.success('Status ažuriran');
       
       logActivity.mutate({
         action_type: 'update',
