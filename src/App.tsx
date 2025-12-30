@@ -22,6 +22,12 @@ import EmployeePortal from "./pages/EmployeePortal";
 import ContractEditor from "./pages/ContractEditor";
 import DocumentTemplates from "./pages/DocumentTemplates";
 import TemplateEditor from "./pages/TemplateEditor";
+import Ponude from "./pages/Ponude";
+import Ugovori from "./pages/Ugovori";
+import Otpremnice from "./pages/Otpremnice";
+import Nalozi from "./pages/Nalozi";
+import Racuni from "./pages/Racuni";
+import Kalendar from "./pages/Kalendar";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +48,12 @@ const App = () => (
                 <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
                 <Route path="/documents/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
                 <Route path="/documents/:id/edit" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
+                <Route path="/ponude" element={<ProtectedRoute><Ponude /></ProtectedRoute>} />
+                <Route path="/ugovori" element={<ProtectedRoute><Ugovori /></ProtectedRoute>} />
+                <Route path="/otpremnice" element={<ProtectedRoute><Otpremnice /></ProtectedRoute>} />
+                <Route path="/nalozi" element={<ProtectedRoute><Nalozi /></ProtectedRoute>} />
+                <Route path="/racuni" element={<ProtectedRoute><Racuni /></ProtectedRoute>} />
+                <Route path="/kalendar" element={<ProtectedRoute><Kalendar /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
                 <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
