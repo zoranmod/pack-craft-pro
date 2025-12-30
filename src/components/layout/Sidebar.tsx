@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -6,8 +5,6 @@ import {
   FilePlus, 
   Truck, 
   Settings,
-  ChevronLeft,
-  ChevronRight,
   Package,
   Users,
   PackageSearch,
@@ -49,7 +46,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -66,28 +62,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-border px-4">
-        {(!collapsed || isMobile) && (
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
-            <span className="font-semibold text-foreground">Akord</span>
-          </div>
-        )}
-        {collapsed && !isMobile && (
-          <img src={logo} alt="Akord logo" className="h-7 w-7 object-contain mx-auto" />
-        )}
-        {isMobile ? (
+        <div className="flex items-center gap-2">
+          <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
+          <span className="font-semibold text-foreground">Akord</span>
+        </div>
+        {isMobile && (
           <button
             onClick={() => onOpenChange?.(false)}
             className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" />
-          </button>
-        ) : (
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-          >
-            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </button>
         )}
       </div>
@@ -114,8 +98,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
             >
-              <item.icon className={cn("h-5 w-5 flex-shrink-0", !isMobile && collapsed && "mx-auto")} />
-              {(isMobile || !collapsed) && <span>{item.label}</span>}
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span>{item.label}</span>
             </Link>
           );
         })}
@@ -128,8 +112,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           onClick={handleLinkClick}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
         >
-          <Settings className={cn("h-5 w-5 flex-shrink-0", !isMobile && collapsed && "mx-auto")} />
-          {(isMobile || !collapsed) && <span>Postavke</span>}
+          <Settings className="h-5 w-5 flex-shrink-0" />
+          <span>Postavke</span>
         </Link>
       </div>
     </div>
@@ -146,14 +130,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     );
   }
 
-  // Desktop: fixed sidebar (reduced width for more content space)
+  // Desktop: fixed sidebar (always expanded)
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-card border-r border-border transition-all duration-300 shadow-card",
-        collapsed ? "w-14" : "w-52"
-      )}
-    >
+    <aside className="fixed left-0 top-0 z-40 h-screen w-52 bg-card border-r border-border shadow-card">
       {sidebarContent}
     </aside>
   );
