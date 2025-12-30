@@ -537,3 +537,21 @@ header {
   padding-left: 0 !important;
   margin-left: 0 !important;
 }
+/* 🔧 Poravnavanje donje linije sidebar headera i page headera */
+
+.sidebar-header {
+  padding-bottom: 0.75rem !important; /* podešavanje visine loga */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.page-header {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Za dark mode kontrast */
+.dark .sidebar-header,
+.dark .page-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
