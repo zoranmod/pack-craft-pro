@@ -92,8 +92,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-sm dark:bg-zinc-800/70 dark:text-zinc-100 dark:border-l-2 dark:border-yellow-500/60"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-zinc-800/40 dark:hover:text-zinc-100"
               )}
             >
               <item.icon className="h-5 w-5 flex-shrink-0" />
