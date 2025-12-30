@@ -1,6 +1,7 @@
 import { FileText, Package, Truck, Users, Plus, FileSignature, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
 import { QuickActions } from '@/components/dashboard/QuickActions';
@@ -47,11 +48,10 @@ const Index = () => {
   return (
     <MainLayout title="Početna">
       {/* Greeting */}
-      <div className="mb-5 -mt-1">
-        <h1 className="text-[26px] font-bold text-foreground">
-          Dobro došli, {userName}!
-        </h1>
-      </div>
+      <PageHeader 
+        title={`Dobro došli, ${userName}!`}
+        className="mb-5 -mt-1"
+      />
 
       {/* Stats Grid - 4 columns */}
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-7">

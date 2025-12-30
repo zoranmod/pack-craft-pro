@@ -1,18 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Filter, Loader2, X, FileSignature } from 'lucide-react';
+import { Plus, Loader2, FileSignature } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DocumentList } from '@/components/documents/DocumentList';
+import { TableToolbar } from '@/components/ui/table-toolbar';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useDocuments } from '@/hooks/useDocuments';
-import { DocumentStatus, documentStatusLabels } from '@/types/document';
+import { DocumentStatus } from '@/types/document';
 
 type StatusFilter = DocumentStatus | 'all';
 
@@ -58,8 +52,8 @@ const Ugovori = () => {
     setSearchParams(searchParams);
   };
 
-  const handleStatusFilterChange = (value: StatusFilter) => {
-    setStatusFilter(value);
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value as StatusFilter);
     if (value === 'all') {
       searchParams.delete('status');
     } else {
@@ -73,42 +67,14 @@ const Ugovori = () => {
       title="Ugovori" 
       subtitle={`Ukupno ${filteredDocuments.length} ugovora`}
     >
-      {searchQuery && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm text-muted-foreground">
-            Pretraga: <strong className="text-foreground">"{searchQuery}"</strong>
-          </span>
-          <Button variant="ghost" size="sm" onClick={clearSearch} className="h-6 px-2">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={(v) => handleStatusFilterChange(v as StatusFilter)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtriraj po statusu" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Svi statusi</SelectItem>
-              {Object.entries(documentStatusLabels).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <Link to="/contracts/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Novi ugovor
-          </Button>
-        </Link>
-      </div>
+      <TableToolbar
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        searchQuery={searchQuery}
+        onClearSearch={clearSearch}
+        primaryActionLabel="Novi ugovor"
+        primaryActionHref="/contracts/new"
+      />
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
