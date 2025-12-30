@@ -319,7 +319,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6" style={{ fontFamily: template?.font_family || 'Arial', maxWidth: '210mm', margin: '0 auto', fontSize: '10px', color: '#000' }}>
+            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', minHeight: '297mm', margin: '0 auto', fontSize: '10px', color: '#000' }}>
+              {/* Flex wrapper for content - pushes footer to bottom */}
+              <div className="flex-grow flex flex-col">
               {/* Memorandum Header - identical for all documents */}
               <MemorandumHeader />
 
@@ -478,6 +480,50 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   </div>
                 </div>
               )}
+
+              {/* Signature Section for Otpremnica/Nalog */}
+              {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
+                <div className="mt-8 pt-6 border-t border-gray-300" style={{ fontSize: '10px' }}>
+                  {/* Red 1: Robu preuzeo */}
+                  <div className="flex items-end justify-between mb-6">
+                    <div className="flex items-end gap-2">
+                      <span style={{ color: '#000' }}>Robu preuzeo:</span>
+                      <div className="w-40 border-b border-gray-400"></div>
+                    </div>
+                    <div className="text-center px-4">
+                      <span style={{ color: '#000' }}>MP</span>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-40 border-b border-gray-400 mb-1"></div>
+                      <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
+                    </div>
+                  </div>
+
+                  {/* Red 2: Za tvrtku */}
+                  <div className="flex items-end justify-between mb-6">
+                    <div className="flex items-end gap-2">
+                      <span style={{ color: '#000' }}>Za {companySettings?.company_name || 'tvrtku'}:</span>
+                      <div className="w-40 border-b border-gray-400"></div>
+                    </div>
+                    <div className="text-center px-4">
+                      <span style={{ color: '#000' }}>MP</span>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-40 border-b border-gray-400 mb-1"></div>
+                      <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
+                    </div>
+                  </div>
+
+                  {/* Red 3: Robu izdao skladištar */}
+                  <div className="flex items-end gap-2 mt-4">
+                    <span style={{ color: '#000' }}>Robu izdao skladištar (puno ime i prezime):</span>
+                    <div className="flex-1 border-b border-gray-400 max-w-[200px]"></div>
+                  </div>
+                </div>
+              )}
+
+              {/* End of flex-grow wrapper */}
+              </div>
 
               {/* Legal Notice */}
               <div className="mt-6 text-center">

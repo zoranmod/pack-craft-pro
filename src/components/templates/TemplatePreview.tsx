@@ -46,12 +46,16 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
 
   return (
     <div 
-      className="bg-white text-black p-6 rounded border shadow-sm overflow-auto max-h-[700px]"
+      className="bg-white text-black p-6 rounded border shadow-sm overflow-auto max-h-[700px] flex flex-col"
       style={{ 
         fontFamily: template.font_family, 
-        fontSize: `${template.body_font_size}px` 
+        fontSize: `${template.body_font_size}px`,
+        minHeight: '297mm',
+        width: '210mm'
       }}
     >
+      {/* Flex wrapper for content */}
+      <div className="flex-grow flex flex-col">
       {/* Memorandum Header - identical for all documents */}
       <MemorandumHeader />
 
@@ -143,6 +147,9 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
           </div>
         </div>
       )}
+
+      {/* End of flex-grow wrapper */}
+      </div>
 
       {/* Memorandum Footer - identical for all documents */}
       <MemorandumFooter />
