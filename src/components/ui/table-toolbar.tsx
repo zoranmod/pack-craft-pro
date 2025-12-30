@@ -81,11 +81,13 @@ export function TableToolbar({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Svi statusi</SelectItem>
-                  {Object.entries(documentStatusLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
+                  {Object.entries(documentStatusLabels)
+                    .filter(([value]) => !['rejected', 'pending'].includes(value))
+                    .map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </>

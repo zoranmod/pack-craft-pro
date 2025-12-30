@@ -18,13 +18,19 @@ import { DocumentType, DocumentStatus, documentTypeLabels } from '@/types/docume
 
 type StatusFilter = DocumentStatus | 'all';
 
+// Valid statuses for filtering (excluding rejected and pending)
+const validFilterStatuses = ['draft', 'sent', 'accepted', 'completed', 'cancelled'];
+
 const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [typeFilter, setTypeFilter] = useState<DocumentType | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => {
-    const status = searchParams.get('status') as StatusFilter;
-    if (status && ['draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'].includes(status)) {
-      return status;
+    const status = searchParams.get('status');
+    // Map deprecated statuses to valid ones
+    if (status === 'pending') return 'draft';
+    if (status === 'rejected') return 'all';
+    if (status && validFilterStatuses.includes(status)) {
+      return status as StatusFilter;
     }
     return 'all';
   });
@@ -32,17 +38,25 @@ const Documents = () => {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const { data: documents = [], isLoading } = useDocuments();
 
-  // Read URL parameters on mount
+  // Read URL parameters on mount and redirect deprecated statuses
   useEffect(() => {
-    const status = searchParams.get('status') as StatusFilter;
-    if (status && ['draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'].includes(status)) {
-      setStatusFilter(status);
+    const status = searchParams.get('status');
+    if (status === 'pending') {
+      searchParams.set('status', 'draft');
+      setSearchParams(searchParams, { replace: true });
+      setStatusFilter('draft');
+    } else if (status === 'rejected') {
+      searchParams.delete('status');
+      setSearchParams(searchParams, { replace: true });
+      setStatusFilter('all');
+    } else if (status && validFilterStatuses.includes(status)) {
+      setStatusFilter(status as StatusFilter);
     }
     const search = searchParams.get('search');
     if (search) {
       setSearchQuery(search);
     }
-  }, [searchParams]);
+  }, [searchParams, setSearchParams]);
 
   // Filter documents by type, status and search query
   const filteredDocuments = documents.filter(doc => {
