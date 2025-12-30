@@ -6,6 +6,7 @@ import { DocumentList } from '@/components/documents/DocumentList';
 import { TableToolbar } from '@/components/ui/table-toolbar';
 import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useDebounce } from '@/hooks/useDebounce';
 import { DocumentStatus } from '@/types/document';
 
 type StatusFilter = DocumentStatus | 'all';
@@ -20,6 +21,7 @@ const Otpremnice = () => {
     return 'all';
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const { data: documents = [], isLoading } = useDocuments();
 
   useEffect(() => {
@@ -37,20 +39,14 @@ const Otpremnice = () => {
   const filteredDocuments = documents.filter(doc => {
     if (doc.type !== 'otpremnica') return false;
     const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = !searchQuery || 
+    const searchLower = debouncedSearch.toLowerCase();
+    const matchesSearch = !debouncedSearch || 
       doc.number.toLowerCase().includes(searchLower) ||
       doc.clientName.toLowerCase().includes(searchLower) ||
       doc.clientAddress?.toLowerCase().includes(searchLower) ||
       doc.notes?.toLowerCase().includes(searchLower);
     return matchesStatus && matchesSearch;
   });
-
-  const clearSearch = () => {
-    setSearchQuery('');
-    searchParams.delete('search');
-    setSearchParams(searchParams);
-  };
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value as StatusFilter);
@@ -70,8 +66,9 @@ const Otpremnice = () => {
       <TableToolbar
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
-        searchQuery={searchQuery}
-        onClearSearch={clearSearch}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Pretraži otpremnice..."
         primaryActionLabel="Nova otpremnica"
         primaryActionHref="/documents/new?type=otpremnica"
       />
@@ -83,14 +80,20 @@ const Otpremnice = () => {
       ) : filteredDocuments.length === 0 ? (
         <div className="text-center py-12">
           <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Nema otpremnica</h3>
-          <p className="text-muted-foreground mb-4">Kreirajte prvu otpremnicu</p>
-          <Link to="/documents/new?type=otpremnica">
-            <Button variant="outline" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Nova otpremnica
-            </Button>
-          </Link>
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            {debouncedSearch ? `Nema rezultata za "${debouncedSearch}"` : 'Nema otpremnica'}
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            {debouncedSearch ? 'Pokušajte s drugim pojmom' : 'Kreirajte prvu otpremnicu'}
+          </p>
+          {!debouncedSearch && (
+            <Link to="/documents/new?type=otpremnica">
+              <Button variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Nova otpremnica
+              </Button>
+            </Link>
+          )}
         </div>
       ) : (
         <DocumentList documents={filteredDocuments} filter="otpremnica" />
