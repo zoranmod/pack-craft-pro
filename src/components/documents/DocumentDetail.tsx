@@ -1,6 +1,6 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy } from 'lucide-react';
-import { Document, documentTypeLabels, documentStatusLabels, DocumentItem } from '@/types/document';
+import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy, ChevronDown } from 'lucide-react';
+import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -16,8 +16,13 @@ import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
 import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
-import { useCopyDocument } from '@/hooks/useDocuments';
-import { StatusWorkflow } from './StatusWorkflow';
+import { useCopyDocument, useUpdateDocumentStatus } from '@/hooks/useDocuments';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -25,13 +30,13 @@ interface DocumentDetailProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground',
+  draft: 'bg-muted text-muted-foreground border-muted',
   sent: 'bg-blue-100 text-blue-700 border-blue-200',
   accepted: 'bg-green-100 text-green-700 border-green-200',
   rejected: 'bg-red-100 text-red-700 border-red-200',
-  pending: 'bg-warning/10 text-warning border-warning/20',
-  completed: 'bg-success/10 text-success border-success/20',
-  cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
+  pending: 'bg-amber-100 text-amber-700 border-amber-200',
+  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
 export function DocumentDetail({ document, error }: DocumentDetailProps) {
@@ -43,7 +48,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: template } = useDocumentTemplate(document?.templateId);
   const { data: articlesData } = useArticles({ pageSize: 1000 });
   const copyDocument = useCopyDocument();
+  const updateStatus = useUpdateDocumentStatus();
   
+  // All available statuses for the dropdown
+  const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'completed', 'cancelled'];
+  
+  const handleStatusChange = (newStatus: DocumentStatus) => {
+    if (!document) return;
+    updateStatus.mutate({
+      id: document.id,
+      status: newStatus,
+      number: document.number,
+    });
+  };
   const isContract = document?.type === 'ugovor';
   
   // Document types that should NOT show prices (otpremnica, nalog-dostava-montaza)
@@ -292,9 +309,39 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">{document.number}</h1>
-              <Badge variant="outline" className={cn(statusStyles[document.status])}>
-                {documentStatusLabels[document.status]}
-              </Badge>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className={cn(
+                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium border cursor-pointer transition-colors hover:opacity-80',
+                    statusStyles[document.status]
+                  )}>
+                    {documentStatusLabels[document.status]}
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-popover border border-border shadow-lg z-50">
+                  {allStatuses.map((status) => (
+                    <DropdownMenuItem
+                      key={status}
+                      onClick={() => handleStatusChange(status)}
+                      className={cn(
+                        'cursor-pointer',
+                        document.status === status && 'bg-accent'
+                      )}
+                    >
+                      <span className={cn(
+                        'w-2 h-2 rounded-full mr-2',
+                        status === 'draft' && 'bg-muted-foreground',
+                        status === 'sent' && 'bg-blue-500',
+                        status === 'accepted' && 'bg-green-500',
+                        status === 'completed' && 'bg-emerald-700',
+                        status === 'cancelled' && 'bg-red-500'
+                      )} />
+                      {documentStatusLabels[status]}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <p className="text-muted-foreground">{documentTypeLabels[document.type]}</p>
           </div>
@@ -565,12 +612,16 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Status Card with Workflow */}
+          {/* Document Info Card */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
-            <h3 className="font-semibold text-foreground mb-4">Status dokumenta</h3>
-            <StatusWorkflow document={document} />
-            <Separator className="my-4" />
+            <h3 className="font-semibold text-foreground mb-4">Informacije</h3>
             <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Status</span>
+                <Badge variant="outline" className={cn('text-xs', statusStyles[document.status])}>
+                  {documentStatusLabels[document.status]}
+                </Badge>
+              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Kreirano</span>
                 <span className="text-foreground">{formatDateHR(document.createdAt)}</span>
