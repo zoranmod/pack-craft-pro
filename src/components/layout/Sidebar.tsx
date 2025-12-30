@@ -17,8 +17,10 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import logo from '@/assets/logo.png';
+import logoLight from '@/assets/logo.png';
+import logoDark from '@/assets/logo-dark.png';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTheme } from '@/hooks/useTheme';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 const menuItems = [
@@ -50,6 +52,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
+  
+  const logo = theme === 'dark' ? logoDark : logoLight;
 
   const handleLinkClick = () => {
     if (isMobile && onOpenChange) {
