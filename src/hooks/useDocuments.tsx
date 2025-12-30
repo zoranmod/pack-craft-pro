@@ -496,3 +496,102 @@ export function useConvertDocument() {
     },
   });
 }
+
+// Hook for copying a document (same type, new number)
+export function useCopyDocument() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const logActivity = useLogActivity();
+
+  return useMutation({
+    mutationFn: async (sourceDocument: Document) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
+
+      // Generate new sequential document number for the same type
+      const documentNumber = await generateDocumentNumber(sourceDocument.type, user.id);
+
+      // Create new document with data from source
+      const { data: doc, error: docError } = await supabase
+        .from('documents')
+        .insert({
+          user_id: user.id,
+          type: sourceDocument.type,
+          number: documentNumber,
+          status: 'draft', // Always start as draft
+          client_name: sourceDocument.clientName,
+          client_oib: sourceDocument.clientOib,
+          client_address: sourceDocument.clientAddress,
+          client_phone: sourceDocument.clientPhone,
+          client_email: sourceDocument.clientEmail,
+          notes: sourceDocument.notes,
+          total_amount: totalAmount,
+          template_id: sourceDocument.templateId,
+          payment_method: sourceDocument.paymentMethod,
+          validity_days: sourceDocument.validityDays,
+          delivery_days: sourceDocument.deliveryDays,
+          prepared_by: sourceDocument.preparedBy,
+          contact_person: sourceDocument.contactPerson,
+          delivery_address: sourceDocument.deliveryAddress,
+        })
+        .select()
+        .single();
+
+      if (docError) throw docError;
+
+      // Copy items
+      const itemsToInsert = sourceDocument.items.map(item => ({
+        document_id: doc.id,
+        name: item.name,
+        code: item.code || null,
+        quantity: item.quantity,
+        unit: item.unit,
+        price: item.price,
+        discount: item.discount,
+        pdv: item.pdv,
+        subtotal: item.subtotal,
+        total: item.total,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('document_items')
+        .insert(itemsToInsert);
+
+      if (itemsError) throw itemsError;
+
+      // Copy contract articles if it's a contract
+      if (sourceDocument.type === 'ugovor' && sourceDocument.contractArticles?.length) {
+        const articlesToInsert = sourceDocument.contractArticles.map(article => ({
+          document_id: doc.id,
+          article_number: article.articleNumber,
+          title: article.title,
+          content: article.content,
+          sort_order: article.sortOrder,
+        }));
+
+        const { error: articlesError } = await supabase
+          .from('document_contract_articles')
+          .insert(articlesToInsert);
+
+        if (articlesError) throw articlesError;
+      }
+
+      return doc;
+    },
+    onSuccess: (doc) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      toast.success(`Dokument kopiran! Novi broj: ${doc.number}`);
+      
+      logActivity.mutate({
+        action_type: 'create',
+        entity_type: 'document',
+        entity_id: doc.id,
+        entity_name: doc.number,
+      });
+    },
+    onError: (error) => {
+      toast.error('Greška pri kopiranju dokumenta: ' + error.message);
+    },
+  });
+}

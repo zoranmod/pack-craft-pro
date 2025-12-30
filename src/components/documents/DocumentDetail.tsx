@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Printer, Mail, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,8 @@ import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
 import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
+import { useCopyDocument } from '@/hooks/useDocuments';
+import { StatusWorkflow } from './StatusWorkflow';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -24,6 +26,9 @@ interface DocumentDetailProps {
 
 const statusStyles: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
+  sent: 'bg-blue-100 text-blue-700 border-blue-200',
+  accepted: 'bg-green-100 text-green-700 border-green-200',
+  rejected: 'bg-red-100 text-red-700 border-red-200',
   pending: 'bg-warning/10 text-warning border-warning/20',
   completed: 'bg-success/10 text-success border-success/20',
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
@@ -37,6 +42,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
   const { data: articlesData } = useArticles({ pageSize: 1000 });
+  const copyDocument = useCopyDocument();
   
   const isContract = document?.type === 'ugovor';
   
@@ -173,19 +179,27 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       const marginMm = 10;
       const contentWidthMm = a4WidthMm - (marginMm * 2);
       
-      // Use a fixed scale for consistent quality
+      // Use higher scale for premium quality
       const canvas = await html2canvas(printRef.current, {
-        scale: 2,
+        scale: 3, // Higher quality
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
       });
       
-      const imgData = canvas.toDataURL('image/png', 1.0);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95); // JPEG for smaller size, high quality
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+      });
+
+      // Add PDF metadata for premium feel
+      pdf.setProperties({
+        title: document.number,
+        subject: documentTypeLabels[document.type],
+        author: companySettings?.company_name || 'Tvrtka',
+        creator: companySettings?.company_name || 'Tvrtka',
       });
       
       // Calculate dimensions to fit content width to A4 width
@@ -287,6 +301,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => {
+              copyDocument.mutateAsync(document).then((newDoc) => {
+                if (newDoc?.id) navigate(`/documents/${newDoc.id}`);
+              });
+            }}
+            disabled={copyDocument.isPending}
+          >
+            <Copy className="mr-2 h-4 w-4" />
+            {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
+          </Button>
           <Button variant="outline" size="sm" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Ispis
@@ -538,16 +565,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Status Card */}
+          {/* Status Card with Workflow */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h3 className="font-semibold text-foreground mb-4">Status dokumenta</h3>
+            <StatusWorkflow document={document} />
+            <Separator className="my-4" />
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Status</span>
-                <Badge variant="outline" className={cn(statusStyles[document.status])}>
-                  {documentStatusLabels[document.status]}
-                </Badge>
-              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Kreirano</span>
                 <span className="text-foreground">{formatDateHR(document.createdAt)}</span>
@@ -563,6 +586,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h3 className="font-semibold text-foreground mb-4">Brze akcije</h3>
             <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start" 
+                onClick={() => {
+                  copyDocument.mutateAsync(document).then((newDoc) => {
+                    if (newDoc?.id) navigate(`/documents/${newDoc.id}`);
+                  });
+                }}
+                disabled={copyDocument.isPending}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj dokument'}
+              </Button>
               <Button variant="outline" className="w-full justify-start" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                 <Download className="mr-2 h-4 w-4" />
                 {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi kao PDF'}

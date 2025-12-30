@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight } from 'lucide-react';
+import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy } from 'lucide-react';
 import { Document, DocumentType, documentTypeLabels, documentStatusLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn, formatDateHR } from '@/lib/utils';
-import { useConvertDocument } from '@/hooks/useDocuments';
+import { useConvertDocument, useCopyDocument } from '@/hooks/useDocuments';
 
 interface DocumentListProps {
   documents: Document[];
@@ -21,6 +21,9 @@ interface DocumentListProps {
 
 const statusStyles: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
+  sent: 'bg-blue-100 text-blue-700 border-blue-200',
+  accepted: 'bg-green-100 text-green-700 border-green-200',
+  rejected: 'bg-red-100 text-red-700 border-red-200',
   pending: 'bg-warning/10 text-warning border-warning/20',
   completed: 'bg-success/10 text-success border-success/20',
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
@@ -37,6 +40,7 @@ const typeIcons: Record<DocumentType, string> = {
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const navigate = useNavigate();
   const convertDocument = useConvertDocument();
+  const copyDocument = useCopyDocument();
   
   const filteredDocs = filter === 'all' 
     ? documents 
@@ -51,6 +55,13 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
       targetType: nextType,
     });
     
+    if (result?.id) {
+      navigate(`/documents/${result.id}`);
+    }
+  };
+
+  const handleCopy = async (doc: Document) => {
+    const result = await copyDocument.mutateAsync(doc);
     if (result?.id) {
       navigate(`/documents/${result.id}`);
     }
@@ -141,6 +152,12 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Download className="mr-2 h-4 w-4" /> Preuzmi PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleCopy(doc)}
+                        disabled={copyDocument.isPending}
+                      >
+                        <Copy className="mr-2 h-4 w-4" /> Kopiraj dokument
                       </DropdownMenuItem>
                       {getNextDocumentType(doc.type) && (
                         <>
