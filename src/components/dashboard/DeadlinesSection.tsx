@@ -29,24 +29,24 @@ export function DeadlinesSection() {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border">
+    <div className="bg-card rounded-[14px] border border-border shadow-[0_2px_6px_rgba(0,0,0,0.06)] h-full">
       <div className="px-6 py-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">Rokovi i isporuke</h3>
+        <h3 className="font-semibold text-foreground text-[15px]">Rokovi i isporuke</h3>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/60">
         {mockDeadlines.map((item) => {
           const config = typeConfig[item.type];
           const Icon = config.icon;
           return (
-            <div key={item.id} className="px-6 py-3 flex items-center gap-4">
-              <div className="text-sm font-medium text-muted-foreground w-16">
+            <div key={item.id} className="px-6 py-3 flex items-center gap-4 hover:bg-[hsl(220_14%_96%)] dark:hover:bg-white/5 transition-colors">
+              <div className="text-[13px] font-medium text-muted-foreground w-14">
                 {formatDate(item.date)}
               </div>
-              <div className="flex-1 text-sm text-foreground truncate">
+              <div className="flex-1 text-[13px] text-foreground truncate font-medium">
                 {item.title}
               </div>
               <span className={cn(
-                "px-2.5 py-1 rounded-md text-xs font-medium",
+                "px-2.5 py-1 rounded-full text-[11px] font-medium",
                 config.className
               )}>
                 {config.label}

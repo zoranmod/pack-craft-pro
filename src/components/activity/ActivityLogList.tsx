@@ -69,19 +69,18 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-border last:border-b-0">
-      <div className={`p-2 rounded-lg ${actionColor}`}>
-        <ActionIcon className="h-4 w-4" />
+    <div className="flex items-start gap-3 py-2.5 border-b border-border/60 last:border-b-0">
+      <div className={`p-1.5 rounded-md ${actionColor}`}>
+        <ActionIcon className="h-3.5 w-3.5" />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 py-0.5">
         <div className="flex items-center gap-2">
-          <EntityIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-          <p className="text-sm font-medium truncate">{message}</p>
+          <EntityIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <p className="text-[13px] font-medium truncate text-foreground">{message}</p>
         </div>
-        <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-          <Clock className="h-3.5 w-3.5" />
-          <span>{timeAgo}</span>
-        </div>
+        <p className="text-[11px] text-[hsl(220_9%_46%)] mt-1">
+          {timeAgo}
+        </p>
       </div>
     </div>
   );
@@ -92,20 +91,20 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'ca
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl border border-border flex flex-col">
+      <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
         {showHeader && (
           <div className="px-6 py-4 border-b border-border shrink-0">
-            <h3 className="font-semibold text-foreground">Aktivnosti</h3>
+            <h3 className="font-semibold text-foreground text-[15px]">Aktivnosti</h3>
           </div>
         )}
-        <div className="p-6">
-          <div className="space-y-4">
+        <div className="p-5">
+          <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <Skeleton className="h-8 w-8 rounded-lg" />
+              <div key={i} className="flex items-start gap-3">
+                <Skeleton className="h-7 w-7 rounded-md" />
                 <div className="flex-1">
-                  <Skeleton className="h-4 w-3/4 mb-2" />
-                  <Skeleton className="h-3 w-1/4" />
+                  <Skeleton className="h-3.5 w-3/4 mb-1.5" />
+                  <Skeleton className="h-2.5 w-1/4" />
                 </div>
               </div>
             ))}
@@ -118,13 +117,13 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'ca
   const hasLogs = logs && logs.length > 0;
 
   return (
-    <div className="bg-card rounded-xl border border-border flex flex-col">
+    <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
       {showHeader && (
         <div className="px-6 py-4 border-b border-border shrink-0">
-          <h3 className="font-semibold text-foreground">Aktivnosti</h3>
+          <h3 className="font-semibold text-foreground text-[15px]">Aktivnosti</h3>
         </div>
       )}
-      <div className="px-6 flex-1">
+      <div className="px-5 py-2 flex-1">
         {hasLogs ? (
           <ScrollArea style={{ maxHeight }} className="pr-2">
             {logs.map((log) => (
@@ -132,8 +131,8 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'ca
             ))}
           </ScrollArea>
         ) : (
-          <div className="text-center py-10 text-muted-foreground">
-            <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
+          <div className="text-center py-8 text-muted-foreground">
+            <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Nema zabilježenih aktivnosti</p>
           </div>
         )}

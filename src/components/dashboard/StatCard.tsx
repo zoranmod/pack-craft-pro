@@ -27,8 +27,8 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
   return (
     <div 
       className={cn(
-        "bg-card rounded-xl p-5 border border-border transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
-        href && "cursor-pointer hover:border-primary/40 hover:shadow-md",
+        "bg-card rounded-[14px] p-6 border border-border transition-all duration-200 shadow-[0_2px_6px_rgba(0,0,0,0.06)]",
+        href && "cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-primary/30",
         className
       )}
       onClick={handleClick}
@@ -41,24 +41,26 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
       }}
     >
       <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-primary/10 p-3 shrink-0">
+        <div className="rounded-lg bg-[hsl(45_100%_90%)] p-3 shrink-0">
           <Icon className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{title}</p>
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{title}</p>
           <div className="flex items-end justify-between gap-2">
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-[28px] font-bold text-foreground leading-none">{value}</p>
             {trend && (
               <span className={cn(
-                "text-xs font-medium",
-                trend.isPositive ? "text-success" : "text-destructive"
+                "text-xs font-semibold px-2 py-0.5 rounded-full",
+                trend.isPositive 
+                  ? "text-success bg-success/10" 
+                  : "text-destructive bg-destructive/10"
               )}>
                 {trend.isPositive ? '↑' : '↓'}{Math.abs(trend.value)}%
               </span>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+            <p className="text-xs text-muted-foreground mt-1.5">{subtitle}</p>
           )}
         </div>
       </div>
