@@ -16,14 +16,14 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-      <div className={isMobile ? "" : "pl-64 transition-all duration-300"}>
+      <div className={isMobile ? "" : "pl-52 transition-all duration-300"}>
         <Header 
           title={title} 
           subtitle={subtitle} 
           onMenuClick={() => setSidebarOpen(true)}
           showMenuButton={isMobile}
         />
-        <main className={`${isMobile ? 'p-3' : 'p-6'} animate-fade-in`}>
+        <main className={`${isMobile ? 'p-4' : 'px-8 py-6'} animate-fade-in`}>
           {children}
         </main>
       </div>

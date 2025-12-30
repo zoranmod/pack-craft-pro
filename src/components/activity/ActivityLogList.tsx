@@ -69,17 +69,17 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
   return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-border last:border-b-0">
-      <div className={`p-1.5 rounded-full ${actionColor}`}>
-        <ActionIcon className="h-3.5 w-3.5" />
+    <div className="flex items-start gap-3 py-3 border-b border-border last:border-b-0">
+      <div className={`p-2 rounded-full ${actionColor}`}>
+        <ActionIcon className="h-4 w-4" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <EntityIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <EntityIcon className="h-4 w-4 text-muted-foreground shrink-0" />
           <p className="text-sm font-medium truncate">{message}</p>
         </div>
-        <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
-          <Clock className="h-3 w-3" />
+        <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+          <Clock className="h-3.5 w-3.5" />
           <span>{timeAgo}</span>
         </div>
       </div>
@@ -92,17 +92,17 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = '40
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-[10px] shadow-card border border-border">
+      <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
         {showHeader && (
-          <div className="px-4 py-2.5 border-b border-border">
-            <h2 className="text-sm font-semibold text-foreground">Aktivnosti</h2>
+          <div className="px-5 py-4 border-b border-border">
+            <h3 className="font-semibold text-foreground">Aktivnosti</h3>
           </div>
         )}
-        <div className="p-4">
-          <div className="space-y-3">
+        <div className="p-5">
+          <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-start gap-3">
-                <Skeleton className="h-7 w-7 rounded-full" />
+                <Skeleton className="h-8 w-8 rounded-full" />
                 <div className="flex-1">
                   <Skeleton className="h-4 w-3/4 mb-2" />
                   <Skeleton className="h-3 w-1/4" />
@@ -118,13 +118,13 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = '40
   const hasLogs = logs && logs.length > 0;
 
   return (
-    <div className="bg-card rounded-[10px] shadow-card border border-border">
+    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
       {showHeader && (
-        <div className="px-4 py-2.5 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">Aktivnosti</h2>
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="font-semibold text-foreground">Aktivnosti</h3>
         </div>
       )}
-      <div className="px-4">
+      <div className="px-5 flex-1">
         {hasLogs ? (
           <ScrollArea style={{ maxHeight }} className="pr-2">
             {logs.map((log) => (
@@ -132,8 +132,8 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = '40
             ))}
           </ScrollArea>
         ) : (
-          <div className="text-center py-6 text-muted-foreground">
-            <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <div className="text-center py-8 text-muted-foreground">
+            <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
             <p className="text-sm">Nema zabilježenih aktivnosti</p>
           </div>
         )}
