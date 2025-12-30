@@ -579,3 +579,31 @@ aside img {
   background: none !important;
   box-shadow: none !important;
 }
+/* FINAL HEADER/SIDEBAR LINE ALIGN FIX */
+
+/* Visina headera i padding */
+header {
+  height: 64px !important;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Sidebar upper section poravnanje */
+aside .flex {
+  height: 64px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Poravnanje teksta Početna i Akord u isti baseline */
+header h1,
+header .text-base {
+  line-height: 0 !important;
+  margin-top: 4px !important;
+}
+
+/* Logo čisti background */
+aside img {
+  background: transparent !important;
+}
