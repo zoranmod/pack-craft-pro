@@ -46,7 +46,7 @@ const Index = () => {
   ];
 
   return (
-    <MainLayout title="Početna">
+    <MainLayout title="Početna" showGlobalSearch>
       {/* Greeting */}
       <PageHeader 
         title={`Dobro došli, ${userName}!`}
