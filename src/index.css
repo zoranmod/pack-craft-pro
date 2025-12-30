@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @layer base {
   :root {
@@ -136,10 +136,15 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }
@@ -148,11 +153,11 @@
   .gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
-  
+
   .shadow-elevated {
     box-shadow: var(--shadow-lg);
   }
@@ -162,7 +167,7 @@
   .card-hover {
     @apply transition-all duration-200 hover:shadow-elevated hover:-translate-y-0.5;
   }
-  
+
   .btn-float {
     @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
   }
@@ -206,15 +211,185 @@
     margin: 10mm;
     size: A4;
   }
-  
+
   /* Hide browser-generated headers and footers */
   html {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  
+
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+}
+/*  ================================
+    GLOBAL APP STYLE UPGRADE
+    modern minimal + glass UI feel
+    ================================ */
+
+:root {
+  --bg-light: #f7f7f7;
+  --bg-dark: #101014;
+  --card-light: #ffffff;
+  --card-dark: #18181d;
+  --accent: #f3b326; /* žuta boja loga - ostaje akcent */
+  --text-light: #1c1c1e;
+  --text-muted: #6c6c75;
+  --border-light: #e5e5ea;
+  --radius: 14px;
+  --shadow-soft: 0px 4px 18px rgba(0, 0, 0, 0.06);
+  --shadow-strong: 0px 6px 26px rgba(0, 0, 0, 0.14);
+}
+
+/* -------- Base Layout -------- */
+
+html,
+body {
+  background: var(--bg-light);
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  color: var(--text-light);
+}
+
+/*  ------------------------------
+    CARD ELEVATION & CLEAN LOOK
+-------------------------------- */
+
+.card,
+.panel,
+.box,
+.container,
+section {
+  background: var(--card-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-soft);
+  transition: 0.25s ease;
+}
+
+.card:hover,
+.panel:hover,
+.box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* --------- Buttons --------- */
+
+button,
+.btn,
+.action {
+  border-radius: 10px;
+  font-weight: 500;
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+button:hover,
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* gold accent buttons */
+button.primary,
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+}
+
+button.secondary,
+.btn-secondary {
+  background: #fff;
+  border: 1px solid var(--border-light);
+}
+
+/* Top dashboard stat cards */
+.stat-card {
+  background: var(--card-light);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-soft);
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-strong);
+}
+
+/* Badges (Završeno, Nacrt...) */
+.badge {
+  border-radius: 30px;
+  font-size: 13px;
+  padding: 4px 11px;
+  font-weight: 500;
+  opacity: 0.95;
+}
+.badge-green {
+  background: #d6f7d6;
+  color: #207a34;
+}
+.badge-red {
+  background: #ffd6d6;
+  color: #b63535;
+}
+.badge-blue {
+  background: #d9e9ff;
+  color: #2454c9;
+}
+
+/* Dokument list rows */
+.row-item {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 13px 14px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  transition: 0.22s;
+}
+.row-item:hover {
+  background: #fafafa;
+  transform: translateX(3px);
+}
+
+/* Aktivnosti list */
+.activity-item {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: 0.2s;
+}
+.activity-item:hover {
+  background: #f2f2f2;
+}
+
+/* Input & fields */
+input,
+select,
+textarea {
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-light);
+  transition: 0.2s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(243, 179, 38, 0.25);
+}
+
+/* Table */
+table {
+  border-radius: 14px;
+  overflow: hidden;
+}
+table tr:hover {
+  background: #fafafa;
+}
+
+/* OPTIONAL — Dark mode activation handled later */
+.dark {
+  background: var(--bg-dark);
+  color: #fff;
 }
