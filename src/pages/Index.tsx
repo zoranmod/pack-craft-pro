@@ -65,10 +65,10 @@ const Index = () => {
         <QuickActions />
       </div>
 
-      {/* Main Content - Side by side with improved sizing */}
+      {/* Main Content - Side by side with max height utilization */}
       <div className="grid gap-5 lg:grid-cols-2">
-        <RecentDocuments documents={documents} maxHeight="calc(100vh - 420px)" />
-        <ActivityLogList limit={25} maxHeight="calc(100vh - 420px)" />
+        <RecentDocuments documents={documents} maxHeight="calc(80vh - 280px)" />
+        <ActivityLogList limit={30} maxHeight="calc(80vh - 280px)" />
       </div>
     </MainLayout>
   );

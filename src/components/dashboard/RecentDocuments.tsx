@@ -18,12 +18,12 @@ const statusStyles: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
-export function RecentDocuments({ documents, maxHeight = "360px" }: RecentDocumentsProps) {
-  const recentDocs = documents.slice(0, 15);
+export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }: RecentDocumentsProps) {
+  const recentDocs = documents.slice(0, 20);
 
   return (
-    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border shrink-0">
         <h3 className="font-semibold text-foreground">Nedavni dokumenti</h3>
         <Link 
           to="/documents" 
