@@ -20,13 +20,13 @@ interface DocumentListProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground',
+  draft: 'bg-gray-100 text-gray-600 border-gray-200',
   sent: 'bg-blue-100 text-blue-700 border-blue-200',
   accepted: 'bg-green-100 text-green-700 border-green-200',
   rejected: 'bg-red-100 text-red-700 border-red-200',
   pending: 'bg-warning/10 text-warning border-warning/20',
-  completed: 'bg-success/10 text-success border-success/20',
-  cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
+  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
 const typeIcons: Record<DocumentType, string> = {
