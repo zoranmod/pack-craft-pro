@@ -19,7 +19,13 @@ type StatusFilter = DocumentStatus | 'all';
 const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<DocumentType | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => {
+    const status = searchParams.get('status') as StatusFilter;
+    if (status && ['draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'].includes(status)) {
+      return status;
+    }
+    return 'all';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const { data: documents = [], isLoading } = useDocuments();
 
@@ -33,7 +39,7 @@ const Documents = () => {
     if (search) {
       setSearchQuery(search);
     }
-  }, [searchParams]);
+  }, []);
 
   // Filter documents by type, status and search query
   const filteredDocuments = documents.filter(doc => {
