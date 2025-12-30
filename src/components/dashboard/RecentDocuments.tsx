@@ -18,50 +18,50 @@ const statusStyles: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
-export function RecentDocuments({ documents, maxHeight = "260px" }: RecentDocumentsProps) {
-  const recentDocs = documents.slice(0, 10);
+export function RecentDocuments({ documents, maxHeight = "360px" }: RecentDocumentsProps) {
+  const recentDocs = documents.slice(0, 15);
 
   return (
-    <div className="bg-card rounded-[10px] shadow-card border border-border">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
-        <h2 className="text-sm font-semibold text-foreground">Nedavni dokumenti</h2>
+    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <h3 className="font-semibold text-foreground">Nedavni dokumenti</h3>
         <Link 
           to="/documents" 
-          className="text-xs text-primary hover:text-primary/80 transition-colors"
+          className="text-sm text-primary hover:underline font-medium"
         >
           Prikaži sve
         </Link>
       </div>
-      <div className="divide-y divide-border overflow-y-auto" style={{ maxHeight }}>
+      <div className="divide-y divide-border overflow-y-auto flex-1" style={{ maxHeight }}>
         {recentDocs.map((doc) => (
           <Link
             key={doc.id}
             to={`/documents/${doc.id}`}
-            className="flex items-center justify-between px-4 py-2 document-row-hover hover:bg-accent/50 transition-colors"
+            className="flex items-center justify-between px-5 py-3.5 hover:bg-accent/50 dark:hover:bg-white/5 transition-colors group"
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground truncate">{doc.number}</span>
-                  <span className={cn("text-[10px] px-1.5 py-0.5 rounded font-medium", statusStyles[doc.status] || statusStyles.default)}>
-                    {documentStatusLabels[doc.status] || doc.status}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground truncate">
-                  {documentTypeLabels[doc.type]} • {doc.clientName}
-                </p>
-              </div>
-            </div>
-            <div className="text-right shrink-0 ml-3">
-              <p className="text-sm font-medium text-foreground">
-                {doc.totalAmount.toLocaleString('hr-HR')} €
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">
+                {doc.number}
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                {formatDateHR(doc.date)}
+              <p className="text-sm text-muted-foreground truncate">
+                {doc.clientName}
               </p>
             </div>
+            <span className={`ml-4 px-2.5 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${statusStyles[doc.status] || statusStyles.draft}`}>
+              {doc.status === 'draft' && 'Nacrt'}
+              {doc.status === 'sent' && 'Poslano'}
+              {doc.status === 'pending' && 'Na čekanju'}
+              {doc.status === 'accepted' && 'Prihvaćeno'}
+              {doc.status === 'completed' && 'Završeno'}
+              {doc.status === 'cancelled' && 'Otkazano'}
+            </span>
           </Link>
         ))}
+        {recentDocs.length === 0 && (
+          <div className="px-5 py-8 text-center text-muted-foreground text-sm">
+            Nema nedavnih dokumenata
+          </div>
+        )}
       </div>
     </div>
   );
