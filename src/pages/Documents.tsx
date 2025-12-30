@@ -12,9 +12,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDocuments } from '@/hooks/useDocuments';
-import { DocumentType, documentTypeLabels } from '@/types/document';
+import { DocumentType, DocumentStatus, documentTypeLabels, documentStatusLabels } from '@/types/document';
 
-type StatusFilter = 'all' | 'pending' | 'completed';
+type StatusFilter = DocumentStatus | 'all';
 
 const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,7 +26,7 @@ const Documents = () => {
   // Read URL parameters on mount
   useEffect(() => {
     const status = searchParams.get('status') as StatusFilter;
-    if (status && ['pending', 'completed'].includes(status)) {
+    if (status && ['draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'].includes(status)) {
       setStatusFilter(status);
     }
     const search = searchParams.get('search');
@@ -106,8 +106,11 @@ const Documents = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Svi statusi</SelectItem>
-              <SelectItem value="pending">Na čekanju</SelectItem>
-              <SelectItem value="completed">Završeno</SelectItem>
+              {Object.entries(documentStatusLabels).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
