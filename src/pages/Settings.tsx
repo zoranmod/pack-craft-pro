@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale } from 'lucide-react';
+import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale, Download, Clock, Archive } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { CompanySettings, defaultCompanySettings } from '@/types/companySettings';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import {
   useCompanySettings,
   useSaveCompanySettings,
@@ -97,6 +99,180 @@ const Settings = () => {
 
   const handleRemoveLogo = () => {
     setCompany({ ...company, logo_url: '' });
+  };
+
+  // Backup Section Component
+  const BackupSection = () => {
+    const [isBackingUp, setIsBackingUp] = useState(false);
+    const [backups, setBackups] = useState<Array<{ name: string; created_at: string }>>([]);
+    const [loadingBackups, setLoadingBackups] = useState(false);
+    const { toast } = useToast();
+
+    const loadBackups = async () => {
+      setLoadingBackups(true);
+      try {
+        const { data, error } = await supabase.storage
+          .from('database-backups')
+          .list('', { sortBy: { column: 'created_at', order: 'desc' }, limit: 10 });
+        
+        if (error) throw error;
+        setBackups(data || []);
+      } catch (error) {
+        console.error('Error loading backups:', error);
+      } finally {
+        setLoadingBackups(false);
+      }
+    };
+
+    useEffect(() => {
+      loadBackups();
+    }, []);
+
+    const handleManualBackup = async () => {
+      setIsBackingUp(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('database-backup');
+        
+        if (error) throw error;
+        
+        toast({
+          title: 'Backup uspješan',
+          description: `Spremljeno ${data.total_rows} redaka iz ${data.tables_backed_up} tablica`,
+        });
+        
+        loadBackups();
+      } catch (error) {
+        console.error('Backup error:', error);
+        toast({
+          title: 'Greška pri backupu',
+          description: 'Nije moguće napraviti backup baze',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsBackingUp(false);
+      }
+    };
+
+    const handleDownloadBackup = async (filename: string) => {
+      try {
+        const { data, error } = await supabase.storage
+          .from('database-backups')
+          .download(filename);
+        
+        if (error) throw error;
+        
+        const url = URL.createObjectURL(data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: 'Preuzimanje pokrenuto',
+          description: filename,
+        });
+      } catch (error) {
+        console.error('Download error:', error);
+        toast({
+          title: 'Greška pri preuzimanju',
+          description: 'Nije moguće preuzeti backup',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    const formatDate = (dateString: string) => {
+      return new Date(dateString).toLocaleString('hr-HR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    };
+
+    return (
+      <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Database className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-foreground">Backup i podaci</h2>
+            <p className="text-sm text-muted-foreground">Automatski dnevni backup i ručno preuzimanje</p>
+          </div>
+        </div>
+        
+        <div className="space-y-6">
+          {/* Manual backup */}
+          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Archive className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Ručni backup</p>
+                <p className="text-sm text-muted-foreground">Kreiraj novi backup odmah</p>
+              </div>
+            </div>
+            <Button onClick={handleManualBackup} disabled={isBackingUp}>
+              {isBackingUp ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Archive className="mr-2 h-4 w-4" />
+              )}
+              Napravi backup
+            </Button>
+          </div>
+
+          {/* Auto backup info */}
+          <div className="flex items-center gap-3 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+            <Clock className="h-5 w-5 text-green-600" />
+            <div>
+              <p className="font-medium text-green-700">Automatski dnevni backup aktivan</p>
+              <p className="text-sm text-green-600">Backup se izvršava svaki dan u 02:00</p>
+            </div>
+          </div>
+
+          {/* Backup list */}
+          <div>
+            <h3 className="font-medium mb-3">Dostupni backupi</h3>
+            {loadingBackups ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : backups.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4">Nema dostupnih backupa</p>
+            ) : (
+              <div className="space-y-2">
+                {backups.map((backup) => (
+                  <div 
+                    key={backup.name}
+                    className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Database className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{backup.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(backup.created_at)}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDownloadBackup(backup.name)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -569,25 +745,8 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Data */}
-        <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Database className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-semibold text-foreground">Podaci</h2>
-              <p className="text-sm text-muted-foreground">Upravljanje podacima aplikacije</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <Button variant="outline">Izvezi sve dokumente</Button>
-            <p className="text-sm text-muted-foreground">
-              Preuzmite sve svoje dokumente u ZIP formatu
-            </p>
-          </div>
-        </div>
+        {/* Backup & Data */}
+        <BackupSection />
       </div>
     </MainLayout>
   );
