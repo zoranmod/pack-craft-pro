@@ -38,8 +38,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
-      <div className="flex h-14 items-center justify-between pl-4 pr-3 md:pr-6">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-16 pl-4 pr-3 md:pr-6 bg-background/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
           {showMenuButton && (
             <Button variant="ghost" size="icon" onClick={onMenuClick}>
@@ -103,7 +102,6 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
     </header>
   );
 }
