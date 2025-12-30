@@ -5,9 +5,14 @@ import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const { data: documents = [], isLoading } = useDocuments();
+  const { user } = useAuth();
+  
+  // Extract user name from email (before @) as fallback
+  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'korisnik';
 
   const stats = {
     totalDocuments: documents.length,
@@ -18,7 +23,7 @@ const Index = () => {
   return (
     <MainLayout 
       title="Početna" 
-      subtitle="Dobrodošli"
+      subtitle={`Dobro došli, ${userName}!`}
     >
       {/* Stats Grid */}
       <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 mb-4">
@@ -53,8 +58,8 @@ const Index = () => {
 
       {/* Main Content - Side by side */}
       <div className="grid gap-3 lg:grid-cols-2">
-        <RecentDocuments documents={documents} />
-        <ActivityLogList limit={15} maxHeight="260px" />
+        <RecentDocuments documents={documents} maxHeight="400px" />
+        <ActivityLogList limit={20} maxHeight="400px" />
       </div>
     </MainLayout>
   );

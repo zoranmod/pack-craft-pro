@@ -6,6 +6,7 @@ import { cn, formatDateHR } from '@/lib/utils';
 
 interface RecentDocumentsProps {
   documents: Document[];
+  maxHeight?: string;
 }
 
 const statusStyles: Record<string, string> = {
@@ -17,8 +18,8 @@ const statusStyles: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-700 border-red-200',
 };
 
-export function RecentDocuments({ documents }: RecentDocumentsProps) {
-  const recentDocs = documents.slice(0, 5);
+export function RecentDocuments({ documents, maxHeight = "260px" }: RecentDocumentsProps) {
+  const recentDocs = documents.slice(0, 10);
 
   return (
     <div className="bg-card rounded-[10px] shadow-card border border-border">
@@ -31,7 +32,7 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
           Prikaži sve
         </Link>
       </div>
-      <div className="divide-y divide-border max-h-[260px] overflow-y-auto">
+      <div className="divide-y divide-border overflow-y-auto" style={{ maxHeight }}>
         {recentDocs.map((doc) => (
           <Link
             key={doc.id}
