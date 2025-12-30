@@ -37,6 +37,36 @@ import { useEmployeeDocuments } from '@/hooks/useEmployees';
 import { formatDateHR, cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { hr } from 'date-fns/locale';
+import { z } from 'zod';
+import { toast } from 'sonner';
+
+// URL validation schema - only allows http:// and https:// URLs
+const urlSchema = z.string().refine(
+  (url) => {
+    if (!url) return true; // Allow empty URLs
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  },
+  { message: 'URL mora početi s http:// ili https://' }
+);
+
+// Helper function to sanitize URL for safe rendering
+const getSafeUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url;
+    }
+  } catch {
+    // Invalid URL
+  }
+  return null;
+};
 
 interface DocumentsTabProps {
   employeeId: string;
@@ -46,6 +76,7 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
   const { documents, create, update, remove } = useEmployeeDocuments(employeeId);
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
   const [form, setForm] = useState({
     document_type: '',
     document_name: '',
@@ -63,6 +94,7 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
       notes: '',
     });
     setEditingId(null);
+    setUrlError(null);
   };
 
   const handleOpen = (doc?: typeof documents[0]) => {
@@ -82,6 +114,16 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
   };
 
   const handleSubmit = async () => {
+    // Validate URL before submission
+    if (form.file_url) {
+      const result = urlSchema.safeParse(form.file_url);
+      if (!result.success) {
+        setUrlError(result.error.errors[0].message);
+        toast.error('Neispravan URL format');
+        return;
+      }
+    }
+
     const data = {
       employee_id: employeeId,
       document_type: form.document_type,
@@ -209,9 +251,9 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
                     <TableCell className="max-w-[200px] truncate">{doc.notes || '-'}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        {doc.file_url && (
+                        {getSafeUrl(doc.file_url) && (
                           <Button size="sm" variant="ghost" asChild>
-                            <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                            <a href={getSafeUrl(doc.file_url)!} target="_blank" rel="noopener noreferrer">
                               <Download className="h-4 w-4" />
                             </a>
                           </Button>
@@ -302,9 +344,17 @@ export function DocumentsTab({ employeeId }: DocumentsTabProps) {
               <Label>URL dokumenta</Label>
               <Input
                 value={form.file_url}
-                onChange={(e) => setForm({ ...form, file_url: e.target.value })}
+                onChange={(e) => {
+                  setForm({ ...form, file_url: e.target.value });
+                  // Clear error when user types
+                  if (urlError) setUrlError(null);
+                }}
                 placeholder="https://..."
+                className={urlError ? 'border-destructive' : ''}
               />
+              {urlError && (
+                <p className="text-sm text-destructive mt-1">{urlError}</p>
+              )}
             </div>
             <div>
               <Label>Napomene</Label>
