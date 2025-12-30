@@ -10,12 +10,12 @@ interface RecentDocumentsProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  sent: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-  accepted: 'bg-success/10 text-success',
-  pending: 'bg-primary/10 text-primary',
-  completed: 'bg-success/20 text-success',
-  cancelled: 'bg-destructive/10 text-destructive',
+  draft: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400',
+  sent: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  accepted: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  pending: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  cancelled: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
 };
 
 export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }: RecentDocumentsProps) {

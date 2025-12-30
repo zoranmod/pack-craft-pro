@@ -20,13 +20,13 @@ interface DocumentListProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600 border-gray-200',
-  sent: 'bg-blue-100 text-blue-700 border-blue-200',
-  accepted: 'bg-green-100 text-green-700 border-green-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  pending: 'bg-warning/10 text-warning border-warning/20',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  cancelled: 'bg-red-100 text-red-700 border-red-200',
+  draft: 'bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800/60 dark:text-zinc-400 dark:border-zinc-700',
+  sent: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
+  accepted: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
+  rejected: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
+  pending: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  completed: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
+  cancelled: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
 };
 
 const typeIcons: Record<DocumentType, string> = {
@@ -97,7 +97,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
             {filteredDocs.map((doc, index) => (
               <tr 
                 key={doc.id} 
-                className="hover:bg-accent/30 transition-colors animate-fade-in"
+                className="hover:bg-muted/50 dark:hover:bg-zinc-800/40 transition-colors animate-fade-in cursor-pointer group/row"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <td className="px-6 py-4">
@@ -125,7 +125,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                   {formatDateHR(doc.date)}
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant="outline" className={cn("text-xs", statusStyles[doc.status])}>
+                  <Badge variant="outline" className={cn("text-xs font-medium px-2.5 py-0.5 rounded-full", statusStyles[doc.status])}>
                     {documentStatusLabels[doc.status]}
                   </Badge>
                 </td>
