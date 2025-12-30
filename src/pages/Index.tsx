@@ -6,13 +6,22 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserProfile } from '@/hooks/useSettings';
 
 const Index = () => {
   const { data: documents = [], isLoading } = useDocuments();
   const { user } = useAuth();
+  const { data: profile } = useUserProfile();
   
-  // Extract user name from email (before @) as fallback
-  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'korisnik';
+  // Build display name: prefer first+last name from profile, fallback to email prefix
+  const getDisplayName = () => {
+    if (profile?.first_name || profile?.last_name) {
+      return [profile.first_name, profile.last_name].filter(Boolean).join(' ');
+    }
+    return user?.email?.split('@')[0] || 'korisnik';
+  };
+  
+  const userName = getDisplayName();
 
   const stats = {
     totalDocuments: documents.length,
