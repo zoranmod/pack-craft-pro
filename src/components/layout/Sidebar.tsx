@@ -33,6 +33,7 @@ const menuItems = [
   { icon: Receipt, label: 'Računi', path: '/racuni' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
   { icon: Users, label: 'Klijenti', path: '/clients' },
+  { icon: Truck, label: 'Dobavljači', path: '/dobavljaci' },
   { icon: UsersRound, label: 'Zaposlenici', path: '/employees' },
   { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
 ];
