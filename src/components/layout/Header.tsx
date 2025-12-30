@@ -38,7 +38,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 pl-4 pr-3 md:pr-6 bg-background/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+    <header className="sticky top-0 z-50 flex items-center justify-between h-16 pl-4 pr-3 md:pr-6 backdrop-blur-xl bg-white/70 dark:bg-[#0d0d0d]/60 supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-black/40 border-b border-white/20 dark:border-white/10 shadow-sm transition-all duration-300">
         <div className="flex items-center gap-3">
           {showMenuButton && (
             <Button variant="ghost" size="icon" onClick={onMenuClick}>
