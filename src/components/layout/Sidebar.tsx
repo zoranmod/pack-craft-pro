@@ -11,7 +11,8 @@ import {
   X,
   Calendar,
   ClipboardList,
-  Package
+  Package,
+  UsersRound
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -31,6 +32,7 @@ const menuItems = [
   { icon: Receipt, label: 'Računi', path: '/racuni' },
   { icon: PackageSearch, label: 'Artikli', path: '/articles' },
   { icon: Users, label: 'Klijenti', path: '/clients' },
+  { icon: UsersRound, label: 'Zaposlenici', path: '/employees' },
   { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
 ];
 
