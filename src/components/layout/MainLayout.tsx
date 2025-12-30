@@ -23,7 +23,7 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
           onMenuClick={() => setSidebarOpen(true)}
           showMenuButton={isMobile}
         />
-        <main className={`${isMobile ? 'p-4' : 'px-8 py-6'} animate-fade-in`}>
+        <main className={`${isMobile ? 'p-4' : 'px-5 py-5 2xl:px-6'} animate-fade-in`}>
           {children}
         </main>
       </div>

@@ -87,14 +87,14 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   );
 }
 
-export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = '400px' }: ActivityLogListProps) {
+export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'calc(80vh - 280px)' }: ActivityLogListProps) {
   const { data: logs, isLoading } = useActivityLogs(limit);
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
+      <div className="bg-card rounded-xl shadow-card border border-border flex flex-col">
         {showHeader && (
-          <div className="px-5 py-4 border-b border-border">
+          <div className="px-5 py-3.5 border-b border-border shrink-0">
             <h3 className="font-semibold text-foreground">Aktivnosti</h3>
           </div>
         )}
@@ -118,9 +118,9 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = '40
   const hasLogs = logs && logs.length > 0;
 
   return (
-    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col min-h-[360px]">
+    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col">
       {showHeader && (
-        <div className="px-5 py-4 border-b border-border">
+        <div className="px-5 py-3.5 border-b border-border shrink-0">
           <h3 className="font-semibold text-foreground">Aktivnosti</h3>
         </div>
       )}
