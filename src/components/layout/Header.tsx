@@ -62,7 +62,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Pretraži dokumente (Enter)..."
+                placeholder="Pretraži dokumente"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
