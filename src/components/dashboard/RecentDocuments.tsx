@@ -54,7 +54,7 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
               "ml-4 px-2.5 py-1 rounded-full text-[11px] font-medium flex-shrink-0",
               statusStyles[doc.status] || statusStyles.draft
             )}>
-              {doc.status === 'draft' && 'Nacrt'}
+              {doc.status === 'draft' && 'U pripremi'}
               {doc.status === 'sent' && 'Poslano'}
               {doc.status === 'pending' && 'Na čekanju'}
               {doc.status === 'accepted' && 'Prihvaćeno'}
