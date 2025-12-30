@@ -514,25 +514,3 @@ table tr:hover {
   background: #1c2946;
   color: #6da8ff;
 }
-/* LOGO - ukloni bijelu pozadinu ako postoji i poravnaj vertikalno */
-.sidebar-logo img {
-  background: transparent !important;
-  border-radius: 0 !important;
-  display: flex;
-  align-items: center;
-}
-
-/* Wrapper za logo i tekst - centriranje i visina */
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 60px;
-  padding-left: 12px;
-}
-
-/* Poravnanje linija headera i sidebara */
-.header-title {
-  padding-left: 12px !important; /* poravnava s logom */
-  margin-top: -2px; /* fino vizualno poravnanje linije */
-}
