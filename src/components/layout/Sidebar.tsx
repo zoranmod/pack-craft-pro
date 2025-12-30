@@ -19,6 +19,7 @@ import logoDark from '@/assets/logo-dark.png';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTheme } from '@/hooks/useTheme';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { useCompanySettings } from '@/hooks/useSettings';
 
 // Module-based sidebar navigation (list views only, no creation actions)
 const menuItems = [
@@ -42,8 +43,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { theme } = useTheme();
+  const { data: companySettings } = useCompanySettings();
   
-  const logo = theme === 'dark' ? logoDark : logoLight;
+  // Use company logo from settings if available, otherwise fall back to default
+  const defaultLogo = theme === 'dark' ? logoDark : logoLight;
+  const logo = companySettings?.logo_url || defaultLogo;
+  const companyName = companySettings?.company_name || 'Akord';
 
   const handleLinkClick = () => {
     if (isMobile && onOpenChange) {
@@ -56,8 +61,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
-          <img src={logo} alt="Akord logo" className="h-8 w-8 object-contain" />
-          <span className="font-semibold text-foreground">Akord</span>
+          <img src={logo} alt="Company logo" className="h-8 w-8 object-contain" />
+          <span className="font-semibold text-foreground">{companyName}</span>
         </div>
         {isMobile && (
           <button
