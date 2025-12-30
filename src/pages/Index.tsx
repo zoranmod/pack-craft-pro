@@ -47,14 +47,14 @@ const Index = () => {
   return (
     <MainLayout title="Početna">
       {/* Greeting */}
-      <div className="mb-6">
+      <div className="mb-5 -mt-1">
         <h1 className="text-[26px] font-bold text-foreground">
           Dobro došli, {userName}!
         </h1>
       </div>
 
       {/* Stats Grid - 4 columns */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-7">
         <StatCard
           title="Ukupno dokumenata"
           value={isLoading ? '...' : stats.totalDocuments}
@@ -85,31 +85,31 @@ const Index = () => {
       </div>
 
       {/* Quick Actions - Button Row */}
-      <div className="mb-6">
+      <div className="mb-7">
         <h2 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Brze akcije</h2>
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-wrap gap-3">
           {quickActionButtons.map((action) => (
             <Button
               key={action.label}
               variant="outline"
-              className="h-11 px-4 bg-card hover:bg-card border-border hover:border-muted-foreground/30 transition-all duration-200 hover:scale-[0.98] active:scale-[0.96] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+              className="h-12 px-5 bg-card hover:bg-card border-border hover:border-muted-foreground/40 transition-all duration-200 hover:scale-[0.98] active:scale-[0.96] shadow-[0_1px_4px_rgba(0,0,0,0.06)] rounded-xl"
               onClick={() => navigate(action.href)}
             >
               <action.icon className="h-4 w-4 mr-2.5 text-primary" />
-              <span className="font-medium">{action.label}</span>
+              <span className="font-medium text-[14px]">{action.label}</span>
             </Button>
           ))}
         </div>
       </div>
 
       {/* Recent Documents & Activities - Side by Side */}
-      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr] mb-6">
+      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] mb-7">
         <RecentDocuments documents={documents} maxHeight="340px" />
         <ActivityLogList limit={12} maxHeight="340px" />
       </div>
 
       {/* Bottom Sections - Deadlines & Analytics */}
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <DeadlinesSection />
         <AnalyticsSection />
       </div>
