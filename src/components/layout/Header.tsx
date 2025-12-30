@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { NotificationDropdown } from './NotificationDropdown';
 
 interface HeaderProps {
   title: string;
@@ -78,9 +77,6 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
               <Sun className="h-4 w-4" />
             )}
           </Button>
-
-          {/* Notifications */}
-          <NotificationDropdown />
 
           {/* User Dropdown */}
           <DropdownMenu>
