@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,13 +30,13 @@ interface DocumentDetailProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground border-muted',
-  sent: 'bg-blue-100 text-blue-700 border-blue-200',
-  accepted: 'bg-green-100 text-green-700 border-green-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  pending: 'bg-amber-100 text-amber-700 border-amber-200',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  cancelled: 'bg-red-100 text-red-700 border-red-200',
+  draft: 'bg-muted text-muted-foreground',
+  sent: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+  accepted: 'bg-success/10 text-success',
+  rejected: 'bg-destructive/10 text-destructive',
+  pending: 'bg-primary/10 text-primary',
+  completed: 'bg-success/20 text-success',
+  cancelled: 'bg-destructive/10 text-destructive',
 };
 
 export function DocumentDetail({ document, error }: DocumentDetailProps) {
@@ -299,12 +299,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-lg">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <div className="flex items-center gap-3">
@@ -312,20 +312,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className={cn(
-                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium border cursor-pointer transition-colors hover:opacity-80',
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:opacity-80',
                     statusStyles[document.status]
                   )}>
                     {documentStatusLabels[document.status]}
                     <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-popover border border-border shadow-lg z-50">
+                <DropdownMenuContent align="start" className="bg-popover border border-border shadow-lg z-50 rounded-lg">
                   {allStatuses.map((status) => (
                     <DropdownMenuItem
                       key={status}
                       onClick={() => handleStatusChange(status)}
                       className={cn(
-                        'cursor-pointer',
+                        'cursor-pointer rounded-md',
                         document.status === status && 'bg-accent'
                       )}
                     >
@@ -333,9 +333,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                         'w-2 h-2 rounded-full mr-2',
                         status === 'draft' && 'bg-muted-foreground',
                         status === 'sent' && 'bg-blue-500',
-                        status === 'accepted' && 'bg-green-500',
-                        status === 'completed' && 'bg-emerald-700',
-                        status === 'cancelled' && 'bg-red-500'
+                        status === 'accepted' && 'bg-success',
+                        status === 'completed' && 'bg-success',
+                        status === 'cancelled' && 'bg-destructive'
                       )} />
                       {documentStatusLabels[status]}
                     </DropdownMenuItem>
@@ -343,7 +343,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <p className="text-muted-foreground">{documentTypeLabels[document.type]}</p>
+            <p className="text-muted-foreground mt-0.5">{documentTypeLabels[document.type]}</p>
           </div>
         </div>
         
@@ -351,6 +351,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           <Button 
             variant="outline" 
             size="sm" 
+            className="rounded-lg"
             onClick={() => {
               copyDocument.mutateAsync(document).then((newDoc) => {
                 if (newDoc?.id) navigate(`/documents/${newDoc.id}`);
@@ -361,20 +362,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint}>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Ispis
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
             {isGeneratingPdf ? 'Generiram...' : 'PDF'}
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="rounded-lg">
             <Mail className="mr-2 h-4 w-4" />
             Pošalji
           </Button>
           <Link to={`/documents/${id}/edit`}>
-            <Button size="sm">
+            <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
               Uredi
             </Button>
@@ -611,17 +612,18 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Document Info Card */}
-          <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
-            <h3 className="font-semibold text-foreground mb-4">Informacije</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h3 className="font-semibold text-foreground mb-5">Informacije</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Status</span>
-                <Badge variant="outline" className={cn('text-xs', statusStyles[document.status])}>
+                <Badge variant="outline" className={cn('text-xs rounded-md', statusStyles[document.status])}>
                   {documentStatusLabels[document.status]}
                 </Badge>
               </div>
+              <Separator />
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Kreirano</span>
                 <span className="text-foreground">{formatDateHR(document.createdAt)}</span>
@@ -633,13 +635,50 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             </div>
           </div>
 
+          {/* Convert Document Panel */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h3 className="font-semibold text-foreground mb-5">Pretvori u</h3>
+            <div className="space-y-2">
+              {document.type !== 'racun' && (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
+                  onClick={() => toast.info('Pretvaranje u račun - uskoro dostupno')}
+                >
+                  <FileText className="mr-3 h-4 w-4 text-primary" />
+                  Račun
+                </Button>
+              )}
+              {document.type !== 'otpremnica' && (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
+                  onClick={() => toast.info('Pretvaranje u otpremnicu - uskoro dostupno')}
+                >
+                  <Truck className="mr-3 h-4 w-4 text-primary" />
+                  Otpremnica
+                </Button>
+              )}
+              {document.type !== 'ugovor' && (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary/30" 
+                  onClick={() => toast.info('Pretvaranje u ugovor - uskoro dostupno')}
+                >
+                  <ScrollText className="mr-3 h-4 w-4 text-primary" />
+                  Ugovor
+                </Button>
+              )}
+            </div>
+          </div>
+
           {/* Quick Actions */}
-          <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
-            <h3 className="font-semibold text-foreground mb-4">Brze akcije</h3>
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h3 className="font-semibold text-foreground mb-5">Brze akcije</h3>
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start" 
+                className="w-full justify-start rounded-lg" 
                 onClick={() => {
                   copyDocument.mutateAsync(document).then((newDoc) => {
                     if (newDoc?.id) navigate(`/documents/${newDoc.id}`);
@@ -647,19 +686,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 }}
                 disabled={copyDocument.isPending}
               >
-                <Copy className="mr-2 h-4 w-4" />
+                <Copy className="mr-3 h-4 w-4" />
                 {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj dokument'}
               </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-                <Download className="mr-2 h-4 w-4" />
+              <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
+                <Download className="mr-3 h-4 w-4" />
                 {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi kao PDF'}
               </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Mail className="mr-2 h-4 w-4" />
+              <Button variant="outline" className="w-full justify-start rounded-lg">
+                <Mail className="mr-3 h-4 w-4" />
                 Pošalji emailom
               </Button>
-              <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
+              <Separator className="my-3" />
+              <Button variant="outline" className="w-full justify-start rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30">
+                <Trash2 className="mr-3 h-4 w-4" />
                 Obriši dokument
               </Button>
             </div>

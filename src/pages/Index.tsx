@@ -35,7 +35,7 @@ const Index = () => {
       subtitle={`Dobro došli, ${userName}!`}
     >
       {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
         <StatCard
           title="Ukupno dokumenata"
           value={isLoading ? '...' : stats.totalDocuments}
@@ -60,13 +60,13 @@ const Index = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-6">
-        <h2 className="text-sm font-semibold text-foreground mb-3">Brze akcije</h2>
+      <div className="mb-8">
+        <h2 className="text-sm font-semibold text-foreground mb-4">Brze akcije</h2>
         <QuickActions />
       </div>
 
       {/* Main Content - Side by side with max height utilization */}
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <RecentDocuments documents={documents} maxHeight="calc(80vh - 280px)" />
         <ActivityLogList limit={30} maxHeight="calc(80vh - 280px)" />
       </div>

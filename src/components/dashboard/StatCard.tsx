@@ -27,8 +27,8 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
   return (
     <div 
       className={cn(
-        "bg-card rounded-[10px] p-4 shadow-card border border-border transition-all duration-200",
-        href && "cursor-pointer hover:border-primary/30 hover:shadow-md",
+        "bg-card rounded-xl p-5 border border-border transition-all duration-200",
+        href && "cursor-pointer hover:border-primary/40 hover:shadow-sm",
         className
       )}
       onClick={handleClick}
@@ -41,15 +41,15 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
       }}
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
-          <p className="text-2xl font-semibold text-foreground">{value}</p>
+          <p className="text-3xl font-semibold text-foreground">{value}</p>
           {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
+            <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           )}
           {trend && (
             <div className={cn(
-              "inline-flex items-center text-xs font-medium",
+              "inline-flex items-center text-xs font-medium mt-1",
               trend.isPositive ? "text-success" : "text-destructive"
             )}>
               {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
@@ -57,7 +57,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
             </div>
           )}
         </div>
-        <div className="rounded-md bg-primary/10 p-2">
+        <div className="rounded-lg bg-primary/10 p-2.5">
           <Icon className="h-5 w-5 text-primary" />
         </div>
       </div>

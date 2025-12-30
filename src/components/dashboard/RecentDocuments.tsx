@@ -10,20 +10,20 @@ interface RecentDocumentsProps {
 }
 
 const statusStyles: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600 border-gray-200',
-  sent: 'bg-blue-100 text-blue-700 border-blue-200',
-  accepted: 'bg-green-100 text-green-700 border-green-200',
-  pending: 'bg-warning/10 text-warning border-warning/20',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  cancelled: 'bg-red-100 text-red-700 border-red-200',
+  draft: 'bg-muted text-muted-foreground',
+  sent: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+  accepted: 'bg-success/10 text-success',
+  pending: 'bg-primary/10 text-primary',
+  completed: 'bg-success/20 text-success',
+  cancelled: 'bg-destructive/10 text-destructive',
 };
 
 export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }: RecentDocumentsProps) {
   const recentDocs = documents.slice(0, 20);
 
   return (
-    <div className="bg-card rounded-xl shadow-card border border-border flex flex-col">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border shrink-0">
+    <div className="bg-card rounded-xl border border-border flex flex-col">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
         <h3 className="font-semibold text-foreground">Nedavni dokumenti</h3>
         <Link 
           to="/documents" 
@@ -37,17 +37,20 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
           <Link
             key={doc.id}
             to={`/documents/${doc.id}`}
-            className="flex items-center justify-between px-5 py-3.5 hover:bg-accent/50 dark:hover:bg-white/5 transition-colors group"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent/50 dark:hover:bg-white/5 transition-colors group"
           >
             <div className="min-w-0 flex-1">
               <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">
                 {doc.number}
               </p>
-              <p className="text-sm text-muted-foreground truncate">
+              <p className="text-sm text-muted-foreground truncate mt-0.5">
                 {doc.clientName}
               </p>
             </div>
-            <span className={`ml-4 px-2.5 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${statusStyles[doc.status] || statusStyles.draft}`}>
+            <span className={cn(
+              "ml-4 px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0",
+              statusStyles[doc.status] || statusStyles.draft
+            )}>
               {doc.status === 'draft' && 'Nacrt'}
               {doc.status === 'sent' && 'Poslano'}
               {doc.status === 'pending' && 'Na čekanju'}
@@ -58,7 +61,7 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
           </Link>
         ))}
         {recentDocs.length === 0 && (
-          <div className="px-5 py-8 text-center text-muted-foreground text-sm">
+          <div className="px-6 py-10 text-center text-muted-foreground text-sm">
             Nema nedavnih dokumenata
           </div>
         )}
