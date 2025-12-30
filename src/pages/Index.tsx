@@ -10,8 +10,8 @@ const Index = () => {
 
   const stats = {
     totalDocuments: documents.length,
-    pendingDocuments: documents.filter(d => d.status === 'pending').length,
-    completedThisMonth: documents.filter(d => d.status === 'completed').length,
+    pendingDocuments: documents.filter(d => ['draft', 'sent', 'pending'].includes(d.status)).length,
+    completedThisMonth: documents.filter(d => ['accepted', 'completed'].includes(d.status)).length,
   };
 
   return (
