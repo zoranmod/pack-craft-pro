@@ -514,3 +514,26 @@ table tr:hover {
   background: #1c2946;
   color: #6da8ff;
 }
+/* ===========================
+   HEADER + SIDEBAR ALIGN FIX
+   =========================== */
+
+.sidebar-logo,
+.sidebar-header,
+header,
+.page-header {
+  padding-left: 16px !important;
+}
+
+/* Ako još uvijek bježi razmak — poravnaj liniju ispod headera */
+header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Gura cijeli page content malo lijevo da sjedne pod isti grid kao sidebar */
+.main-content,
+.content-wrapper,
+.page-container {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
