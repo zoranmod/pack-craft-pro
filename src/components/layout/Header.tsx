@@ -39,7 +39,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
 
   return (
     <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="flex h-14 items-center justify-between px-3 md:px-6">
+      <div className="flex h-14 items-center justify-between px-3 md:pl-4 md:pr-6">
         <div className="flex items-center gap-3">
           {showMenuButton && (
             <Button variant="ghost" size="icon" onClick={onMenuClick}>
