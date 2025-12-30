@@ -69,7 +69,7 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
   return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-border/60 last:border-b-0">
+    <div className="flex items-start gap-3 py-3 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] last:border-b-0 hover:bg-[hsl(0_0%_97%)] dark:hover:bg-[hsl(0_0%_13%)] transition-colors -mx-5 px-5">
       <div className={`p-1.5 rounded-md ${actionColor}`}>
         <ActionIcon className="h-3.5 w-3.5" />
       </div>
@@ -91,9 +91,9 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'ca
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
+      <div className="bg-card rounded-xl border border-border flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
         {showHeader && (
-          <div className="px-6 py-4 border-b border-border shrink-0">
+          <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] shrink-0">
             <h3 className="font-semibold text-foreground text-[15px]">Aktivnosti</h3>
           </div>
         )}
@@ -117,9 +117,9 @@ export function ActivityLogList({ limit = 50, showHeader = true, maxHeight = 'ca
   const hasLogs = logs && logs.length > 0;
 
   return (
-    <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
+    <div className="bg-card rounded-xl border border-border flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
       {showHeader && (
-        <div className="px-6 py-4 border-b border-border shrink-0">
+        <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] shrink-0">
           <h3 className="font-semibold text-foreground text-[15px]">Aktivnosti</h3>
         </div>
       )}

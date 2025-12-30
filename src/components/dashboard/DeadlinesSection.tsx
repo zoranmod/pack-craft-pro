@@ -29,16 +29,22 @@ export function DeadlinesSection() {
   };
 
   return (
-    <div className="bg-card rounded-[14px] border border-border shadow-[0_2px_6px_rgba(0,0,0,0.06)] h-full">
-      <div className="px-6 py-4 border-b border-border">
+    <div className="bg-card rounded-xl border border-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full">
+      <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)]">
         <h3 className="font-semibold text-foreground text-[15px]">Rokovi i isporuke</h3>
       </div>
-      <div className="divide-y divide-border/60">
-        {mockDeadlines.map((item) => {
+      <div>
+        {mockDeadlines.map((item, index) => {
           const config = typeConfig[item.type];
           const Icon = config.icon;
           return (
-            <div key={item.id} className="px-6 py-3 flex items-center gap-4 hover:bg-[hsl(220_14%_96%)] dark:hover:bg-white/5 transition-colors">
+            <div 
+              key={item.id} 
+              className={cn(
+                "px-6 py-3.5 flex items-center gap-4 hover:bg-[hsl(0_0%_97%)] dark:hover:bg-[hsl(0_0%_13%)] transition-colors",
+                index < mockDeadlines.length - 1 && "border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)]"
+              )}
+            >
               <div className="text-[13px] font-medium text-muted-foreground w-14">
                 {formatDate(item.date)}
               </div>

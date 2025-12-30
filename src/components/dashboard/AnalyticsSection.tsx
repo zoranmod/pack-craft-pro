@@ -11,8 +11,8 @@ const mockData = [
 
 export function AnalyticsSection() {
   return (
-    <div className="bg-card rounded-[14px] border border-border shadow-[0_2px_6px_rgba(0,0,0,0.06)] h-full">
-      <div className="px-6 py-4 border-b border-border">
+    <div className="bg-card rounded-xl border border-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full">
+      <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)]">
         <h3 className="font-semibold text-foreground text-[15px]">Analitika prometa</h3>
       </div>
       <div className="p-5">
@@ -37,8 +37,8 @@ export function AnalyticsSection() {
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                   fontSize: '12px'
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
@@ -55,7 +55,7 @@ export function AnalyticsSection() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between text-[13px]">
+        <div className="mt-3 pt-3 border-t border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] flex items-center justify-between text-[13px]">
           <span className="text-muted-foreground">Posljednjih 6 mjeseci</span>
           <span className="font-semibold text-success">+18.4%</span>
         </div>

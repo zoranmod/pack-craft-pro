@@ -27,8 +27,8 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
   return (
     <div 
       className={cn(
-        "bg-card rounded-[14px] p-6 border border-border transition-all duration-200 shadow-[0_2px_6px_rgba(0,0,0,0.06)]",
-        href && "cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-primary/30",
+        "bg-card rounded-xl p-6 border border-border transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
+        href && "cursor-pointer hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-primary/30",
         className
       )}
       onClick={handleClick}
@@ -41,7 +41,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
       }}
     >
       <div className="flex items-center gap-4">
-        <div className="rounded-lg bg-[hsl(45_100%_90%)] p-3 shrink-0">
+        <div className="rounded-full bg-[hsl(45_100%_92%)] dark:bg-primary/20 p-3.5 shrink-0">
           <Icon className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">

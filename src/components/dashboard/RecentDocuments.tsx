@@ -22,8 +22,8 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
   const recentDocs = documents.slice(0, 20);
 
   return (
-    <div className="bg-card rounded-[14px] border border-border flex flex-col shadow-[0_2px_6px_rgba(0,0,0,0.06)]">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+    <div className="bg-card rounded-xl border border-border flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] shrink-0">
         <h3 className="font-semibold text-foreground text-[15px]">Nedavni dokumenti</h3>
         <Link 
           to="/documents" 
@@ -32,12 +32,15 @@ export function RecentDocuments({ documents, maxHeight = "calc(80vh - 280px)" }:
           Prikaži sve
         </Link>
       </div>
-      <div className="divide-y divide-border/60 overflow-y-auto flex-1" style={{ maxHeight }}>
-        {recentDocs.map((doc) => (
+      <div className="overflow-y-auto flex-1" style={{ maxHeight }}>
+        {recentDocs.map((doc, index) => (
           <Link
             key={doc.id}
             to={`/documents/${doc.id}`}
-            className="flex items-center justify-between px-6 py-3 hover:bg-[hsl(220_14%_96%)] dark:hover:bg-white/5 transition-colors group"
+            className={cn(
+              "flex items-center justify-between px-6 py-3.5 hover:bg-[hsl(0_0%_97%)] dark:hover:bg-[hsl(0_0%_13%)] transition-colors group",
+              index < recentDocs.length - 1 && "border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)]"
+            )}
           >
             <div className="min-w-0 flex-1">
               <p className="font-medium text-foreground text-sm truncate group-hover:text-primary transition-colors">
