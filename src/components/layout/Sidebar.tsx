@@ -25,6 +25,7 @@ import { useCompanySettings } from '@/hooks/useSettings';
 // Module-based sidebar navigation (list views only, no creation actions)
 const menuItems = [
   { icon: LayoutDashboard, label: 'Početna', path: '/' },
+  { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
   { icon: FileText, label: 'Ponude', path: '/ponude' },
   { icon: FileSignature, label: 'Ugovori', path: '/ugovori' },
   { icon: Package, label: 'Otpremnice', path: '/otpremnice' },

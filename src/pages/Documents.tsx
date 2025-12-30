@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Filter, Loader2, X } from 'lucide-react';
+import { Plus, Loader2, FileText, Filter } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DocumentList } from '@/components/documents/DocumentList';
+import { TableToolbar } from '@/components/ui/table-toolbar';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -12,13 +13,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDocuments } from '@/hooks/useDocuments';
-import { DocumentType, DocumentStatus, documentTypeLabels, documentStatusLabels } from '@/types/document';
+import { useDebounce } from '@/hooks/useDebounce';
+import { DocumentType, DocumentStatus, documentTypeLabels } from '@/types/document';
 
 type StatusFilter = DocumentStatus | 'all';
 
 const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filter, setFilter] = useState<DocumentType | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<DocumentType | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => {
     const status = searchParams.get('status') as StatusFilter;
     if (status && ['draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'].includes(status)) {
@@ -27,6 +29,7 @@ const Documents = () => {
     return 'all';
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const { data: documents = [], isLoading } = useDocuments();
 
   // Read URL parameters on mount
@@ -39,15 +42,15 @@ const Documents = () => {
     if (search) {
       setSearchQuery(search);
     }
-  }, []);
+  }, [searchParams]);
 
   // Filter documents by type, status and search query
   const filteredDocuments = documents.filter(doc => {
-    const matchesType = filter === 'all' || doc.type === filter;
+    const matchesType = typeFilter === 'all' || doc.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
     
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = !searchQuery || 
+    const searchLower = debouncedSearch.toLowerCase();
+    const matchesSearch = !debouncedSearch || 
       doc.number.toLowerCase().includes(searchLower) ||
       doc.clientName.toLowerCase().includes(searchLower) ||
       doc.clientAddress?.toLowerCase().includes(searchLower) ||
@@ -56,14 +59,8 @@ const Documents = () => {
     return matchesType && matchesStatus && matchesSearch;
   });
 
-  const clearSearch = () => {
-    setSearchQuery('');
-    searchParams.delete('search');
-    setSearchParams(searchParams);
-  };
-
-  const handleStatusFilterChange = (value: StatusFilter) => {
-    setStatusFilter(value);
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value as StatusFilter);
     if (value === 'all') {
       searchParams.delete('status');
     } else {
@@ -77,28 +74,24 @@ const Documents = () => {
       title="Svi dokumenti" 
       subtitle={`Ukupno ${filteredDocuments.length} dokumenata`}
     >
-      {/* Search indicator */}
-      {searchQuery && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm text-muted-foreground">
-            Pretraga: <strong className="text-foreground">"{searchQuery}"</strong>
-          </span>
-          <Button variant="ghost" size="sm" onClick={clearSearch} className="h-6 px-2">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3 flex-wrap">
+      <TableToolbar
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Pretraži sve dokumente..."
+        primaryActionLabel="Novi dokument"
+        primaryActionHref="/documents/new"
+      >
+        {/* Type filter as additional child */}
+        <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={filter} onValueChange={(v) => setFilter(v as DocumentType | 'all')}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtriraj po tipu" />
+          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as DocumentType | 'all')}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Tip dokumenta" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Svi dokumenti</SelectItem>
+              <SelectItem value="all">Svi tipovi</SelectItem>
               {Object.entries(documentTypeLabels).map(([value, label]) => (
                 <SelectItem key={value} value={value}>
                   {label}
@@ -106,36 +99,33 @@ const Documents = () => {
               ))}
             </SelectContent>
           </Select>
-          <Select value={statusFilter} onValueChange={(v) => handleStatusFilterChange(v as StatusFilter)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtriraj po statusu" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Svi statusi</SelectItem>
-              {Object.entries(documentStatusLabels).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
-        
-        <Link to="/documents/new">
-          <Button className="gap-2 btn-float">
-            <Plus className="h-4 w-4" />
-            Novi dokument
-          </Button>
-        </Link>
-      </div>
+      </TableToolbar>
 
-      {/* Document List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
+      ) : filteredDocuments.length === 0 ? (
+        <div className="text-center py-12">
+          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            {debouncedSearch ? `Nema rezultata za "${debouncedSearch}"` : 'Nema dokumenata'}
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            {debouncedSearch ? 'Pokušajte s drugim pojmom' : 'Kreirajte prvi dokument'}
+          </p>
+          {!debouncedSearch && (
+            <Link to="/documents/new">
+              <Button variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Novi dokument
+              </Button>
+            </Link>
+          )}
+        </div>
       ) : (
-        <DocumentList documents={filteredDocuments} filter={filter} />
+        <DocumentList documents={filteredDocuments} filter={typeFilter} />
       )}
     </MainLayout>
   );
