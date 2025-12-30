@@ -27,7 +27,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
   return (
     <div 
       className={cn(
-        "bg-card rounded-md p-5 shadow-card border border-border transition-all duration-200",
+        "bg-card rounded-[10px] p-4 shadow-card border border-border transition-all duration-200",
         href && "cursor-pointer hover:border-primary/30 hover:shadow-md",
         className
       )}
@@ -41,7 +41,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
       }}
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
           <p className="text-2xl font-semibold text-foreground">{value}</p>
           {subtitle && (
@@ -57,7 +57,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
             </div>
           )}
         </div>
-        <div className="rounded-md bg-primary/10 p-2.5">
+        <div className="rounded-md bg-primary/10 p-2">
           <Icon className="h-5 w-5 text-primary" />
         </div>
       </div>

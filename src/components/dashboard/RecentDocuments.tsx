@@ -21,22 +21,22 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
   const recentDocs = documents.slice(0, 5);
 
   return (
-    <div className="bg-card rounded-md shadow-card border border-border">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+    <div className="bg-card rounded-[10px] shadow-card border border-border">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
         <h2 className="text-sm font-semibold text-foreground">Nedavni dokumenti</h2>
         <Link 
           to="/documents" 
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-primary hover:text-primary/80 transition-colors"
         >
           Prikaži sve
         </Link>
       </div>
-      <div className="divide-y divide-border max-h-[280px] overflow-y-auto">
+      <div className="divide-y divide-border max-h-[260px] overflow-y-auto">
         {recentDocs.map((doc) => (
           <Link
             key={doc.id}
             to={`/documents/${doc.id}`}
-            className="flex items-center justify-between px-4 py-2.5 hover:bg-accent/50 transition-colors"
+            className="flex items-center justify-between px-4 py-2 document-row-hover hover:bg-accent/50 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
