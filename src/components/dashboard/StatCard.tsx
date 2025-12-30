@@ -27,8 +27,8 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
   return (
     <div 
       className={cn(
-        "bg-card rounded-xl p-5 border border-border transition-all duration-200",
-        href && "cursor-pointer hover:border-primary/40 hover:shadow-sm",
+        "bg-card rounded-xl p-5 border border-border transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+        href && "cursor-pointer hover:border-primary/40 hover:shadow-md",
         className
       )}
       onClick={handleClick}
@@ -40,25 +40,26 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
         }
       }}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
-          <p className="text-3xl font-semibold text-foreground">{value}</p>
+      <div className="flex items-center gap-4">
+        <div className="rounded-xl bg-primary/10 p-3 shrink-0">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{title}</p>
+          <div className="flex items-end justify-between gap-2">
+            <p className="text-2xl font-bold text-foreground">{value}</p>
+            {trend && (
+              <span className={cn(
+                "text-xs font-medium",
+                trend.isPositive ? "text-success" : "text-destructive"
+              )}>
+                {trend.isPositive ? '↑' : '↓'}{Math.abs(trend.value)}%
+              </span>
+            )}
+          </div>
           {subtitle && (
             <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           )}
-          {trend && (
-            <div className={cn(
-              "inline-flex items-center text-xs font-medium mt-1",
-              trend.isPositive ? "text-success" : "text-destructive"
-            )}>
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-              <span className="ml-1 text-muted-foreground">od prošlog mj.</span>
-            </div>
-          )}
-        </div>
-        <div className="rounded-lg bg-primary/10 p-2.5">
-          <Icon className="h-5 w-5 text-primary" />
         </div>
       </div>
     </div>
