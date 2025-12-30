@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, User, Phone, Mail, MapPin, Building2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, User, Phone, Mail, MapPin, Building2, X } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient, Client, CreateClientData } from '@/hooks/useClients';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const emptyForm: CreateClientData = {
   name: '',
@@ -46,15 +47,16 @@ const Clients = () => {
   const deleteClient = useDeleteClient();
 
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateClientData>(emptyForm);
 
   const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(search.toLowerCase()) ||
-    (client.oib && client.oib.includes(search)) ||
-    (client.city && client.city.toLowerCase().includes(search.toLowerCase()))
+    client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    (client.oib && client.oib.includes(debouncedSearch)) ||
+    (client.city && client.city.toLowerCase().includes(debouncedSearch.toLowerCase()))
   );
 
   const openNew = () => {
@@ -110,8 +112,18 @@ const Clients = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Pretraži klijente..."
-              className="pl-9"
+              className="pl-9 pr-9"
             />
+            {search && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => setSearch('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           <Button onClick={openNew} className="gap-2">
             <Plus className="h-4 w-4" />
@@ -125,12 +137,18 @@ const Clients = () => {
         ) : filteredClients.length === 0 ? (
           <div className="text-center py-12">
             <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">Nema klijenata</h3>
-            <p className="text-muted-foreground mb-4">Dodajte prvog klijenta da započnete</p>
-            <Button onClick={openNew} variant="outline" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Dodaj klijenta
-            </Button>
+            <h3 className="text-lg font-medium text-foreground mb-2">
+              {debouncedSearch ? `Nema rezultata za "${debouncedSearch}"` : 'Nema klijenata'}
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              {debouncedSearch ? 'Pokušajte s drugim pojmom' : 'Dodajte prvog klijenta da započnete'}
+            </p>
+            {!debouncedSearch && (
+              <Button onClick={openNew} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Dodaj klijenta
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

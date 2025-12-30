@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, User, LogOut, Menu, Sun, Moon } from 'lucide-react';
+import { Search, User, LogOut, Menu, Sun, Moon, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { useDebounce } from '@/hooks/useDebounce';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,16 +25,21 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      navigate(`/documents?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
+  // Navigate when debounced search changes
+  useEffect(() => {
+    if (debouncedSearch.trim()) {
+      navigate(`/documents?search=${encodeURIComponent(debouncedSearch.trim())}`);
     }
-  };
+  }, [debouncedSearch, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
   };
 
   return (
@@ -56,12 +62,21 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton }: HeaderP
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Pretraži..."
+              placeholder="Pretraži dokumente..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-              className="w-48 pl-9 h-9 bg-card border-border text-sm"
+              className="w-48 pl-9 pr-9 h-9 bg-card border-border text-sm"
             />
+            {searchQuery && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={clearSearch}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {/* Theme Toggle */}

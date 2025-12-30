@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Filter, X } from 'lucide-react';
+import { Plus, Filter, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -17,9 +18,10 @@ interface TableToolbarProps {
   onStatusFilterChange?: (value: string) => void;
   showStatusFilter?: boolean;
   
-  // Search indicator
-  searchQuery?: string;
-  onClearSearch?: () => void;
+  // Search
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
   
   // Primary action button
   primaryActionLabel?: string;
@@ -34,8 +36,9 @@ export function TableToolbar({
   statusFilter = 'all',
   onStatusFilterChange,
   showStatusFilter = true,
-  searchQuery,
-  onClearSearch,
+  searchValue = '',
+  onSearchChange,
+  searchPlaceholder = 'Pretraži...',
   primaryActionLabel,
   primaryActionHref,
   primaryActionOnClick,
@@ -43,21 +46,32 @@ export function TableToolbar({
 }: TableToolbarProps) {
   return (
     <div className="space-y-4 mb-6">
-      {/* Search indicator */}
-      {searchQuery && (
-        <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm text-muted-foreground">
-            Pretraga: <strong className="text-foreground">"{searchQuery}"</strong>
-          </span>
-          <Button variant="ghost" size="sm" onClick={onClearSearch} className="h-6 px-2">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
       {/* Toolbar row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap flex-1">
+          {/* Search input */}
+          {onSearchChange && (
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchValue}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder={searchPlaceholder}
+                className="pl-9 pr-9"
+              />
+              {searchValue && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={() => onSearchChange('')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
+          
           {showStatusFilter && onStatusFilterChange && (
             <>
               <Filter className="h-4 w-4 text-muted-foreground" />

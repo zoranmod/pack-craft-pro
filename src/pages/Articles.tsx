@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Plus, Search, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Search, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark, X } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,7 @@ import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, Arti
 import { ArticleImportDialog } from '@/components/articles/ArticleImportDialog';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const emptyForm: CreateArticleData = {
   code: '',
@@ -62,18 +63,15 @@ const emptyForm: CreateArticleData = {
 
 const Articles = () => {
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
-  // Debounce search
-  useMemo(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1); // Reset to first page on search
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+  // Reset to first page when search changes
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const { data, isLoading } = useArticles({ page, pageSize, search: debouncedSearch });
   const articles = data?.articles || [];
@@ -141,10 +139,20 @@ const Articles = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Pretraži artikle..."
-              className="pl-9"
+              className="pl-9 pr-9"
             />
+            {search && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => handleSearchChange('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           <div className="flex gap-2">
             <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2">
@@ -183,12 +191,18 @@ const Articles = () => {
         ) : articles.length === 0 ? (
           <div className="text-center py-12">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">Nema artikala</h3>
-            <p className="text-muted-foreground mb-4">Dodajte prvi artikl da započnete</p>
-            <Button onClick={openNew} variant="outline" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Dodaj artikl
-            </Button>
+            <h3 className="text-lg font-medium text-foreground mb-2">
+              {debouncedSearch ? `Nema rezultata za "${debouncedSearch}"` : 'Nema artikala'}
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              {debouncedSearch ? 'Pokušajte s drugim pojmom' : 'Dodajte prvi artikl da započnete'}
+            </p>
+            {!debouncedSearch && (
+              <Button onClick={openNew} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Dodaj artikl
+              </Button>
+            )}
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border/50 shadow-card overflow-hidden">
