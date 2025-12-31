@@ -221,49 +221,37 @@ export function DocumentBodyContent({
       {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
         <div className="mt-4 pt-3 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
           {/* Row 1: Robu preuzeo */}
-          <div 
-            style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'auto 70mm 12mm 70mm', 
-              alignItems: 'baseline',
-              columnGap: '3mm',
-              paddingTop: '6mm',
-              paddingBottom: '0'
-            }}
-          >
+          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '6mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
-            <div style={{ borderBottom: '1px solid #666' }}></div>
-            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm' }}></div>
+            <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ borderBottom: '1px solid #666', width: '100%' }}></div>
+              <div style={{ width: '65mm', borderBottom: '1px solid #666' }}></div>
               <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
             </div>
           </div>
 
-          {/* Row 2: Za tvrtku */}
-          <div 
-            style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'auto 70mm 12mm 70mm', 
-              alignItems: 'baseline',
-              columnGap: '3mm',
-              paddingTop: '10mm',
-              paddingBottom: '0'
-            }}
-          >
+          {/* Row 2: Za tvrtku - auto-filled with preparedBy */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '10mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
-            <div style={{ borderBottom: '1px solid #666' }}></div>
-            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', position: 'relative' }}>
+              {document.preparedBy && (
+                <span style={{ position: 'absolute', bottom: '1mm', left: '2mm', color: '#000', fontSize: '11px' }}>
+                  {document.preparedBy}
+                </span>
+              )}
+            </div>
+            <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ borderBottom: '1px solid #666', width: '100%' }}></div>
+              <div style={{ width: '65mm', borderBottom: '1px solid #666' }}></div>
               <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
             </div>
           </div>
 
           {/* Row 3: Robu izdao skladištar */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '3mm', marginTop: '10mm' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: '10mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu izdao skladištar (puno ime i prezime):</span>
-            <div style={{ flex: 1, borderBottom: '1px solid #666', maxWidth: '160mm' }}></div>
+            <div style={{ flex: 1, borderBottom: '1px solid #666', marginLeft: '2mm', maxWidth: '100mm' }}></div>
           </div>
         </div>
       )}
