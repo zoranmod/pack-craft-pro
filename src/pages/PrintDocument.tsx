@@ -221,37 +221,57 @@ export function DocumentBodyContent({
       {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
         <div className="mt-4 pt-3 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
           {/* Row 1: Robu preuzeo */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '6mm' }}>
-            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', height: '0' }}></div>
-            <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', height: '0' }}></div>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'auto 55mm 14mm 55mm', 
+            alignItems: 'end',
+            paddingTop: '6mm'
+          }}>
+            <span style={{ color: '#000', whiteSpace: 'nowrap', paddingRight: '2mm' }}>Robu preuzeo:</span>
+            <div style={{ borderBottom: '1px solid #666' }}></div>
+            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ borderBottom: '1px solid #666' }}></div>
           </div>
-          <div style={{ display: 'flex', paddingLeft: 'calc(100% - 65mm)', justifyContent: 'center' }}>
-            <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'auto 55mm 14mm 55mm'
+          }}>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
           </div>
 
           {/* Row 2: Za tvrtku - auto-filled with preparedBy */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '8mm' }}>
-            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', height: '0', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'auto 55mm 14mm 55mm', 
+            alignItems: 'end',
+            paddingTop: '8mm'
+          }}>
+            <span style={{ color: '#000', whiteSpace: 'nowrap', paddingRight: '2mm' }}>Za tvrtku:</span>
+            <div style={{ borderBottom: '1px solid #666', textAlign: 'center' }}>
               {document.preparedBy && (
-                <span style={{ color: '#000', fontSize: '11px', paddingBottom: '1mm' }}>
-                  {document.preparedBy}
-                </span>
+                <span style={{ color: '#000', fontSize: '11px' }}>{document.preparedBy}</span>
               )}
             </div>
-            <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', height: '0' }}></div>
+            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ borderBottom: '1px solid #666' }}></div>
           </div>
-          <div style={{ display: 'flex', paddingLeft: 'calc(100% - 65mm)', justifyContent: 'center' }}>
-            <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'auto 55mm 14mm 55mm'
+          }}>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
           </div>
 
           {/* Row 3: Robu izdao skladištar */}
           <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: '10mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu izdao skladištar (puno ime i prezime):</span>
-            <div style={{ flex: 1, borderBottom: '1px solid #666', marginLeft: '2mm', maxWidth: '100mm', height: '0' }}></div>
+            <div style={{ flex: 1, borderBottom: '1px solid #666', marginLeft: '2mm', maxWidth: '100mm' }}></div>
           </div>
         </div>
       )}
