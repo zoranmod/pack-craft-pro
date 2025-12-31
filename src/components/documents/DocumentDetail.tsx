@@ -6,8 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { useRef, useState, useMemo } from 'react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
@@ -18,6 +16,7 @@ import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
+import { generateDocumentPdf, downloadPdf, printPdf } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,117 +101,51 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  
-
-  // Shared PDF generation logic used by Download
-  const generatePdfBlob = async (): Promise<Blob | null> => {
-    if (!printRef.current || !document) return null;
-    
-    try {
-      // A4 dimensions in mm: 210 x 297
-      const a4WidthMm = 210;
-      const a4HeightMm = 297;
-      
-      // Use higher scale for premium quality
-      const canvas = await html2canvas(printRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-      });
-      
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
-
-      // Add PDF metadata
-      pdf.setProperties({
-        title: document.number,
-        subject: documentTypeLabels[document.type],
-        author: companySettings?.company_name || 'Tvrtka',
-        creator: companySettings?.company_name || 'Tvrtka',
-      });
-      
-      // Calculate dimensions - document already has 10mm internal padding
-      // so we place it at 0,0 to fill the full A4 page
-      const imgWidthMm = a4WidthMm;
-      const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
-      
-      // Handle multi-page if content is longer than A4
-      if (imgHeightMm <= a4HeightMm) {
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
-      } else {
-        // Multi-page
-        let remainingHeight = imgHeightMm;
-        let sourceY = 0;
-        let pageNum = 0;
-        
-        while (remainingHeight > 0) {
-          if (pageNum > 0) {
-            pdf.addPage();
-          }
-          
-          const sliceHeight = Math.min(a4HeightMm, remainingHeight);
-          const sliceRatio = sliceHeight / imgHeightMm;
-          const sourceHeight = canvas.height * sliceRatio;
-          
-          const sliceCanvas = window.document.createElement('canvas');
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = sourceHeight;
-          const ctx = sliceCanvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
-            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(sliceData, 'JPEG', 0, 0, imgWidthMm, sliceHeight);
-          }
-          
-          sourceY += sourceHeight;
-          remainingHeight -= sliceHeight;
-          pageNum++;
-        }
-      }
-      
-      return pdf.output('blob');
-    } catch (err) {
-      console.error('PDF generation error:', err);
-      return null;
-    }
-  };
-
-  // Navigate to dedicated print page (avoids popup blockers)
-  const handlePrint = () => {
-    if (!document) return;
-    navigate(`/print/${document.id}`);
-  };
-
+  // Generate PDF using pdfmake
   const handleDownloadPdf = async () => {
-    if (!printRef.current || !document) return;
+    if (!document) return;
     
     setIsGeneratingPdf(true);
     toast.info('Generiram PDF...');
     
     try {
-      const pdfBlob = await generatePdfBlob();
-      if (!pdfBlob) {
-        toast.error('Greška pri generiranju PDF-a');
-        return;
-      }
+      const pdfBlob = await generateDocumentPdf({
+        document,
+        companySettings,
+        template,
+        enrichedItems,
+      });
       
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const link = window.document.createElement('a');
-      link.href = url;
-      link.download = `${document.number}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
-      
+      downloadPdf(pdfBlob, `${document.number}.pdf`);
       toast.success('PDF uspješno generiran!');
     } catch (err) {
       console.error('PDF generation error:', err);
       toast.error('Greška pri generiranju PDF-a');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  // Print PDF using pdfmake (no HTML print route)
+  const handlePrint = async () => {
+    if (!document) return;
+    
+    setIsGeneratingPdf(true);
+    toast.info('Pripremam ispis...');
+    
+    try {
+      const pdfBlob = await generateDocumentPdf({
+        document,
+        companySettings,
+        template,
+        enrichedItems,
+      });
+      
+      printPdf(pdfBlob);
+      toast.success('Dokument poslan na ispis');
+    } catch (err) {
+      console.error('Print error:', err);
+      toast.error('Greška pri ispisu');
     } finally {
       setIsGeneratingPdf(false);
     }
