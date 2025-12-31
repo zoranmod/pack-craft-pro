@@ -267,7 +267,7 @@
   overflow: hidden;
   position: relative;
   margin: 0;
-  padding: 10mm 12mm;
+  padding: 8mm 12mm;
   background: hsl(0 0% 100%);
   color: hsl(0 0% 0%);
   /* Flexbox layout for proper footer positioning */
