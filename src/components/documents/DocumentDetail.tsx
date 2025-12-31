@@ -101,9 +101,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  const [isPrinting, setIsPrinting] = useState(false);
+  
 
-  // Shared PDF generation logic used by both Print and Download
+  // Shared PDF generation logic used by Download
   const generatePdfBlob = async (): Promise<Blob | null> => {
     if (!printRef.current || !document) return null;
     
@@ -111,19 +111,22 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       // A4 dimensions in mm: 210 x 297
       const a4WidthMm = 210;
       const a4HeightMm = 297;
-      // Reduced margins for better A4 usage (8mm instead of 10mm)
+      // Minimal margins for maximum A4 usage (8mm)
       const marginMm = 8;
       const contentWidthMm = a4WidthMm - (marginMm * 2);
       
       // Use higher scale for premium quality
       const canvas = await html2canvas(printRef.current, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
+        // Remove any extra padding/margin from capture
+        x: 0,
+        y: 0,
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -170,7 +173,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           const ctx = sliceCanvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
-            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
             pdf.addImage(sliceData, 'JPEG', imgX, imgY, imgWidthMm, sliceHeight);
           }
           
@@ -187,65 +190,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
-  // Print using hidden iframe to avoid popup blockers (ERR_BLOCKED_BY_CLIENT)
-  const handlePrint = async () => {
+  // Navigate to dedicated print page (avoids popup blockers)
+  const handlePrint = () => {
     if (!document) return;
-    
-    setIsPrinting(true);
-    toast.info('Pripremam za ispis...');
-    
-    try {
-      const pdfBlob = await generatePdfBlob();
-      if (!pdfBlob) {
-        toast.error('Greška pri generiranju dokumenta za ispis');
-        setIsPrinting(false);
-        return;
-      }
-      
-      // Create object URL for the PDF blob
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      
-      // Create hidden iframe for printing (avoids popup blockers)
-      const iframe = window.document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.top = '-10000px';
-      iframe.style.left = '-10000px';
-      iframe.style.width = '1px';
-      iframe.style.height = '1px';
-      iframe.style.border = 'none';
-      iframe.src = pdfUrl;
-      
-      iframe.onload = () => {
-        try {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-        } catch (e) {
-          console.error('Print iframe error:', e);
-          toast.error('Greška pri ispisu. Pokušajte ponovno.');
-        }
-        
-        // Clean up after a delay to allow print dialog to appear
-        setTimeout(() => {
-          URL.revokeObjectURL(pdfUrl);
-          iframe.remove();
-          setIsPrinting(false);
-        }, 1000);
-      };
-      
-      iframe.onerror = () => {
-        toast.error('Greška pri učitavanju dokumenta za ispis');
-        URL.revokeObjectURL(pdfUrl);
-        iframe.remove();
-        setIsPrinting(false);
-      };
-      
-      window.document.body.appendChild(iframe);
-      
-    } catch (err) {
-      console.error('Print error:', err);
-      toast.error('Greška pri ispisu');
-      setIsPrinting(false);
-    }
+    navigate(`/print/${document.id}`);
   };
 
   const handleDownloadPdf = async () => {
@@ -366,9 +314,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint} disabled={isPrinting}>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
-            {isPrinting ? 'Pripremam...' : 'Ispis'}
+            Ispis
           </Button>
           <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
