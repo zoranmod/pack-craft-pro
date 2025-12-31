@@ -28,34 +28,23 @@ export function DocumentBodyContent({
 }) {
   return (
     <>
-      {/* Document Title - Centered */}
-      <div className="text-center mb-4">
-        <h2 className="font-bold" style={{ color: '#000', fontSize: '16px' }}>
-          {documentTypeLabels[document.type].toUpperCase()}
-        </h2>
-        <p className="font-semibold" style={{ color: '#000', fontSize: '13px' }}>
-          {document.number}
-        </p>
-      </div>
-
-      {/* Client Info & Document Details */}
-      <div className="flex justify-between items-start mb-4" style={{ fontSize: '13px' }}>
-        <div>
-          <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
-          <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
-          <p style={{ color: '#000' }}>{document.clientAddress}</p>
-          {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
-          {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
-          {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
-          {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
-          {document.deliveryAddress && (
-            <div className="mt-1">
-              <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
-              <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
-            </div>
-          )}
+      {/* Document Header - 3-zone layout: left (client), center (title), right (metadata) */}
+      <div className="flex justify-between items-start mb-4">
+        {/* Left: empty placeholder for balance */}
+        <div style={{ flex: '1' }}></div>
+        
+        {/* Center: Document Title only - 20% larger */}
+        <div className="text-center" style={{ flex: '1' }}>
+          <h2 className="font-bold" style={{ color: '#000', fontSize: '19px', letterSpacing: '0.5px' }}>
+            {documentTypeLabels[document.type].toUpperCase()}
+          </h2>
         </div>
-        <div className="text-right">
+        
+        {/* Right: Document number + metadata */}
+        <div className="text-right" style={{ flex: '1', fontSize: '12px' }}>
+          <p className="font-semibold" style={{ color: '#000', marginBottom: '2px' }}>
+            {document.number}
+          </p>
           <p style={{ color: '#000' }}>Datum: {formatDateHR(document.date)}</p>
           {document.validityDays && template?.show_validity_days && (
             <p style={{ color: '#000' }}>Rok valjanosti: {document.validityDays} dana</p>
@@ -67,6 +56,23 @@ export function DocumentBodyContent({
             <p style={{ color: '#000' }}>Način plaćanja: {document.paymentMethod}</p>
           )}
         </div>
+      </div>
+
+      {/* Client Info */}
+      <div className="mb-4" style={{ fontSize: '13px' }}>
+        <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
+        <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
+        <p style={{ color: '#000' }}>{document.clientAddress}</p>
+        {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
+        {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
+        {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
+        {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
+        {document.deliveryAddress && (
+          <div className="mt-1">
+            <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
+            <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
+          </div>
+        )}
       </div>
 
       {/* Items Table */}

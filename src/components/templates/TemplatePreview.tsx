@@ -62,45 +62,43 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         {/* Memorandum Header - identical for all documents */}
         <MemorandumHeader />
 
-        {/* Document Title */}
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold uppercase tracking-wide" style={{ color: template.primary_color }}>
-            {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
-          </h2>
-          <p className="text-gray-600 mt-1">Broj: {template.document_type.toUpperCase().slice(0,3)}-2025-0001</p>
-          <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
+        {/* Document Header - 3-zone layout */}
+        <div className="flex justify-between items-start mb-4">
+          {/* Left: empty placeholder for balance */}
+          <div style={{ flex: '1' }}></div>
+          
+          {/* Center: Document Title only - 20% larger */}
+          <div className="text-center" style={{ flex: '1' }}>
+            <h2 className="font-bold uppercase tracking-wide" style={{ color: template.primary_color, fontSize: '19px', letterSpacing: '0.5px' }}>
+              {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
+            </h2>
+          </div>
+          
+          {/* Right: Document number + metadata */}
+          <div className="text-right text-sm" style={{ flex: '1' }}>
+            <p className="font-semibold" style={{ marginBottom: '2px' }}>
+              {template.document_type.toUpperCase().slice(0,3)}-2025-0001
+            </p>
+            <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
+            {template.show_validity_days && (
+              <p className="text-gray-600">Rok valjanosti: {template.default_validity_days} dana</p>
+            )}
+            {template.show_delivery_days && (
+              <p className="text-gray-600">Rok isporuke: {template.default_delivery_days} dana</p>
+            )}
+            {template.show_payment_method && (
+              <p className="text-gray-600">Način plaćanja: {template.default_payment_method}</p>
+            )}
+          </div>
         </div>
 
         {/* Client Info */}
-        <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-200">
+        <div className="mb-5 p-3 bg-gray-50 rounded border border-gray-200">
           <p className="font-semibold text-sm mb-1">Kupac:</p>
           <p className="font-medium">Naziv kupca d.o.o.</p>
           <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
           <p className="text-gray-600 text-sm">OIB: 98765432109</p>
         </div>
-
-        {/* Metadata */}
-        <div className="mb-4 text-sm flex flex-wrap gap-x-6 gap-y-1">
-          {template.show_payment_method && (
-            <div>
-              <span className="text-gray-600">Način plaćanja: </span>
-              <span className="font-medium">{template.default_payment_method}</span>
-            </div>
-          )}
-          {template.show_validity_days && (
-            <div>
-              <span className="text-gray-600">Rok valjanosti: </span>
-              <span className="font-medium">{template.default_validity_days} dana</span>
-            </div>
-          )}
-          {template.show_delivery_days && (
-            <div>
-              <span className="text-gray-600">Rok isporuke: </span>
-              <span className="font-medium">{template.default_delivery_days} dana</span>
-            </div>
-          )}
-        </div>
-
         {/* Table */}
         <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>
           <thead>
