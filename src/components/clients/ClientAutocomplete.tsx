@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Plus, User, Building2 } from 'lucide-react';
+import { Search, Plus, User, Building2, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useClients, Client } from '@/hooks/useClients';
+import { useClients, Client, normalizeClientName, useGetOrCreateClient } from '@/hooks/useClients';
 import { cn } from '@/lib/utils';
 
 interface ClientAutocompleteProps {
@@ -21,13 +20,24 @@ export function ClientAutocomplete({
 }: ClientAutocompleteProps) {
   const [search, setSearch] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const { data: clients = [], isLoading } = useClients();
+  const { getOrCreateClient } = useGetOrCreateClient();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(search.toLowerCase()) ||
     (client.oib && client.oib.includes(search))
   );
+
+  // Check if there's an exact match (case-insensitive)
+  const normalizedSearch = normalizeClientName(search);
+  const hasExactMatch = search.trim() !== '' && clients.some(
+    client => normalizeClientName(client.name) === normalizedSearch
+  );
+
+  // Show "add new" option if there's text and no exact match
+  const showAddNewOption = search.trim() !== '' && !hasExactMatch;
 
   useEffect(() => {
     setSearch(value);
@@ -47,6 +57,22 @@ export function ClientAutocomplete({
     setSearch(client.name);
     setIsOpen(false);
     onSelect(client);
+  };
+
+  const handleAddNewClient = async () => {
+    if (!search.trim() || isCreating) return;
+    
+    setIsCreating(true);
+    try {
+      const client = await getOrCreateClient(search.trim());
+      if (client) {
+        setSearch(client.name);
+        setIsOpen(false);
+        onSelect(client);
+      }
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -71,56 +97,78 @@ export function ClientAutocomplete({
             <div className="p-3 text-sm text-muted-foreground text-center">
               Učitavanje...
             </div>
-          ) : filteredClients.length > 0 ? (
-            <div className="py-1">
-              {filteredClients.map((client) => (
-                <button
-                  key={client.id}
-                  type="button"
-                  onClick={() => handleSelect(client)}
-                  className="w-full px-3 py-2 text-left hover:bg-accent transition-colors flex items-start gap-3"
-                >
-                  {client.client_type === 'company' ? (
-                    <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  ) : (
-                    <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground truncate">{client.name}</span>
-                      <Badge variant={client.client_type === 'company' ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
-                        {client.client_type === 'company' ? 'Pravna' : 'Privatna'}
-                      </Badge>
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {[client.address, client.city].filter(Boolean).join(', ')}
-                      {client.oib && ` • OIB: ${client.oib}`}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
           ) : (
-            <div className="p-3 text-sm text-muted-foreground text-center">
-              Nema pronađenih klijenata
-            </div>
+            <>
+              {/* Show "Add new client" option at the top when typing a new name */}
+              {showAddNewOption && (
+                <button
+                  type="button"
+                  onClick={handleAddNewClient}
+                  disabled={isCreating}
+                  className="w-full px-3 py-2.5 text-left hover:bg-accent transition-colors flex items-center gap-3 border-b border-border bg-primary/5"
+                >
+                  {isCreating ? (
+                    <Loader2 className="h-4 w-4 text-primary animate-spin flex-shrink-0" />
+                  ) : (
+                    <Plus className="h-4 w-4 text-primary flex-shrink-0" />
+                  )}
+                  <span className="text-primary font-medium">
+                    {isCreating ? 'Kreiram...' : `+ Dodaj novog klijenta: "${search.trim()}"`}
+                  </span>
+                </button>
+              )}
+
+              {filteredClients.length > 0 ? (
+                <div className="py-1">
+                  {filteredClients.map((client) => (
+                    <button
+                      key={client.id}
+                      type="button"
+                      onClick={() => handleSelect(client)}
+                      className="w-full px-3 py-2 text-left hover:bg-accent transition-colors flex items-start gap-3"
+                    >
+                      {client.client_type === 'company' ? (
+                        <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-foreground truncate">{client.name}</span>
+                          <Badge variant={client.client_type === 'company' ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
+                            {client.client_type === 'company' ? 'Pravna' : 'Privatna'}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {[client.address, client.city].filter(Boolean).join(', ')}
+                          {client.oib && ` • OIB: ${client.oib}`}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : !showAddNewOption ? (
+                <div className="p-3 text-sm text-muted-foreground text-center">
+                  Nema pronađenih klijenata
+                </div>
+              ) : null}
+            </>
           )}
           
-          {onAddNew && (
+          {/* Legacy "Add new" button - only show if onAddNew prop is provided and we're not showing inline add */}
+          {onAddNew && !showAddNewOption && (
             <div className="border-t border-border p-2">
-              <Button
+              <button
                 type="button"
-                variant="ghost"
-                size="sm"
                 onClick={() => {
                   setIsOpen(false);
                   onAddNew();
                 }}
-                className="w-full justify-start gap-2 text-primary"
+                className="w-full px-3 py-2 text-left hover:bg-accent transition-colors flex items-center gap-2 text-primary rounded-md"
               >
                 <Plus className="h-4 w-4" />
                 Dodaj novog klijenta
-              </Button>
+              </button>
             </div>
           )}
         </div>
