@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, ExternalLink, Mail, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -120,52 +120,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
-  // Open PDF in new tab for viewing/printing
-  const handleOpenPdf = async () => {
-    if (!document || !printRef.current) return;
-
-    // Open an in-app viewer tab first (avoids navigating directly to blob: URLs)
-    const token = crypto.randomUUID();
-    const filename = `${document.number}.pdf`;
-    const viewerTab = window.open(`/pdf-viewer?token=${encodeURIComponent(token)}`, '_blank');
-
-    if (!viewerTab) {
-      toast.error('Preglednik je blokirao otvaranje nove kartice');
-      return;
-    }
-
-    setIsGeneratingPdf(true);
-    toast.info('Generiram PDF...');
-
-    try {
-      const pdfBlob = await generatePdfFromElement(printRef.current);
-
-      const payload = {
-        type: 'LOVABLE_PDF_BLOB',
-        token,
-        blob: pdfBlob,
-        filename,
-      };
-
-      // Send a few times to avoid race conditions if the viewer isn't ready yet
-      for (let i = 0; i < 6; i += 1) {
-        setTimeout(() => {
-          try {
-            viewerTab.postMessage(payload, window.location.origin);
-          } catch {
-            // ignore
-          }
-        }, i * 250);
-      }
-
-      toast.success('PDF otvoren u novoj kartici');
-    } catch (err) {
-      console.error('PDF open error:', err);
-      toast.error('Greška pri otvaranju PDF-a');
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
   
   if (error) {
     return (
@@ -257,15 +211,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           </Button>
           <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
-            {isGeneratingPdf ? 'Generiram...' : 'Preuzmi PDF'}
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={handleOpenPdf} disabled={isGeneratingPdf}>
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Otvori PDF
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-lg">
-            <Mail className="mr-2 h-4 w-4" />
-            Pošalji
+            {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
           </Button>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
@@ -403,15 +349,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </Button>
               <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                 <Download className="mr-3 h-4 w-4" />
-                {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi PDF'}
-              </Button>
-              <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleOpenPdf} disabled={isGeneratingPdf}>
-                <ExternalLink className="mr-3 h-4 w-4" />
-                Otvori PDF
-              </Button>
-              <Button variant="outline" className="w-full justify-start rounded-lg">
-                <Mail className="mr-3 h-4 w-4" />
-                Pošalji emailom
+                {isGeneratingPdf ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
               <Separator className="my-3" />
               <Button variant="outline" className="w-full justify-start rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30">
