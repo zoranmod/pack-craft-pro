@@ -851,10 +851,13 @@ export function DocumentForm() {
                   <Input
                     id="preparedBy"
                     value={formData.preparedBy}
-                    readOnly
-                    className="mt-1.5 bg-muted/50 cursor-not-allowed"
-                    placeholder="Automatski popunjeno"
+                    onChange={(e) => setFormData({ ...formData, preparedBy: e.target.value })}
+                    placeholder="Ime i prezime"
+                    className="mt-1.5"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Automatski popunjeno – možete promijeniti po potrebi.
+                  </p>
                 </div>
               </div>
             </div>
