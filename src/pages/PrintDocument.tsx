@@ -191,35 +191,50 @@ export function DocumentBodyContent({
       {/* Signature Section for Otpremnica/Nalog */}
       {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
         <div className="mt-4 pt-3 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
-          <div className="flex items-end justify-between mb-3">
-            <div className="flex items-end gap-2">
-              <span style={{ color: '#000' }}>Robu preuzeo:</span>
-              <div className="w-40 border-b border-gray-400"></div>
-            </div>
-            <div className="text-center px-4">
-              <span style={{ color: '#000' }}>MP</span>
-            </div>
-            <div className="text-center">
-              <div className="w-40 border-b border-gray-400 mb-1"></div>
-              <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
-            </div>
-          </div>
-          <div className="flex items-end justify-between mb-3">
-            <div className="flex items-end gap-2">
-              <span style={{ color: '#000' }}>Za tvrtku:</span>
-              <div className="w-40 border-b border-gray-400"></div>
-            </div>
-            <div className="text-center px-4">
-              <span style={{ color: '#000' }}>MP</span>
-            </div>
-            <div className="text-center">
-              <div className="w-40 border-b border-gray-400 mb-1"></div>
-              <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
+          {/* Row 1: Robu preuzeo */}
+          <div 
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '38mm 60mm 14mm 60mm', 
+              alignItems: 'end',
+              columnGap: '4mm',
+              paddingTop: '6mm',
+              paddingBottom: '2mm'
+            }}
+          >
+            <span style={{ color: '#000' }}>Robu preuzeo:</span>
+            <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ position: 'relative' }}>
+              <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+              <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '2px', fontSize: '8px', color: '#000' }}>(potpis)</span>
             </div>
           </div>
-          <div className="flex items-end gap-2 mt-2">
+
+          {/* Row 2: Za tvrtku */}
+          <div 
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '38mm 60mm 14mm 60mm', 
+              alignItems: 'end',
+              columnGap: '4mm',
+              paddingTop: '10mm',
+              paddingBottom: '2mm'
+            }}
+          >
+            <span style={{ color: '#000' }}>Za tvrtku:</span>
+            <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+            <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
+            <div style={{ position: 'relative' }}>
+              <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+              <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '2px', fontSize: '8px', color: '#000' }}>(potpis)</span>
+            </div>
+          </div>
+
+          {/* Row 3: Robu izdao skladištar */}
+          <div className="flex items-end gap-2" style={{ marginTop: '8mm' }}>
             <span style={{ color: '#000' }}>Robu izdao skladištar (puno ime i prezime):</span>
-            <div className="flex-1 border-b border-gray-400 max-w-[200px]"></div>
+            <div style={{ flex: 1, borderBottom: '1px solid #666', maxWidth: '180px' }}></div>
           </div>
         </div>
       )}
