@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Printer, Mail, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
+import { ArrowLeft, Edit, Download, ExternalLink, Mail, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,7 @@ import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generatePdfFromElement, downloadPdf, printPdf } from '@/lib/pdfGenerator';
+import { generatePdfFromElement, downloadPdf, openPdfInNewTab } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -120,20 +120,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
-  // Print PDF from HTML preview
-  const handlePrint = async () => {
+  // Open PDF in new tab for viewing/printing
+  const handleOpenPdf = async () => {
     if (!document || !printRef.current) return;
     
     setIsGeneratingPdf(true);
-    toast.info('Pripremam ispis...');
+    toast.info('Generiram PDF...');
     
     try {
       const pdfBlob = await generatePdfFromElement(printRef.current);
-      printPdf(pdfBlob);
-      toast.success('Dokument poslan na ispis');
+      openPdfInNewTab(pdfBlob);
+      toast.success('PDF otvoren u novoj kartici');
     } catch (err) {
-      console.error('Print error:', err);
-      toast.error('Greška pri ispisu');
+      console.error('PDF open error:', err);
+      toast.error('Greška pri otvaranju PDF-a');
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -227,13 +227,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            Ispis
-          </Button>
           <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
-            {isGeneratingPdf ? 'Generiram...' : 'PDF'}
+            {isGeneratingPdf ? 'Generiram...' : 'Preuzmi PDF'}
+          </Button>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={handleOpenPdf} disabled={isGeneratingPdf}>
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Otvori PDF
           </Button>
           <Button variant="outline" size="sm" className="rounded-lg">
             <Mail className="mr-2 h-4 w-4" />
@@ -375,7 +375,11 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </Button>
               <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                 <Download className="mr-3 h-4 w-4" />
-                {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi kao PDF'}
+                {isGeneratingPdf ? 'Generiram PDF...' : 'Preuzmi PDF'}
+              </Button>
+              <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleOpenPdf} disabled={isGeneratingPdf}>
+                <ExternalLink className="mr-3 h-4 w-4" />
+                Otvori PDF
               </Button>
               <Button variant="outline" className="w-full justify-start rounded-lg">
                 <Mail className="mr-3 h-4 w-4" />

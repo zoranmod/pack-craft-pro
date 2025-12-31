@@ -101,33 +101,19 @@ export function downloadPdf(blob: Blob, filename: string): void {
 }
 
 /**
- * Opens the PDF for printing using a hidden iframe (avoids popup blockers)
+ * Opens the PDF in a new browser tab for viewing/printing
  */
-export function printPdf(blob: Blob): void {
+export function openPdfInNewTab(blob: Blob): void {
   const url = URL.createObjectURL(blob);
+  const newTab = window.open(url, '_blank');
   
-  // Create hidden iframe for printing
-  const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: none;';
-  iframe.src = url;
+  if (!newTab) {
+    // If popup was blocked, fallback to opening in same window
+    window.location.href = url;
+  }
   
-  iframe.onload = () => {
-    try {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-    } catch {
-      // Fallback: download the PDF
-      downloadPdf(blob, 'document.pdf');
-    }
-    
-    // Cleanup after delay
-    setTimeout(() => {
-      if (document.body.contains(iframe)) {
-        document.body.removeChild(iframe);
-      }
-      URL.revokeObjectURL(url);
-    }, 60000);
-  };
-  
-  document.body.appendChild(iframe);
+  // Clean up URL after a delay (give time for the tab to load)
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 60000);
 }
