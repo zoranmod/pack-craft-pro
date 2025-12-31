@@ -20,10 +20,11 @@ import {
 import { useCreateDocument, useDocument, useUpdateDocument } from '@/hooks/useDocuments';
 import { useContractArticleTemplates, useSaveDocumentContractArticles, useInitializeDefaultTemplates } from '@/hooks/useContractArticles';
 import { ClientAutocomplete } from '@/components/clients/ClientAutocomplete';
+import { NewClientModal, NewClientData } from '@/components/clients/NewClientModal';
 import { ArticleAutocomplete } from '@/components/articles/ArticleAutocomplete';
 import { ContractArticlesEditor } from '@/components/contracts/ContractArticlesEditor';
 import { QuickTemplates } from '@/components/articles/QuickTemplates';
-import { Client } from '@/hooks/useClients';
+import { Client, useCreateClient } from '@/hooks/useClients';
 import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
 import { useDefaultTemplate, useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 import { useAuth } from '@/hooks/useAuth';
@@ -175,8 +176,13 @@ export function DocumentForm() {
   const initializeTemplates = useInitializeDefaultTemplates();
   const saveDocumentArticles = useSaveDocumentContractArticles();
   const saveAsTemplate = useSaveAsTemplate();
+  const createClient = useCreateClient();
   const [contractArticles, setContractArticles] = useState<ContractArticleFormData[]>([]);
   const [placeholderValues, setPlaceholderValues] = useState<Record<string, string>>({});
+  
+  // New client modal state
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [isCreatingClient, setIsCreatingClient] = useState(false);
 
   // Initialize contract articles when templates load (for ugovor type)
   useEffect(() => {
@@ -291,6 +297,47 @@ export function DocumentForm() {
     });
   };
 
+  // Handle saving new client from modal
+  const handleSaveNewClient = async (data: NewClientData) => {
+    setIsCreatingClient(true);
+    try {
+      const client = await createClient.mutateAsync({
+        name: data.name,
+        client_type: data.client_type,
+        oib: data.oib,
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        notes: data.contact_person ? `Kontakt: ${data.contact_person}` : undefined,
+      });
+      
+      if (client) {
+        // Auto-fill form with new client data
+        setFormData(prev => ({
+          ...prev,
+          clientName: client.name,
+          clientOib: client.oib || '',
+          clientAddress: [client.address, client.postal_code, client.city].filter(Boolean).join(', '),
+          clientPhone: client.phone || '',
+          clientEmail: client.email || '',
+        }));
+        
+        // Apply client's default PDV to all items
+        if (hasPrices) {
+          setItems(prevItems => prevItems.map(item => {
+            const updatedItem = { ...item, pdv: client.default_pdv };
+            const { subtotal, total } = calculateItemTotals(updatedItem);
+            return { ...updatedItem, subtotal, total };
+          }));
+        }
+        
+        setShowNewClientModal(false);
+      }
+    } finally {
+      setIsCreatingClient(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -399,6 +446,7 @@ export function DocumentForm() {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-background py-4 -mx-4 px-4 border-b border-border shadow-sm flex items-center justify-between">
@@ -489,9 +537,20 @@ export function DocumentForm() {
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h2 className="font-semibold text-foreground mb-4">Podaci o klijentu</h2>
             
-            {/* Client Autocomplete */}
+            {/* Add New Client Button - Primary Action */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowNewClientModal(true)}
+              className="w-full mb-4 gap-2 border-dashed border-primary/50 text-primary hover:bg-primary/5 hover:border-primary"
+            >
+              <Plus className="h-4 w-4" />
+              Dodaj novog klijenta
+            </Button>
+            
+            {/* Quick Client Picker */}
             <div className="mb-4">
-              <Label>Brzi odabir klijenta</Label>
+              <Label className="text-muted-foreground text-sm">Brzi odabir postojećeg klijenta</Label>
               <div className="mt-1.5">
                 <ClientAutocomplete
                   value={formData.clientName}
@@ -513,7 +572,7 @@ export function DocumentForm() {
                       }));
                     }
                   }}
-                  placeholder="Pretraži postojeće klijente..."
+                  placeholder="Odaberi postojećeg klijenta..."
                 />
               </div>
             </div>
@@ -957,5 +1016,15 @@ export function DocumentForm() {
         </div>
       </div>
     </form>
+
+    {/* New Client Modal */}
+    <NewClientModal
+      open={showNewClientModal}
+      onOpenChange={setShowNewClientModal}
+      initialName=""
+      onSave={handleSaveNewClient}
+      isLoading={isCreatingClient}
+    />
+    </>
   );
 }
