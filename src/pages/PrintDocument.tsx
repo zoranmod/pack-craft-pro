@@ -110,7 +110,7 @@ export function DocumentBodyContent({
               <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Šifra</th>
               <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Naziv</th>
               <th style={{ padding: '2mm 1mm', textAlign: 'center', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>{unitLabel}</th>
-              <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>{qtyLabel}</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'center', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>{qtyLabel}</th>
               {hasPrices && (
                 <>
                   <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Cijena</th>
@@ -130,7 +130,7 @@ export function DocumentBodyContent({
                 <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top' }}>{item.code || ''}</td>
                 <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', overflowWrap: 'anywhere' }}>{item.name}</td>
                 <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'center', whiteSpace: 'nowrap' }}>{item.unit}</td>
-                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right', whiteSpace: 'nowrap' }}>{item.quantity}</td>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'center', whiteSpace: 'nowrap' }}>{item.quantity}</td>
                 {hasPrices && (
                   <>
                     <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right' }}>{formatCurrency(item.price)} €</td>
@@ -224,19 +224,19 @@ export function DocumentBodyContent({
           <div 
             style={{ 
               display: 'grid', 
-              gridTemplateColumns: '38mm 60mm 14mm 60mm', 
-              alignItems: 'end',
-              columnGap: '4mm',
+              gridTemplateColumns: 'auto 70mm 12mm 70mm', 
+              alignItems: 'baseline',
+              columnGap: '3mm',
               paddingTop: '6mm',
-              paddingBottom: '2mm'
+              paddingBottom: '0'
             }}
           >
-            <span style={{ color: '#000' }}>Robu preuzeo:</span>
-            <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
+            <div style={{ borderBottom: '1px solid #666' }}></div>
             <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
-            <div style={{ position: 'relative' }}>
-              <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
-              <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '2px', fontSize: '8px', color: '#000' }}>(potpis)</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ borderBottom: '1px solid #666', width: '100%' }}></div>
+              <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
             </div>
           </div>
 
@@ -244,26 +244,26 @@ export function DocumentBodyContent({
           <div 
             style={{ 
               display: 'grid', 
-              gridTemplateColumns: '38mm 60mm 14mm 60mm', 
-              alignItems: 'end',
-              columnGap: '4mm',
+              gridTemplateColumns: 'auto 70mm 12mm 70mm', 
+              alignItems: 'baseline',
+              columnGap: '3mm',
               paddingTop: '10mm',
-              paddingBottom: '2mm'
+              paddingBottom: '0'
             }}
           >
-            <span style={{ color: '#000' }}>Za tvrtku:</span>
-            <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
+            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
+            <div style={{ borderBottom: '1px solid #666' }}></div>
             <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
-            <div style={{ position: 'relative' }}>
-              <div style={{ borderBottom: '1px solid #666', height: '1px' }}></div>
-              <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '2px', fontSize: '8px', color: '#000' }}>(potpis)</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ borderBottom: '1px solid #666', width: '100%' }}></div>
+              <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
             </div>
           </div>
 
           {/* Row 3: Robu izdao skladištar */}
-          <div className="flex items-end gap-2" style={{ marginTop: '8mm' }}>
-            <span style={{ color: '#000' }}>Robu izdao skladištar (puno ime i prezime):</span>
-            <div style={{ flex: 1, borderBottom: '1px solid #666', maxWidth: '180px' }}></div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '3mm', marginTop: '10mm' }}>
+            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu izdao skladištar (puno ime i prezime):</span>
+            <div style={{ flex: 1, borderBottom: '1px solid #666', maxWidth: '160mm' }}></div>
           </div>
         </div>
       )}
