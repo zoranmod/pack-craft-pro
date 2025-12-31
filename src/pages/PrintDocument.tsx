@@ -228,9 +228,9 @@ export function DocumentBodyContent({
             paddingTop: '6mm'
           }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
-            <div style={{ borderBottom: '1px solid #666' }}></div>
+            <div style={{ borderBottom: '1px solid #666', minHeight: '4mm' }}></div>
             <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
-            <div style={{ borderBottom: '1px solid #666' }}></div>
+            <div style={{ borderBottom: '1px solid #666', minHeight: '4mm' }}></div>
           </div>
           <div style={{ 
             display: 'grid', 
@@ -250,7 +250,7 @@ export function DocumentBodyContent({
             paddingTop: '8mm'
           }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
-            <div style={{ borderBottom: '1px solid #666', textAlign: 'center', position: 'relative' }}>
+            <div style={{ borderBottom: '1px solid #666', textAlign: 'center', position: 'relative', minHeight: '4mm' }}>
               {document.preparedBy && (
                 <span style={{ color: '#000', fontSize: '11px', position: 'absolute', bottom: '2mm', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}>
                   {document.preparedBy}
@@ -258,7 +258,7 @@ export function DocumentBodyContent({
               )}
             </div>
             <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
-            <div style={{ borderBottom: '1px solid #666' }}></div>
+            <div style={{ borderBottom: '1px solid #666', minHeight: '4mm' }}></div>
           </div>
           <div style={{ 
             display: 'grid', 
