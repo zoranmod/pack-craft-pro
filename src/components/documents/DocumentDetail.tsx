@@ -16,7 +16,7 @@ import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generatePdfFromElement, downloadPdf, openPdfInNewTab } from '@/lib/pdfGenerator';
+import { generatePdfFromElement, downloadPdf } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -123,13 +123,41 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   // Open PDF in new tab for viewing/printing
   const handleOpenPdf = async () => {
     if (!document || !printRef.current) return;
-    
+
+    // Open an in-app viewer tab first (avoids navigating directly to blob: URLs)
+    const token = crypto.randomUUID();
+    const filename = `${document.number}.pdf`;
+    const viewerTab = window.open(`/pdf-viewer?token=${encodeURIComponent(token)}`, '_blank');
+
+    if (!viewerTab) {
+      toast.error('Preglednik je blokirao otvaranje nove kartice');
+      return;
+    }
+
     setIsGeneratingPdf(true);
     toast.info('Generiram PDF...');
-    
+
     try {
       const pdfBlob = await generatePdfFromElement(printRef.current);
-      openPdfInNewTab(pdfBlob);
+
+      const payload = {
+        type: 'LOVABLE_PDF_BLOB',
+        token,
+        blob: pdfBlob,
+        filename,
+      };
+
+      // Send a few times to avoid race conditions if the viewer isn't ready yet
+      for (let i = 0; i < 6; i += 1) {
+        setTimeout(() => {
+          try {
+            viewerTab.postMessage(payload, window.location.origin);
+          } catch {
+            // ignore
+          }
+        }, i * 250);
+      }
+
       toast.success('PDF otvoren u novoj kartici');
     } catch (err) {
       console.error('PDF open error:', err);
