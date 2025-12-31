@@ -311,17 +311,26 @@
   line-height: 1.1;
 }
 
-/* Footer company info line - MUST NOT wrap to prevent 2nd page */
-.footer-company-info {
-  white-space: nowrap;
+/* Footer company info wrapper - fixed height for exactly 2 lines */
+.footer-company-wrap {
+  max-height: 7mm;
   overflow: hidden;
-  text-overflow: clip;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Footer company info line - max 2 lines with line-clamp */
+.footer-company-info {
   font-size: 6.5px;
-  line-height: 1.0;
+  line-height: 1.05;
   margin: 0 !important;
   padding: 0 !important;
   text-align: center;
   color: hsl(0 0% 40%);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 /*  ================================
