@@ -47,7 +47,7 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
   const docFooter = clone.querySelector('.doc-footer') as HTMLElement;
   
   if (docBody) {
-    docBody.style.cssText += 'flex: 1 !important; overflow: hidden !important;';
+    docBody.style.cssText += 'flex: 1 1 auto !important; overflow: hidden !important; min-height: 0 !important;';
   }
   
   if (docFooter) {
