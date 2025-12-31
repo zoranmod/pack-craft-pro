@@ -300,7 +300,7 @@
   max-height: var(--print-footer-max-height-mm) !important;
 }
 
-/* Legal note inside footer - visible above the footer image */
+/* Legal note inside footer - visible above the footer lines */
 .legal-note {
   position: relative;
   z-index: 2;
@@ -311,26 +311,32 @@
   line-height: 1.1;
 }
 
-/* Footer company info wrapper - fixed height for exactly 2 lines */
-.footer-company-wrap {
-  max-height: 7mm;
+/* Memorandum footer - standard 2-line contact info */
+.memorandum-footer {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1;
+}
+
+/* Footer lines wrapper - fixed height for exactly 2 lines */
+.footer-lines-wrap {
+  max-height: 8mm;
   overflow: hidden;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-/* Footer company info line - max 2 lines with line-clamp */
-.footer-company-info {
+/* Each footer line - must never wrap */
+.footer-line {
   font-size: 6.5px;
-  line-height: 1.05;
+  line-height: 1.15;
   margin: 0 !important;
   padding: 0 !important;
   text-align: center;
-  color: hsl(0 0% 40%);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  color: hsl(0 0% 35%);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /*  ================================

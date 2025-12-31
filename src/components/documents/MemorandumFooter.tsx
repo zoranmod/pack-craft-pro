@@ -1,27 +1,14 @@
-import footerImage from '@/assets/memorandum-footer.jpg';
-
 export const MemorandumFooter = () => {
   return (
-    <div 
-      className="memorandum-footer"
-      style={{
-        margin: 0,
-        padding: 0,
-        lineHeight: 0,
-      }}
-    >
-      <img 
-        src={footerImage} 
-        alt="Podnožje memoranduma" 
-        style={{ 
-          display: 'block',
-          width: '100%',
-          height: 'auto',
-          maxHeight: '28mm',
-          margin: 0,
-          padding: 0,
-        }}
-      />
+    <div className="memorandum-footer">
+      <div className="footer-lines-wrap">
+        <p className="footer-line">
+          www.akord-zupanja.hr ⸰ info@akord-zupanja.hr ⸰ Besplatan info tel: 0800 9455
+        </p>
+        <p className="footer-line">
+          Maloprodaja +385 32 830 345 ⸰ Veleprodaja +385 32 830 346 ⸰ Projektiranje namještaja +385 32 638 776 ⸰ Računovodstvo +385 32 638 900
+        </p>
+      </div>
     </div>
   );
 };
