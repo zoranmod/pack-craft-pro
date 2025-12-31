@@ -72,19 +72,30 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
 
         {/* Main content with reserved space for footer */}
         <div style={{ paddingBottom: '42mm' }}>
-          {/* Contract Title */}
-          <div className="text-center mb-6">
-            <h1 className="text-xl font-bold uppercase tracking-wide mb-3">
-              Ugovor o kupoprodaji
-            </h1>
-            <p className="text-sm">
-              Broj ugovora: <span className="font-semibold">{document.number}</span>
-            </p>
+          {/* Contract Header - 3-zone layout */}
+          <div className="flex justify-between items-start mb-4">
+            {/* Left: empty placeholder for balance */}
+            <div style={{ flex: '1' }}></div>
+            
+            {/* Center: Contract Title only - 20% larger */}
+            <div className="text-center" style={{ flex: '1' }}>
+              <h1 className="font-bold uppercase tracking-wide" style={{ fontSize: '19px' }}>
+                Ugovor o kupoprodaji
+              </h1>
+            </div>
+            
+            {/* Right: Document number + date */}
+            <div className="text-right text-sm" style={{ flex: '1' }}>
+              <p className="font-semibold" style={{ marginBottom: '2px' }}>
+                {document.number}
+              </p>
+              <p>Datum: {formatDateHR(document.date)}</p>
+            </div>
           </div>
 
           {/* Intro */}
-          <div className="mb-6 text-sm leading-relaxed">
-            <p className="mb-3">
+          <div className="mb-5 text-sm leading-relaxed">
+            <p>
               U Zagrebu, dana {formatDateHR(document.date)} godine, sklapaju:
             </p>
           </div>
