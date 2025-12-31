@@ -102,18 +102,24 @@ export function downloadPdf(blob: Blob, filename: string): void {
 
 /**
  * Opens the PDF in a new browser tab for viewing/printing
+ * Uses <a> tag click which is more reliable than window.open for blob URLs
  */
 export function openPdfInNewTab(blob: Blob): void {
   const url = URL.createObjectURL(blob);
-  const newTab = window.open(url, '_blank');
   
-  if (!newTab) {
-    // If popup was blocked, fallback to opening in same window
-    window.location.href = url;
-  }
+  // Create a hidden <a> tag - this approach is less likely to be blocked
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
   
-  // Clean up URL after a delay (give time for the tab to load)
+  // Append temporarily to body (needed for Firefox)
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Clean up URL after longer delay - give enough time for tab to fully load
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 60000);
+  }, 120000); // 2 minutes
 }
