@@ -111,7 +111,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       // A4 dimensions in mm: 210 x 297
       const a4WidthMm = 210;
       const a4HeightMm = 297;
-      const marginMm = 10;
+      // Reduced margins for better A4 usage (8mm instead of 10mm)
+      const marginMm = 8;
       const contentWidthMm = a4WidthMm - (marginMm * 2);
       
       // Use higher scale for premium quality
@@ -186,6 +187,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
+  // Print using hidden iframe to avoid popup blockers (ERR_BLOCKED_BY_CLIENT)
   const handlePrint = async () => {
     if (!document) return;
     
@@ -196,36 +198,52 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       const pdfBlob = await generatePdfBlob();
       if (!pdfBlob) {
         toast.error('Greška pri generiranju dokumenta za ispis');
+        setIsPrinting(false);
         return;
       }
       
       // Create object URL for the PDF blob
       const pdfUrl = URL.createObjectURL(pdfBlob);
       
-      // Open PDF in new tab and trigger print
-      const printWindow = window.open(pdfUrl, '_blank');
-      if (!printWindow) {
-        toast.error('Blokirani skočni prozori. Molimo omogućite ih za ispis.');
-        URL.revokeObjectURL(pdfUrl);
-        return;
-      }
+      // Create hidden iframe for printing (avoids popup blockers)
+      const iframe = window.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-10000px';
+      iframe.style.left = '-10000px';
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      iframe.style.border = 'none';
+      iframe.src = pdfUrl;
       
-      // Wait for PDF to load, then print
-      printWindow.onload = () => {
+      iframe.onload = () => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (e) {
+          console.error('Print iframe error:', e);
+          toast.error('Greška pri ispisu. Pokušajte ponovno.');
+        }
+        
+        // Clean up after a delay to allow print dialog to appear
         setTimeout(() => {
-          printWindow.print();
-        }, 500);
+          URL.revokeObjectURL(pdfUrl);
+          iframe.remove();
+          setIsPrinting(false);
+        }, 1000);
       };
       
-      // Clean up the URL after a delay
-      setTimeout(() => {
+      iframe.onerror = () => {
+        toast.error('Greška pri učitavanju dokumenta za ispis');
         URL.revokeObjectURL(pdfUrl);
-      }, 60000);
+        iframe.remove();
+        setIsPrinting(false);
+      };
+      
+      window.document.body.appendChild(iframe);
       
     } catch (err) {
       console.error('Print error:', err);
       toast.error('Greška pri ispisu');
-    } finally {
       setIsPrinting(false);
     }
   };
@@ -369,9 +387,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
       </div>
 
-      <div className="flex flex-col xl:grid xl:grid-cols-[1fr_320px] gap-6">
-        {/* Document Preview */}
-        <div className="w-full overflow-x-auto">
+      {/* Responsive grid: stack on small screens, side-by-side on xl+ */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6">
+        {/* Document Preview - constrained width with horizontal scroll if needed */}
+        <div className="w-full min-w-0 overflow-x-auto">
           {isContract ? (
             <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
               <ContractDocumentView 
@@ -380,7 +399,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', minHeight: '297mm', margin: '0 auto', fontSize: '11.5px', color: '#000' }}>
+            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-5 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', maxWidth: '100%', minHeight: '297mm', margin: '0 auto', fontSize: '11.5px', color: '#000' }}>
               {/* Flex wrapper for content - pushes footer to bottom */}
               <div className="flex-grow flex flex-col">
               {/* Memorandum Header - identical for all documents */}
@@ -597,8 +616,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           )}
         </div>
 
-        {/* Sidebar - responsive: below document on smaller screens, side panel on xl+ */}
-        <div className="w-full space-y-5">
+        {/* Sidebar - stacks below document on smaller screens, fixed width column on xl+ */}
+        <div className="w-full xl:w-[320px] space-y-5 flex-shrink-0">
           {/* Document Info Card */}
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="font-semibold text-foreground mb-5">Informacije</h3>
