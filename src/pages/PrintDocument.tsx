@@ -6,7 +6,6 @@ import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { useArticles } from '@/hooks/useArticles';
 import { Document, documentTypeLabels } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
-import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
 import { ContractDocumentView } from '@/components/documents/ContractDocumentView';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -287,9 +286,6 @@ export function DocumentContent({
         />
       </div>
 
-      <div className="doc-footer">
-        <MemorandumFooter />
-      </div>
     </div>
   );
 }

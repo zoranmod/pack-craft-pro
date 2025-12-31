@@ -12,7 +12,6 @@ import { ContractDocumentView } from './ContractDocumentView';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
-import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
@@ -254,10 +253,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   enrichedItems={enrichedItems}
                   hasPrices={hasPrices}
                 />
-              </div>
-
-              <div className="doc-footer">
-                <MemorandumFooter />
               </div>
             </div>
           )}
