@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { DocumentBodyContent } from '@/pages/PrintDocument';
 
 interface DocumentDetailProps {
   document: Document | null | undefined;
@@ -111,9 +112,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       // A4 dimensions in mm: 210 x 297
       const a4WidthMm = 210;
       const a4HeightMm = 297;
-      // Minimal margins for maximum A4 usage (8mm)
-      const marginMm = 8;
-      const contentWidthMm = a4WidthMm - (marginMm * 2);
       
       // Use higher scale for premium quality
       const canvas = await html2canvas(printRef.current, {
@@ -121,12 +119,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        // Remove any extra padding/margin from capture
-        x: 0,
-        y: 0,
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -141,17 +136,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         creator: companySettings?.company_name || 'Tvrtka',
       });
       
-      // Calculate dimensions to fit content width to A4 width
-      const imgWidthMm = contentWidthMm;
+      // Calculate dimensions - document already has 10mm internal padding
+      // so we place it at 0,0 to fill the full A4 page
+      const imgWidthMm = a4WidthMm;
       const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
-      const imgX = marginMm;
-      const imgY = marginMm;
       
       // Handle multi-page if content is longer than A4
-      const pageContentHeight = a4HeightMm - (marginMm * 2);
-      
-      if (imgHeightMm <= pageContentHeight) {
-        pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidthMm, imgHeightMm);
+      if (imgHeightMm <= a4HeightMm) {
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
       } else {
         // Multi-page
         let remainingHeight = imgHeightMm;
@@ -163,7 +155,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             pdf.addPage();
           }
           
-          const sliceHeight = Math.min(pageContentHeight, remainingHeight);
+          const sliceHeight = Math.min(a4HeightMm, remainingHeight);
           const sliceRatio = sliceHeight / imgHeightMm;
           const sourceHeight = canvas.height * sliceRatio;
           
@@ -173,8 +165,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           const ctx = sliceCanvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
-            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92);
-            pdf.addImage(sliceData, 'JPEG', imgX, imgY, imgWidthMm, sliceHeight);
+            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(sliceData, 'JPEG', 0, 0, imgWidthMm, sliceHeight);
           }
           
           sourceY += sourceHeight;
@@ -347,219 +339,54 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-5 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', maxWidth: '100%', minHeight: '297mm', margin: '0 auto', fontSize: '11.5px', color: '#000' }}>
-              {/* Flex wrapper for content - pushes footer to bottom */}
-              <div className="flex-grow flex flex-col">
-              {/* Memorandum Header - identical for all documents */}
+            <div 
+              ref={printRef} 
+              className="a4-document bg-white"
+              style={{ 
+                fontFamily: template?.font_family || 'Arial', 
+                width: '210mm', 
+                minHeight: '297mm',
+                maxWidth: '100%',
+                margin: '0 auto', 
+                padding: '10mm',
+                boxSizing: 'border-box',
+                fontSize: '11.5px', 
+                color: '#000',
+                position: 'relative',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                borderRadius: '8px',
+              }}
+            >
+              {/* Header */}
               <MemorandumHeader />
-
-              {/* Document Title - Centered */}
-              <div className="text-center mb-4">
-                <h2 className="font-bold" style={{ color: '#000', fontSize: '16px' }}>{documentTypeLabels[document.type].toUpperCase()}</h2>
-                <p className="font-semibold" style={{ color: '#000', fontSize: '13px' }}>{document.number}</p>
+              
+              {/* Main content - padding-bottom reserves space for footer */}
+              <div style={{ paddingBottom: '40mm' }}>
+                <DocumentBodyContent
+                  document={document}
+                  template={template}
+                  companySettings={companySettings}
+                  enrichedItems={enrichedItems}
+                  hasPrices={hasPrices}
+                />
               </div>
-
-              {/* Client Info & Document Details */}
-              <div className="flex justify-between items-start mb-4" style={{ fontSize: '13px' }}>
-                <div>
-                  <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
-                  <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
-                  <p style={{ color: '#000' }}>{document.clientAddress}</p>
-                  {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
-                  {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
-                  {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
-                  {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
-                  {document.deliveryAddress && (
-                    <div className="mt-1">
-                      <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
-                      <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
-                    </div>
-                  )}
+              
+              {/* Footer - absolutely positioned at bottom */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  bottom: '10mm',
+                  left: '10mm',
+                  right: '10mm',
+                }}
+              >
+                <div className="text-center mb-2">
+                  <p style={{ color: '#000', fontSize: '10px' }}>
+                    Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
+                  </p>
                 </div>
-                <div className="text-right">
-                  <p style={{ color: '#000' }}>Datum: {formatDateHR(document.date)}</p>
-                  {document.validityDays && template?.show_validity_days && (
-                    <p style={{ color: '#000' }}>Rok valjanosti: {document.validityDays} dana</p>
-                  )}
-                  {document.deliveryDays && template?.show_delivery_days && (
-                    <p style={{ color: '#000' }}>Rok isporuke: {document.deliveryDays} dana</p>
-                  )}
-                  {document.paymentMethod && (
-                    <p style={{ color: '#000' }}>Način plaćanja: {document.paymentMethod}</p>
-                  )}
-                </div>
+                <MemorandumFooter />
               </div>
-
-              {/* Items Table */}
-              <div className="mb-4 overflow-x-auto">
-                <table className="w-full" style={{ fontSize: '11.5px' }}>
-                  <thead>
-                    <tr className="border-b-2 border-gray-800">
-                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>R.br.</th>
-                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Šifra</th>
-                      <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Naziv</th>
-                      <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Jed.</th>
-                      <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Kol.</th>
-                      {hasPrices && (
-                        <>
-                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
-                          {template?.show_discount_column !== false && (
-                            <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Rabat</th>
-                          )}
-                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>PDV</th>
-                          <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Ukupno</th>
-                        </>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {enrichedItems.map((item, index) => (
-                      <tr key={item.id} className="border-b border-gray-300">
-                        <td className="py-1" style={{ color: '#000' }}>{index + 1}.</td>
-                        <td className="py-1" style={{ color: '#000' }}>{item.code || ''}</td>
-                        <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
-                        <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
-                        <td className="py-1 text-center" style={{ color: '#000' }}>{item.quantity}</td>
-                        {hasPrices && (
-                          <>
-                            <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
-                            {template?.show_discount_column !== false && (
-                              <td className="py-1 text-right" style={{ color: '#000' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
-                            )}
-                            <td className="py-1 text-right" style={{ color: '#000' }}>{round2(item.pdv)}%</td>
-                            <td className="py-1 text-right font-medium" style={{ color: '#000' }}>{formatCurrency(item.total)} €</td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Totals - only show for document types with prices */}
-              {hasPrices && (
-                <div className="flex justify-end mb-6">
-                  <div className="w-64 space-y-1" style={{ fontSize: '11.5px' }}>
-                    <div className="flex justify-between">
-                      <span style={{ color: '#000' }}>Osnovica:</span>
-                      <span style={{ color: '#000' }}>
-                        {formatCurrency(document.items.reduce((sum, item) => sum + item.subtotal, 0))} €
-                      </span>
-                    </div>
-                    {document.items.some(item => item.discount > 0) && (
-                      <div className="flex justify-between">
-                        <span style={{ color: '#000' }}>Rabat:</span>
-                        <span style={{ color: '#000' }}>
-                          -{formatCurrency(document.items.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0))} €
-                        </span>
-                      </div>
-                    )}
-                    {template?.show_pdv_breakdown !== false && (
-                      <div className="flex justify-between">
-                        <span style={{ color: '#000' }}>PDV (25%):</span>
-                        <span style={{ color: '#000' }}>
-                          {formatCurrency(document.items.reduce((sum, item) => {
-                            const afterDiscount = round2(item.subtotal - round2(item.subtotal * item.discount / 100));
-                            return sum + round2(afterDiscount * item.pdv / 100);
-                          }, 0))} €
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between pt-1 border-t-2 border-gray-800">
-                      <span className="font-bold" style={{ color: '#000' }}>UKUPNO:</span>
-                      <span className="font-bold" style={{ color: '#000' }}>
-                        {formatCurrency(document.totalAmount)} €
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Notes */}
-              {document.notes && (
-                <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{ fontSize: '11.5px' }}>
-                  <p className="font-medium mb-1" style={{ color: '#000' }}>Napomena</p>
-                  <p style={{ color: '#000' }}>{document.notes}</p>
-                </div>
-              )}
-
-              {/* Stamp & Signature Section for Ponuda */}
-              {document.type === 'ponuda' && (
-                <div className="mt-6 pt-4 border-t border-gray-300">
-                  {/* Centered Stamp */}
-                  <div className="text-center mb-6">
-                    <p style={{ color: '#000', fontSize: '11.5px' }}>M.P.</p>
-                  </div>
-                  
-                  {/* Right-aligned container with centered text inside */}
-                  <div className="flex justify-end">
-                    <div className="text-center" style={{ minWidth: '200px' }}>
-                      {document.preparedBy && (
-                        <div className="mb-4">
-                          <p style={{ color: '#000', fontSize: '11.5px' }}>Ponudu izradio/la:</p>
-                          <p className="font-medium" style={{ color: '#000', fontSize: '11.5px' }}>{document.preparedBy}</p>
-                        </div>
-                      )}
-                      <div className="mt-6">
-                        <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
-                        <p style={{ color: '#000', fontSize: '11.5px' }}>(Potpis)</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Signature Section for Otpremnica/Nalog */}
-              {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
-                <div className="mt-8 pt-6 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
-                  {/* Red 1: Robu preuzeo */}
-                  <div className="flex items-end justify-between mb-6">
-                    <div className="flex items-end gap-2">
-                      <span style={{ color: '#000' }}>Robu preuzeo:</span>
-                      <div className="w-40 border-b border-gray-400"></div>
-                    </div>
-                    <div className="text-center px-4">
-                      <span style={{ color: '#000' }}>MP</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-40 border-b border-gray-400 mb-1"></div>
-                      <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
-                    </div>
-                  </div>
-
-                  {/* Red 2: Za tvrtku */}
-                  <div className="flex items-end justify-between mb-6">
-                    <div className="flex items-end gap-2">
-                      <span style={{ color: '#000' }}>Za {companySettings?.company_name || 'tvrtku'}:</span>
-                      <div className="w-40 border-b border-gray-400"></div>
-                    </div>
-                    <div className="text-center px-4">
-                      <span style={{ color: '#000' }}>MP</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-40 border-b border-gray-400 mb-1"></div>
-                      <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
-                    </div>
-                  </div>
-
-                  {/* Red 3: Robu izdao skladištar */}
-                  <div className="flex items-end gap-2 mt-4">
-                    <span style={{ color: '#000' }}>Robu izdao skladištar (puno ime i prezime):</span>
-                    <div className="flex-1 border-b border-gray-400 max-w-[200px]"></div>
-                  </div>
-                </div>
-              )}
-
-              {/* End of flex-grow wrapper */}
-              </div>
-
-              {/* Legal Notice */}
-              <div className="mt-6 text-center">
-                <p style={{ color: '#000', fontSize: '11.5px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
-              </div>
-
-              {/* Memorandum Footer - identical for all documents */}
-              <MemorandumFooter />
             </div>
           )}
         </div>
