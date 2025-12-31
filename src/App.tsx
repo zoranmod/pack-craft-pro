@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Documents from "./pages/Documents";
 import NewDocument from "./pages/NewDocument";
 import DocumentView from "./pages/DocumentView";
+import PrintDocument from "./pages/PrintDocument";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/documents/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
                 <Route path="/documents/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
                 <Route path="/documents/:id/edit" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
+                <Route path="/print/:id" element={<ProtectedRoute><PrintDocument /></ProtectedRoute>} />
                 <Route path="/ponude" element={<ProtectedRoute><Ponude /></ProtectedRoute>} />
                 <Route path="/ugovori" element={<ProtectedRoute><Ugovori /></ProtectedRoute>} />
                 <Route path="/otpremnice" element={<ProtectedRoute><Otpremnice /></ProtectedRoute>} />
