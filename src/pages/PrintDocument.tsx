@@ -74,59 +74,67 @@ export function DocumentBodyContent({
 
       {/* Items Table */}
       <div className="mb-4">
-        <table className="w-full" style={{ fontSize: '11.5px', tableLayout: 'fixed' }}>
+        <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', fontSize: '11.5px' }}>
           <colgroup>
-            <col style={{ width: '10mm' }} /> {/* R.br. */}
-            <col style={{ width: '18mm' }} /> {/* Šifra */}
-            <col /> {/* Naziv - auto takes remaining space */}
-            <col style={{ width: '15mm' }} /> {/* Jed. */}
-            <col style={{ width: '18mm' }} /> {/* Kol. */}
-            {hasPrices && (
+            {hasPrices ? (
               <>
-                <col style={{ width: '22mm' }} /> {/* Cijena */}
+                <col style={{ width: '5%' }} /> {/* R.br. */}
+                <col style={{ width: '10%' }} /> {/* Šifra */}
+                <col style={{ width: '35%' }} /> {/* Naziv */}
+                <col style={{ width: '8%' }} /> {/* Jed. */}
+                <col style={{ width: '8%' }} /> {/* Kol. */}
+                <col style={{ width: '10%' }} /> {/* Cijena */}
                 {template?.show_discount_column !== false && (
-                  <col style={{ width: '16mm' }} /> /* Rabat */
+                  <col style={{ width: '8%' }} /> 
                 )}
-                <col style={{ width: '14mm' }} /> {/* PDV */}
-                <col style={{ width: '24mm' }} /> {/* Ukupno */}
+                <col style={{ width: '6%' }} /> {/* PDV */}
+                <col style={{ width: '10%' }} /> {/* Ukupno */}
+              </>
+            ) : (
+              <>
+                <col style={{ width: '6%' }} /> {/* R.br. */}
+                <col style={{ width: '12%' }} /> {/* Šifra */}
+                <col style={{ width: '60%' }} /> {/* Naziv */}
+                <col style={{ width: '10%' }} /> {/* Jed. */}
+                <col style={{ width: '12%' }} /> {/* Kol. */}
               </>
             )}
           </colgroup>
           <thead>
-            <tr className="border-b-2 border-gray-800">
-              <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>R.br.</th>
-              <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Šifra</th>
-              <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Naziv</th>
-              <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Jed.</th>
-              <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Kol.</th>
+            <tr style={{ borderBottom: '2px solid #1a1a1a' }}>
+              <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>R.br.</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Šifra</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Naziv</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'center', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>Jed.</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>Kol.</th>
               {hasPrices && (
                 <>
-                  <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
+                  <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Cijena</th>
                   {template?.show_discount_column !== false && (
-                    <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Rabat</th>
+                    <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Rabat</th>
                   )}
-                  <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>PDV</th>
-                  <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Ukupno</th>
+                  <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>PDV</th>
+                  <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Ukupno</th>
                 </>
               )}
             </tr>
           </thead>
           <tbody>
             {enrichedItems.map((item, index) => (
-              <tr key={item.id} className="border-b border-gray-300">
-                <td className="py-1" style={{ color: '#000' }}>{index + 1}.</td>
-                <td className="py-1" style={{ color: '#000' }}>{item.code || ''}</td>
-                <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
-                <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
-                <td className="py-1 text-right" style={{ color: '#000' }}>{item.quantity}</td>
+              <tr key={item.id} style={{ borderBottom: '1px solid #ccc' }}>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top' }}>{index + 1}.</td>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top' }}>{item.code || ''}</td>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', overflowWrap: 'anywhere' }}>{item.name}</td>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'center', whiteSpace: 'nowrap' }}>{item.unit}</td>
+                <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right', whiteSpace: 'nowrap' }}>{item.quantity}</td>
                 {hasPrices && (
                   <>
-                    <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
+                    <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right' }}>{formatCurrency(item.price)} €</td>
                     {template?.show_discount_column !== false && (
-                      <td className="py-1 text-right" style={{ color: '#000' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
+                      <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right' }}>{item.discount > 0 ? `${round2(item.discount)}%` : ''}</td>
                     )}
-                    <td className="py-1 text-right" style={{ color: '#000' }}>{round2(item.pdv)}%</td>
-                    <td className="py-1 text-right font-medium" style={{ color: '#000' }}>{formatCurrency(item.total)} €</td>
+                    <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right' }}>{round2(item.pdv)}%</td>
+                    <td style={{ padding: '2mm 1mm', color: '#000', verticalAlign: 'top', textAlign: 'right', fontWeight: 500 }}>{formatCurrency(item.total)} €</td>
                   </>
                 )}
               </tr>
