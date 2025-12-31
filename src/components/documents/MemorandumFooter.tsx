@@ -8,8 +8,6 @@ export const MemorandumFooter = () => {
         margin: 0,
         padding: 0,
         lineHeight: 0,
-        breakInside: 'avoid',
-        pageBreakInside: 'avoid',
       }}
     >
       <img 
