@@ -1,11 +1,11 @@
-import { useNavigate, Link, useParams } from 'react-router-dom';
+import { useNavigate, Link, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
@@ -41,9 +41,11 @@ const statusStyles: Record<string, string> = {
 
 export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfTriggered, setPdfTriggered] = useState(false);
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
   const { data: articlesData } = useArticles({ pageSize: 1000 });
@@ -100,6 +102,21 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
+  // Generate PDF filename with type prefix
+  const getPdfFilename = (doc: Document): string => {
+    const typePrefix: Record<string, string> = {
+      'ponuda': 'PON',
+      'ugovor': 'UGO',
+      'otpremnica': 'OTP',
+      'nalog-dostava-montaza': 'NAL',
+      'racun': 'RAC',
+    };
+    const prefix = typePrefix[doc.type] || 'DOC';
+    // Extract number part, removing existing prefix if any
+    const numberPart = doc.number.replace(/^[A-Z]+-/, '');
+    return `${prefix}-${numberPart}.pdf`;
+  };
+
   // Generate PDF from HTML preview using html2canvas + jsPDF
   const handleDownloadPdf = async () => {
     if (!document || !printRef.current) return;
@@ -109,17 +126,33 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     
     try {
       const pdfBlob = await generatePdfFromElement(printRef.current);
-      downloadPdf(pdfBlob, `${document.number}.pdf`);
-      toast.success('PDF uspješno generiran!');
+      const filename = getPdfFilename(document);
+      downloadPdf(pdfBlob, filename);
+      toast.success('PDF spremljen.');
     } catch (err) {
       console.error('PDF generation error:', err);
-      toast.error('Greška pri generiranju PDF-a');
+      toast.error('Greška pri spremanju PDF-a. Pokušajte ponovno.');
     } finally {
       setIsGeneratingPdf(false);
     }
   };
 
-  
+  // Auto-trigger PDF download if action=pdf is in URL
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'pdf' && document && printRef.current && !pdfTriggered && !isGeneratingPdf) {
+      setPdfTriggered(true);
+      // Remove the action param from URL
+      searchParams.delete('action');
+      setSearchParams(searchParams, { replace: true });
+      // Delay slightly to ensure DOM is ready
+      setTimeout(() => {
+        handleDownloadPdf();
+      }, 500);
+    }
+  }, [document, searchParams, pdfTriggered, isGeneratingPdf]);
+
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
