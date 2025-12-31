@@ -26,6 +26,8 @@ import { QuickTemplates } from '@/components/articles/QuickTemplates';
 import { Client } from '@/hooks/useClients';
 import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
 import { useDefaultTemplate, useDocumentTemplates } from '@/hooks/useDocumentTemplates';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserProfile } from '@/hooks/useSettings';
 
 // Helper function to calculate item totals with rounding
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -42,6 +44,10 @@ export function DocumentForm() {
   const { id: documentId } = useParams();
   const [searchParams] = useSearchParams();
   const isEditMode = !!documentId;
+  
+  // Get current user info for auto-fill
+  const { user } = useAuth();
+  const { data: userProfile } = useUserProfile();
 
   const typeParam = searchParams.get('type');
   const typeFromUrl: DocumentType = typeParam && typeParam in documentTypeLabels
@@ -51,6 +57,14 @@ export function DocumentForm() {
   const createDocument = useCreateDocument();
   const updateDocument = useUpdateDocument();
   const { data: existingDocument, isLoading: isLoadingDocument } = useDocument(documentId || '');
+  
+  // Get display name for auto-fill
+  const getCurrentUserDisplayName = () => {
+    if (userProfile?.first_name || userProfile?.last_name) {
+      return [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ');
+    }
+    return user?.email?.split('@')[0] || '';
+  };
 
   const [formData, setFormData] = useState(() => ({
     type: typeFromUrl,
@@ -145,6 +159,16 @@ export function DocumentForm() {
       }
     }
   }, [isEditMode, existingDocument]);
+  
+  // Auto-fill preparedBy with current user's name when creating new document
+  useEffect(() => {
+    if (!isEditMode && !formData.preparedBy) {
+      const displayName = getCurrentUserDisplayName();
+      if (displayName) {
+        setFormData(prev => ({ ...prev, preparedBy: displayName }));
+      }
+    }
+  }, [isEditMode, userProfile, user]);
 
   // Contract articles state
   const { data: articleTemplates = [] } = useContractArticleTemplates();
@@ -827,9 +851,9 @@ export function DocumentForm() {
                   <Input
                     id="preparedBy"
                     value={formData.preparedBy}
-                    onChange={(e) => setFormData({ ...formData, preparedBy: e.target.value })}
-                    placeholder="Ime i prezime"
-                    className="mt-1.5"
+                    readOnly
+                    className="mt-1.5 bg-muted/50 cursor-not-allowed"
+                    placeholder="Automatski popunjeno"
                   />
                 </div>
               </div>
