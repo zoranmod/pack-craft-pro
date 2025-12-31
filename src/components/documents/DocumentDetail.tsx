@@ -16,7 +16,7 @@ import { MemorandumFooter } from './MemorandumFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generateDocumentPdf, downloadPdf, printPdf } from '@/lib/pdfGenerator';
+import { generatePdfFromElement, downloadPdf, printPdf } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -101,21 +101,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  // Generate PDF using pdfmake
+  // Generate PDF from HTML preview using html2canvas + jsPDF
   const handleDownloadPdf = async () => {
-    if (!document) return;
+    if (!document || !printRef.current) return;
     
     setIsGeneratingPdf(true);
     toast.info('Generiram PDF...');
     
     try {
-      const pdfBlob = await generateDocumentPdf({
-        document,
-        companySettings,
-        template,
-        enrichedItems,
-      });
-      
+      const pdfBlob = await generatePdfFromElement(printRef.current);
       downloadPdf(pdfBlob, `${document.number}.pdf`);
       toast.success('PDF uspješno generiran!');
     } catch (err) {
@@ -126,21 +120,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
-  // Print PDF using pdfmake (no HTML print route)
+  // Print PDF from HTML preview
   const handlePrint = async () => {
-    if (!document) return;
+    if (!document || !printRef.current) return;
     
     setIsGeneratingPdf(true);
     toast.info('Pripremam ispis...');
     
     try {
-      const pdfBlob = await generateDocumentPdf({
-        document,
-        companySettings,
-        template,
-        enrichedItems,
-      });
-      
+      const pdfBlob = await generatePdfFromElement(printRef.current);
       printPdf(pdfBlob);
       toast.success('Dokument poslan na ispis');
     } catch (err) {
