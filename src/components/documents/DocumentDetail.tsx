@@ -341,28 +341,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           ) : (
             <div 
               ref={printRef} 
-              className="a4-document bg-white"
+              className="a4-page"
               style={{ 
-                fontFamily: template?.font_family || 'Arial', 
-                width: '210mm', 
-                height: '297mm',
-                maxWidth: '100%',
-                margin: '0 auto', 
-                padding: '10mm',
-                boxSizing: 'border-box',
-                fontSize: '11.5px', 
-                color: '#000',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                borderRadius: '8px',
+                fontFamily: template?.font_family || 'Arial',
+                fontSize: '11.5px',
               }}
             >
-              {/* Header */}
-              <MemorandumHeader />
-              
-              {/* Main content - padding-bottom reserves space for footer */}
-              <div style={{ paddingBottom: '42mm' }}>
+              <div className="doc-body">
+                <MemorandumHeader />
                 <DocumentBodyContent
                   document={document}
                   template={template}
@@ -371,20 +357,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   hasPrices={hasPrices}
                 />
               </div>
-              
-              {/* Footer - absolutely positioned at bottom with zero margins */}
-              <div 
-                style={{
-                  position: 'absolute',
-                  bottom: '12mm',
-                  left: '10mm',
-                  right: '10mm',
-                  margin: 0,
-                  padding: 0,
-                }}
-              >
-                <div style={{ textAlign: 'center', marginBottom: '2mm', lineHeight: '1' }}>
-                  <p style={{ color: '#000', fontSize: '9px', margin: 0, padding: 0 }}>
+
+              <div className="doc-footer">
+                <div className="text-center" style={{ lineHeight: '0.98' }}>
+                  <p style={{ fontSize: '9px' }}>
                     Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
                   </p>
                 </div>

@@ -45,20 +45,14 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
   };
 
   return (
-    <div 
-      className="bg-white text-black rounded border shadow-sm overflow-hidden"
-      style={{ 
-        fontFamily: template.font_family, 
+    <div
+      className="a4-page"
+      style={{
+        fontFamily: template.font_family,
         fontSize: `${template.body_font_size}px`,
-        height: '297mm',
-        width: '210mm',
-        padding: '10mm',
-        boxSizing: 'border-box',
-        position: 'relative',
       }}
     >
-      {/* Main content with reserved space for footer */}
-      <div style={{ paddingBottom: '42mm' }}>
+      <div className="doc-body">
         {/* Memorandum Header - identical for all documents */}
         <MemorandumHeader />
 
@@ -66,14 +60,14 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         <div className="flex justify-between items-start mb-4">
           {/* Left: empty placeholder for balance */}
           <div style={{ flex: '1' }}></div>
-          
+
           {/* Center: Document Title only - 20% larger */}
           <div className="text-center" style={{ flex: '1' }}>
             <h2 className="font-bold uppercase tracking-wide" style={{ color: template.primary_color, fontSize: '19px', letterSpacing: '0.5px' }}>
               {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
             </h2>
           </div>
-          
+
           {/* Right: Document number + metadata */}
           <div className="text-right text-sm" style={{ flex: '1' }}>
             <p className="font-semibold" style={{ marginBottom: '2px' }}>
@@ -150,19 +144,9 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         )}
       </div>
 
-      {/* Footer - absolutely positioned at bottom with zero margins */}
-      <div 
-        style={{
-          position: 'absolute',
-          bottom: '12mm',
-          left: '10mm',
-          right: '10mm',
-          margin: 0,
-          padding: 0,
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '2mm', lineHeight: '1' }}>
-          <p style={{ color: '#000', fontSize: '9px', margin: 0, padding: 0 }}>
+      <div className="doc-footer">
+        <div className="text-center" style={{ lineHeight: '0.98' }}>
+          <p style={{ fontSize: '9px' }}>
             Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
           </p>
         </div>
