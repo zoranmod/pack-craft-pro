@@ -5,6 +5,9 @@ export const MemorandumFooter = () => {
     <div 
       className="memorandum-footer"
       style={{
+        margin: 0,
+        padding: 0,
+        lineHeight: 0,
         breakInside: 'avoid',
         pageBreakInside: 'avoid',
       }}
@@ -12,8 +15,14 @@ export const MemorandumFooter = () => {
       <img 
         src={footerImage} 
         alt="Podnožje memoranduma" 
-        className="w-full h-auto"
-        style={{ maxHeight: '30mm' }}
+        style={{ 
+          display: 'block',
+          width: '100%',
+          height: 'auto',
+          maxHeight: '28mm',
+          margin: 0,
+          padding: 0,
+        }}
       />
     </div>
   );
