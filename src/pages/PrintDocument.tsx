@@ -25,6 +25,10 @@ export function DocumentBodyContent({
   enrichedItems: any[];
   hasPrices: boolean;
 }) {
+  // For otpremnica, use full column names
+  const isOtpremnica = document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza';
+  const unitLabel = isOtpremnica ? 'Jedinica' : 'Jed.';
+  const qtyLabel = isOtpremnica ? 'Količina' : 'Kol.';
   return (
     <>
       {/* Document Header - 2-column grid: left (client info), right (metadata) */}
@@ -94,9 +98,9 @@ export function DocumentBodyContent({
               <>
                 <col style={{ width: '6%' }} /> {/* R.br. */}
                 <col style={{ width: '12%' }} /> {/* Šifra */}
-                <col style={{ width: '60%' }} /> {/* Naziv */}
-                <col style={{ width: '10%' }} /> {/* Jed. */}
-                <col style={{ width: '12%' }} /> {/* Kol. */}
+                <col style={{ width: '54%' }} /> {/* Naziv - reduced to fit longer labels */}
+                <col style={{ width: '14%' }} /> {/* Jedinica - wider for full text */}
+                <col style={{ width: '14%' }} /> {/* Količina - wider for full text */}
               </>
             )}
           </colgroup>
@@ -105,8 +109,8 @@ export function DocumentBodyContent({
               <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>R.br.</th>
               <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Šifra</th>
               <th style={{ padding: '2mm 1mm', textAlign: 'left', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Naziv</th>
-              <th style={{ padding: '2mm 1mm', textAlign: 'center', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>Jed.</th>
-              <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>Kol.</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'center', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>{unitLabel}</th>
+              <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top', whiteSpace: 'nowrap' }}>{qtyLabel}</th>
               {hasPrices && (
                 <>
                   <th style={{ padding: '2mm 1mm', textAlign: 'right', fontWeight: 600, color: '#000', verticalAlign: 'top' }}>Cijena</th>
