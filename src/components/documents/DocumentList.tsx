@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn, formatDateHR } from '@/lib/utils';
 import { useConvertDocument, useCopyDocument } from '@/hooks/useDocuments';
+import { toast } from 'sonner';
 
 interface DocumentListProps {
   documents: Document[];
@@ -138,10 +139,13 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                           <Edit className="mr-2 h-4 w-4" /> Uredi
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/documents/${doc.id}`}>
-                          <Download className="mr-2 h-4 w-4" /> Spremi PDF
-                        </Link>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          toast.info('Otvaram dokument za preuzimanje PDF-a...');
+                          navigate(`/documents/${doc.id}?action=pdf`);
+                        }}
+                      >
+                        <Download className="mr-2 h-4 w-4" /> Spremi PDF
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleCopy(doc)}
