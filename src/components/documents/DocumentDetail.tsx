@@ -257,9 +257,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
 
               <div className="doc-footer">
-                <p className="legal-note">
-                  Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
-                </p>
                 <MemorandumFooter />
               </div>
             </div>

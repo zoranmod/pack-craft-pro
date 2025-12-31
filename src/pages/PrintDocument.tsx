@@ -168,19 +168,19 @@ export function DocumentBodyContent({
 
       {/* Stamp & Signature Section for Ponuda */}
       {document.type === 'ponuda' && (
-        <div className="mt-4 pt-4 border-t border-gray-300">
-          <div className="text-center mb-4">
+        <div className="mt-3 pt-3 border-t border-gray-300">
+          <div className="text-center mb-3">
             <p style={{ color: '#000', fontSize: '11.5px' }}>M.P.</p>
           </div>
           <div className="flex justify-end">
             <div className="text-center" style={{ minWidth: '200px' }}>
               {document.preparedBy && (
-                <div className="mb-4">
+                <div className="mb-3">
                   <p style={{ color: '#000', fontSize: '11.5px' }}>Ponudu izradio/la:</p>
                   <p className="font-medium" style={{ color: '#000', fontSize: '11.5px' }}>{document.preparedBy}</p>
                 </div>
               )}
-              <div className="mt-4">
+              <div className="mt-3">
                 <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
                 <p style={{ color: '#000', fontSize: '11.5px' }}>(Potpis)</p>
               </div>
@@ -191,8 +191,8 @@ export function DocumentBodyContent({
 
       {/* Signature Section for Otpremnica/Nalog */}
       {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
-        <div className="mt-6 pt-4 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
-          <div className="flex items-end justify-between mb-4">
+        <div className="mt-4 pt-3 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
+          <div className="flex items-end justify-between mb-3">
             <div className="flex items-end gap-2">
               <span style={{ color: '#000' }}>Robu preuzeo:</span>
               <div className="w-40 border-b border-gray-400"></div>
@@ -205,7 +205,7 @@ export function DocumentBodyContent({
               <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
             </div>
           </div>
-          <div className="flex items-end justify-between mb-4">
+          <div className="flex items-end justify-between mb-3">
             <div className="flex items-end gap-2">
               <span style={{ color: '#000' }}>Za tvrtku:</span>
               <div className="w-40 border-b border-gray-400"></div>
@@ -218,7 +218,7 @@ export function DocumentBodyContent({
               <span style={{ color: '#000', fontSize: '8px' }}>(potpis)</span>
             </div>
           </div>
-          <div className="flex items-end gap-2 mt-3">
+          <div className="flex items-end gap-2 mt-2">
             <span style={{ color: '#000' }}>Robu izdao skladištar (puno ime i prezime):</span>
             <div className="flex-1 border-b border-gray-400 max-w-[200px]"></div>
           </div>
@@ -288,9 +288,6 @@ export function DocumentContent({
       </div>
 
       <div className="doc-footer">
-        <p className="legal-note">
-          Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
-        </p>
         <MemorandumFooter />
       </div>
     </div>
