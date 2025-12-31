@@ -74,14 +74,31 @@ export function DocumentBodyContent({
 
       {/* Items Table */}
       <div className="mb-4">
-        <table className="w-full" style={{ fontSize: '11.5px' }}>
+        <table className="w-full" style={{ fontSize: '11.5px', tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '10mm' }} /> {/* R.br. */}
+            <col style={{ width: '18mm' }} /> {/* Šifra */}
+            <col /> {/* Naziv - auto takes remaining space */}
+            <col style={{ width: '15mm' }} /> {/* Jed. */}
+            <col style={{ width: '18mm' }} /> {/* Kol. */}
+            {hasPrices && (
+              <>
+                <col style={{ width: '22mm' }} /> {/* Cijena */}
+                {template?.show_discount_column !== false && (
+                  <col style={{ width: '16mm' }} /> /* Rabat */
+                )}
+                <col style={{ width: '14mm' }} /> {/* PDV */}
+                <col style={{ width: '24mm' }} /> {/* Ukupno */}
+              </>
+            )}
+          </colgroup>
           <thead>
             <tr className="border-b-2 border-gray-800">
               <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>R.br.</th>
               <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Šifra</th>
               <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>Naziv</th>
               <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Jed.</th>
-              <th className="py-1 text-center font-semibold" style={{ color: '#000' }}>Kol.</th>
+              <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Kol.</th>
               {hasPrices && (
                 <>
                   <th className="py-1 text-right font-semibold" style={{ color: '#000' }}>Cijena</th>
@@ -101,7 +118,7 @@ export function DocumentBodyContent({
                 <td className="py-1" style={{ color: '#000' }}>{item.code || ''}</td>
                 <td className="py-1" style={{ color: '#000' }}>{item.name}</td>
                 <td className="py-1 text-center" style={{ color: '#000' }}>{item.unit}</td>
-                <td className="py-1 text-center" style={{ color: '#000' }}>{item.quantity}</td>
+                <td className="py-1 text-right" style={{ color: '#000' }}>{item.quantity}</td>
                 {hasPrices && (
                   <>
                     <td className="py-1 text-right" style={{ color: '#000' }}>{formatCurrency(item.price)} €</td>
