@@ -288,11 +288,9 @@ export function DocumentContent({
       </div>
 
       <div className="doc-footer">
-        <div className="text-center" style={{ lineHeight: '0.98' }}>
-          <p style={{ fontSize: '9px' }}>
-            Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
-          </p>
-        </div>
+        <p className="legal-note">
+          Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
+        </p>
         <MemorandumFooter />
       </div>
     </div>
@@ -416,8 +414,8 @@ const PrintDocument = () => {
         </Button>
       </div>
 
-      {/* Document content - clean A4 page */}
-      <div className="min-h-screen py-8 print:py-0 print:bg-white flex justify-center">
+      {/* Document content - clean A4 page, no wrapper that could cause 2nd page */}
+      <div className="py-8 print:py-0 print:bg-white flex justify-center" style={{ minHeight: 'auto' }}>
         <DocumentContent 
           document={document}
           template={template}

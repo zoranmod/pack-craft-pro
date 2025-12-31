@@ -362,11 +362,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
 
               <div className="doc-footer">
-                <div className="text-center" style={{ lineHeight: '0.98' }}>
-                  <p style={{ fontSize: '9px' }}>
-                    Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
-                  </p>
-                </div>
+                <p className="legal-note">
+                  Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
+                </p>
                 <MemorandumFooter />
               </div>
             </div>

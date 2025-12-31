@@ -217,6 +217,7 @@
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
+    min-height: 0 !important;
     background: hsl(0 0% 100%) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -225,11 +226,14 @@
   /* Tailwind helpers that often cause an extra (blank) page in print */
   .min-h-screen {
     min-height: 0 !important;
+    height: auto !important;
   }
 
   /* Chrome pagination can behave oddly if any ancestor is transformed */
   * {
     transform: none !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
   .a4-page {
@@ -237,6 +241,14 @@
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Prevent any element from forcing a page break */
+  .print-controls,
+  .print-controls * {
+    display: none !important;
   }
 }
 
@@ -271,19 +283,27 @@
   bottom: var(--print-footer-bottom-mm);
   break-inside: avoid;
   page-break-inside: avoid;
-  line-height: 0.98;
 }
 
-.doc-footer,
 .doc-footer * {
   margin: 0 !important;
-  padding: 0 !important;
 }
 
 .doc-footer img {
   display: block;
   height: auto;
   max-height: var(--print-footer-max-height-mm) !important;
+}
+
+/* Legal note inside footer - visible above the footer image */
+.legal-note {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-size: 9px;
+  color: hsl(0 0% 30%);
+  padding-bottom: 4px !important;
+  line-height: 1.2;
 }
 
 /*  ================================
