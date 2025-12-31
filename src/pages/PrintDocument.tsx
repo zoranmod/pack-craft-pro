@@ -28,20 +28,35 @@ export function DocumentBodyContent({
 }) {
   return (
     <>
-      {/* Document Header - 3-zone layout: left (client), center (title), right (metadata) */}
-      <div className="flex justify-between items-start mb-4">
-        {/* Left: empty placeholder for balance */}
-        <div style={{ flex: '1' }}></div>
-        
-        {/* Center: Document Title only - 20% larger */}
-        <div className="text-center" style={{ flex: '1' }}>
-          <h2 className="font-bold" style={{ color: '#000', fontSize: '19px', letterSpacing: '0.5px' }}>
-            {documentTypeLabels[document.type].toUpperCase()}
-          </h2>
+      {/* Document Header - 2-column grid: left (client info), right (metadata) */}
+      {/* Title centered above the grid */}
+      <div className="text-center mb-4">
+        <h2 className="font-bold" style={{ color: '#000', fontSize: '19px', letterSpacing: '0.5px' }}>
+          {documentTypeLabels[document.type].toUpperCase()}
+        </h2>
+      </div>
+
+      {/* 2-column layout: buyer left, metadata right, aligned at top */}
+      <div className="grid grid-cols-2 gap-4 mb-4 items-start">
+        {/* Left: Client Info */}
+        <div style={{ fontSize: '13px' }}>
+          <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
+          <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
+          <p style={{ color: '#000' }}>{document.clientAddress}</p>
+          {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
+          {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
+          {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
+          {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
+          {document.deliveryAddress && (
+            <div className="mt-1">
+              <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
+              <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
+            </div>
+          )}
         </div>
-        
-        {/* Right: Document number + metadata */}
-        <div className="text-right" style={{ flex: '1', fontSize: '12px' }}>
+
+        {/* Right: Document metadata */}
+        <div className="text-right" style={{ fontSize: '12px' }}>
           <p className="font-semibold" style={{ color: '#000', marginBottom: '2px' }}>
             {document.number}
           </p>
@@ -56,23 +71,6 @@ export function DocumentBodyContent({
             <p style={{ color: '#000' }}>Način plaćanja: {document.paymentMethod}</p>
           )}
         </div>
-      </div>
-
-      {/* Client Info */}
-      <div className="mb-4" style={{ fontSize: '13px' }}>
-        <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
-        <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
-        <p style={{ color: '#000' }}>{document.clientAddress}</p>
-        {document.clientOib && <p style={{ color: '#000' }}>OIB: {document.clientOib}</p>}
-        {document.clientPhone && <p style={{ color: '#000' }}>Tel: {document.clientPhone}</p>}
-        {document.clientEmail && <p style={{ color: '#000' }}>Email: {document.clientEmail}</p>}
-        {document.contactPerson && <p style={{ color: '#000' }}>Kontakt: {document.contactPerson}</p>}
-        {document.deliveryAddress && (
-          <div className="mt-1">
-            <p className="font-medium" style={{ color: '#000' }}>Adresa isporuke:</p>
-            <p style={{ color: '#000' }}>{document.deliveryAddress}</p>
-          </div>
-        )}
       </div>
 
       {/* Items Table */}
@@ -248,6 +246,18 @@ export function DocumentContent({
 }) {
   const isContract = document.type === 'ugovor';
 
+  // Get print settings from companySettings or use defaults
+  const footerBottomMm = companySettings?.print_footer_bottom_mm ?? 14;
+  const footerMaxHeightMm = companySettings?.print_footer_max_height_mm ?? 14;
+  const contentBottomPaddingMm = companySettings?.print_content_bottom_padding_mm ?? 42;
+
+  // Apply CSS variables for print layout
+  const printStyles = {
+    '--print-footer-bottom-mm': `${footerBottomMm}mm`,
+    '--print-footer-max-height-mm': `${footerMaxHeightMm}mm`,
+    '--print-content-bottom-padding-mm': `${contentBottomPaddingMm}mm`,
+  } as React.CSSProperties;
+
   if (isContract) {
     return (
       <ContractDocumentView 
@@ -261,6 +271,7 @@ export function DocumentContent({
     <div
       className="a4-page"
       style={{
+        ...printStyles,
         fontFamily: template?.font_family || 'Arial',
         fontSize: '11.5px',
       }}

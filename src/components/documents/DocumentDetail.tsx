@@ -345,7 +345,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               style={{ 
                 fontFamily: template?.font_family || 'Arial',
                 fontSize: '11.5px',
-              }}
+                '--print-footer-bottom-mm': `${companySettings?.print_footer_bottom_mm ?? 14}mm`,
+                '--print-footer-max-height-mm': `${companySettings?.print_footer_max_height_mm ?? 14}mm`,
+                '--print-content-bottom-padding-mm': `${companySettings?.print_content_bottom_padding_mm ?? 42}mm`,
+              } as React.CSSProperties}
             >
               <div className="doc-body">
                 <MemorandumHeader />

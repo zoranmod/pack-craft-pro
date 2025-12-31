@@ -23,6 +23,11 @@ export interface CompanySettings {
   registration_number?: string;
   capital_amount?: string;
   director_name?: string;
+  
+  // Print/PDF layout settings
+  print_footer_bottom_mm?: number;
+  print_footer_max_height_mm?: number;
+  print_content_bottom_padding_mm?: number;
 }
 
 export const defaultCompanySettings: CompanySettings = {
@@ -46,4 +51,7 @@ export const defaultCompanySettings: CompanySettings = {
   registration_number: '',
   capital_amount: '',
   director_name: '',
+  print_footer_bottom_mm: 14,
+  print_footer_max_height_mm: 14,
+  print_content_bottom_padding_mm: 42,
 };

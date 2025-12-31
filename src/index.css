@@ -241,6 +241,13 @@
 }
 
 /* A4 document primitives used by Preview/PDF/Print */
+/* CSS variables for user-adjustable print layout */
+:root {
+  --print-footer-bottom-mm: 14mm;
+  --print-footer-max-height-mm: 14mm;
+  --print-content-bottom-padding-mm: 42mm;
+}
+
 .a4-page {
   width: 210mm;
   height: 297mm;
@@ -254,14 +261,14 @@
 }
 
 .doc-body {
-  padding-bottom: 42mm;
+  padding-bottom: var(--print-content-bottom-padding-mm);
 }
 
 .doc-footer {
   position: absolute;
   left: 12mm;
   right: 12mm;
-  bottom: 14mm;
+  bottom: var(--print-footer-bottom-mm);
   break-inside: avoid;
   page-break-inside: avoid;
   line-height: 0.98;
@@ -276,7 +283,7 @@
 .doc-footer img {
   display: block;
   height: auto;
-  max-height: 14mm !important;
+  max-height: var(--print-footer-max-height-mm) !important;
 }
 
 /*  ================================
