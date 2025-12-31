@@ -9,7 +9,7 @@ import { useRef, useState, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
-import DOMPurify from 'dompurify';
+
 import { ContractDocumentView } from './ContractDocumentView';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
@@ -101,110 +101,11 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  const handlePrint = () => {
-    const printContent = printRef.current;
-    if (!printContent) return;
-    
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Blokirani skočni prozori. Molimo omogućite ih za ispis.');
-      return;
-    }
-    
-    // Sanitize innerHTML to prevent XSS attacks
-    const sanitizedContent = DOMPurify.sanitize(printContent.innerHTML, {
-      ALLOWED_TAGS: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li'],
-      ALLOWED_ATTR: ['class', 'style', 'src', 'alt', 'colspan', 'rowspan'],
-    });
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${DOMPurify.sanitize(document?.number || 'Dokument')}</title>
-          <style>
-            @page {
-              size: A4;
-              margin: 15mm;
-            }
-            * { box-sizing: border-box; }
-            body { 
-              font-family: Arial, sans-serif; 
-              color: #333; 
-              margin: 0;
-              padding: 0;
-              width: 210mm;
-              min-height: 297mm;
-            }
-            .print-container {
-              width: 100%;
-              padding: 0;
-            }
-            img { max-width: 100%; height: auto; }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12.5px; }
-            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-            th { font-weight: 600; color: #666; }
-            .text-right { text-align: right; }
-            .text-center { text-align: center; }
-            .font-bold { font-weight: bold; }
-            .font-semibold { font-weight: 600; }
-            .font-medium { font-weight: 500; }
-            .text-sm { font-size: 12.5px; }
-            .text-xs { font-size: 11.5px; }
-            .text-xl { font-size: 20px; }
-            .text-base { font-size: 15px; }
-            .mb-1 { margin-bottom: 4px; }
-            .mb-2 { margin-bottom: 8px; }
-            .mb-4 { margin-bottom: 16px; }
-            .mb-6 { margin-bottom: 24px; }
-            .mb-8 { margin-bottom: 32px; }
-            .mt-2 { margin-top: 8px; }
-            .mt-4 { margin-top: 16px; }
-            .mt-8 { margin-top: 32px; }
-            .pt-2 { padding-top: 8px; }
-            .pt-6 { padding-top: 24px; }
-            .pt-8 { padding-top: 32px; }
-            .py-1 { padding-top: 4px; padding-bottom: 4px; }
-            .py-2 { padding-top: 8px; padding-bottom: 8px; }
-            .p-3 { padding: 12px; }
-            .border-t { border-top: 1px solid #ddd; }
-            .border-b { border-bottom: 1px solid #ddd; }
-            .border-t-2 { border-top: 2px solid #333; }
-            .border-b-2 { border-bottom: 2px solid #333; }
-            .rounded { border-radius: 4px; }
-            .bg-gray-50 { background-color: #f9fafb; }
-            .text-gray-500 { color: #6b7280; }
-            .text-gray-600 { color: #4b5563; }
-            .text-gray-700 { color: #374151; }
-            .text-gray-900 { color: #111827; }
-            .space-y-1 > * + * { margin-top: 4px; }
-            .w-72 { width: 288px; }
-            .w-48 { width: 192px; }
-            .flex { display: flex; }
-            .justify-between { justify-content: space-between; }
-            .justify-end { justify-content: flex-end; }
-            .items-start { align-items: flex-start; }
-            @media print { 
-              body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-container">
-            ${sanitizedContent}
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    setTimeout(() => printWindow.print(), 250);
-  };
+  const [isPrinting, setIsPrinting] = useState(false);
 
-  const handleDownloadPdf = async () => {
-    if (!printRef.current || !document) return;
-    
-    setIsGeneratingPdf(true);
-    toast.info('Generiram PDF...');
+  // Shared PDF generation logic used by both Print and Download
+  const generatePdfBlob = async (): Promise<Blob | null> => {
+    if (!printRef.current || !document) return null;
     
     try {
       // A4 dimensions in mm: 210 x 297
@@ -215,20 +116,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       
       // Use higher scale for premium quality
       const canvas = await html2canvas(printRef.current, {
-        scale: 3, // Higher quality
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95); // JPEG for smaller size, high quality
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
 
-      // Add PDF metadata for premium feel
+      // Add PDF metadata
       pdf.setProperties({
         title: document.number,
         subject: documentTypeLabels[document.type],
@@ -246,8 +147,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       const pageContentHeight = a4HeightMm - (marginMm * 2);
       
       if (imgHeightMm <= pageContentHeight) {
-        // Single page - center vertically if there's space
-        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidthMm, imgHeightMm);
+        pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidthMm, imgHeightMm);
       } else {
         // Multi-page
         let remainingHeight = imgHeightMm;
@@ -263,15 +163,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           const sliceRatio = sliceHeight / imgHeightMm;
           const sourceHeight = canvas.height * sliceRatio;
           
-          // Create a canvas slice for this page
           const sliceCanvas = window.document.createElement('canvas');
           sliceCanvas.width = canvas.width;
           sliceCanvas.height = sourceHeight;
           const ctx = sliceCanvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
-            const sliceData = sliceCanvas.toDataURL('image/png', 1.0);
-            pdf.addImage(sliceData, 'PNG', imgX, imgY, imgWidthMm, sliceHeight);
+            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(sliceData, 'JPEG', imgX, imgY, imgWidthMm, sliceHeight);
           }
           
           sourceY += sourceHeight;
@@ -280,7 +179,77 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         }
       }
       
-      pdf.save(`${document.number}.pdf`);
+      return pdf.output('blob');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      return null;
+    }
+  };
+
+  const handlePrint = async () => {
+    if (!document) return;
+    
+    setIsPrinting(true);
+    toast.info('Pripremam za ispis...');
+    
+    try {
+      const pdfBlob = await generatePdfBlob();
+      if (!pdfBlob) {
+        toast.error('Greška pri generiranju dokumenta za ispis');
+        return;
+      }
+      
+      // Create object URL for the PDF blob
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      // Open PDF in new tab and trigger print
+      const printWindow = window.open(pdfUrl, '_blank');
+      if (!printWindow) {
+        toast.error('Blokirani skočni prozori. Molimo omogućite ih za ispis.');
+        URL.revokeObjectURL(pdfUrl);
+        return;
+      }
+      
+      // Wait for PDF to load, then print
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      };
+      
+      // Clean up the URL after a delay
+      setTimeout(() => {
+        URL.revokeObjectURL(pdfUrl);
+      }, 60000);
+      
+    } catch (err) {
+      console.error('Print error:', err);
+      toast.error('Greška pri ispisu');
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!printRef.current || !document) return;
+    
+    setIsGeneratingPdf(true);
+    toast.info('Generiram PDF...');
+    
+    try {
+      const pdfBlob = await generatePdfBlob();
+      if (!pdfBlob) {
+        toast.error('Greška pri generiranju PDF-a');
+        return;
+      }
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const link = window.document.createElement('a');
+      link.href = url;
+      link.download = `${document.number}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
       
       toast.success('PDF uspješno generiran!');
     } catch (err) {
@@ -379,9 +348,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint}>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={handlePrint} disabled={isPrinting}>
             <Printer className="mr-2 h-4 w-4" />
-            Ispis
+            {isPrinting ? 'Pripremam...' : 'Ispis'}
           </Button>
           <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
             <Download className="mr-2 h-4 w-4" />
