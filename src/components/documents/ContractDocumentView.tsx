@@ -55,35 +55,23 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
     );
 
     return (
-      <div 
-        ref={ref} 
-        className="a4-document bg-white text-black font-serif" 
-        style={{ 
-          width: '210mm', 
-          height: '297mm',
-          padding: '10mm',
-          boxSizing: 'border-box',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Memorandum Header - identical for all documents */}
-        <MemorandumHeader />
+      <div ref={ref} className="a4-page font-serif">
+        <div className="doc-body">
+          {/* Memorandum Header - identical for all documents */}
+          <MemorandumHeader />
 
-        {/* Main content with reserved space for footer */}
-        <div style={{ paddingBottom: '42mm' }}>
           {/* Contract Header - 3-zone layout */}
           <div className="flex justify-between items-start mb-4">
             {/* Left: empty placeholder for balance */}
             <div style={{ flex: '1' }}></div>
-            
+
             {/* Center: Contract Title only - 20% larger */}
             <div className="text-center" style={{ flex: '1' }}>
               <h1 className="font-bold uppercase tracking-wide" style={{ fontSize: '19px' }}>
                 Ugovor o kupoprodaji
               </h1>
             </div>
-            
+
             {/* Right: Document number + date */}
             <div className="text-right text-sm" style={{ flex: '1' }}>
               <p className="font-semibold" style={{ marginBottom: '2px' }}>
@@ -227,19 +215,9 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
           )}
         </div>
 
-        {/* Footer - absolutely positioned at bottom with zero margins */}
-        <div 
-          style={{
-            position: 'absolute',
-            bottom: '12mm',
-            left: '10mm',
-            right: '10mm',
-            margin: 0,
-            padding: 0,
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: '2mm', lineHeight: '1' }}>
-            <p style={{ color: '#000', fontSize: '9px', margin: 0, padding: 0 }}>
+        <div className="doc-footer">
+          <div className="text-center" style={{ lineHeight: '0.98' }}>
+            <p style={{ fontSize: '9px' }}>
               Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
             </p>
           </div>

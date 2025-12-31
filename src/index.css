@@ -205,24 +205,80 @@
   }
 }
 
-/* Print styles - remove browser headers/footers */
+/* Print styles - strict single-page A4 (no extra blank page) */
 @media print {
   @page {
-    margin: 10mm;
     size: A4;
+    margin: 0;
   }
 
-  /* Hide browser-generated headers and footers */
-  html {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
+  html,
   body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    background: hsl(0 0% 100%) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  /* Tailwind helpers that often cause an extra (blank) page in print */
+  .min-h-screen {
+    min-height: 0 !important;
+  }
+
+  /* Chrome pagination can behave oddly if any ancestor is transformed */
+  * {
+    transform: none !important;
+  }
+
+  .a4-page {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
   }
 }
+
+/* A4 document primitives used by Preview/PDF/Print */
+.a4-page {
+  width: 210mm;
+  height: 297mm;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  margin: 0;
+  padding: 10mm 12mm;
+  background: hsl(0 0% 100%);
+  color: hsl(0 0% 0%);
+}
+
+.doc-body {
+  padding-bottom: 42mm;
+}
+
+.doc-footer {
+  position: absolute;
+  left: 12mm;
+  right: 12mm;
+  bottom: 14mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  line-height: 0.98;
+}
+
+.doc-footer,
+.doc-footer * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.doc-footer img {
+  display: block;
+  height: auto;
+  max-height: 14mm !important;
+}
+
 /*  ================================
     GLOBAL APP STYLE UPGRADE
     modern minimal + glass UI feel
