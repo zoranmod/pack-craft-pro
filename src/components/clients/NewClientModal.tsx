@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Building2, User, Loader2 } from 'lucide-react';
 import {
   Dialog,
@@ -46,16 +46,18 @@ export function NewClientModal({
   const [email, setEmail] = useState('');
   const [contactPerson, setContactPerson] = useState('');
 
-  // Reset form when modal opens with new name
-  useState(() => {
-    setName(initialName);
-    setClientType('company');
-    setOib('');
-    setAddress('');
-    setPhone('');
-    setEmail('');
-    setContactPerson('');
-  });
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setName(initialName);
+      setClientType('company');
+      setOib('');
+      setAddress('');
+      setPhone('');
+      setEmail('');
+      setContactPerson('');
+    }
+  }, [open, initialName]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
