@@ -223,21 +223,21 @@ export function DocumentBodyContent({
           {/* Row 1: Robu preuzeo */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'auto 55mm 14mm 55mm', 
+            gridTemplateColumns: '24mm 55mm 14mm 55mm', 
             alignItems: 'end',
             paddingTop: '6mm'
           }}>
-            <span style={{ color: '#000', whiteSpace: 'nowrap', paddingRight: '2mm' }}>Robu preuzeo:</span>
+            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
             <div style={{ borderBottom: '1px solid #666' }}></div>
             <div style={{ textAlign: 'center', color: '#000' }}>MP</div>
             <div style={{ borderBottom: '1px solid #666' }}></div>
           </div>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'auto 55mm 14mm 55mm'
+            gridTemplateColumns: '24mm 55mm 14mm 55mm'
           }}>
             <div></div>
-            <div></div>
+            <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
             <div></div>
             <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
           </div>
@@ -245,11 +245,11 @@ export function DocumentBodyContent({
           {/* Row 2: Za tvrtku - auto-filled with preparedBy */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'auto 55mm 14mm 55mm', 
+            gridTemplateColumns: '24mm 55mm 14mm 55mm', 
             alignItems: 'end',
             paddingTop: '8mm'
           }}>
-            <span style={{ color: '#000', whiteSpace: 'nowrap', paddingRight: '2mm' }}>Za tvrtku:</span>
+            <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
             <div style={{ borderBottom: '1px solid #666', textAlign: 'center' }}>
               {document.preparedBy && (
                 <span style={{ color: '#000', fontSize: '11px' }}>{document.preparedBy}</span>
@@ -260,10 +260,10 @@ export function DocumentBodyContent({
           </div>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'auto 55mm 14mm 55mm'
+            gridTemplateColumns: '24mm 55mm 14mm 55mm'
           }}>
             <div></div>
-            <div></div>
+            <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
             <div></div>
             <div style={{ textAlign: 'center', fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</div>
           </div>
