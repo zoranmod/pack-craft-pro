@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, User, LogOut, Menu, Sun, Moon, X } from 'lucide-react';
+import { Search, User, LogOut, Menu, Sun, Moon, X, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -23,6 +25,7 @@ interface HeaderProps {
 export function Header({ title, subtitle, onMenuClick, showMenuButton, showGlobalSearch = false }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -108,6 +111,16 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               <div className="px-2 py-1.5 text-sm text-muted-foreground truncate">
                 {user?.email}
               </div>
+              <DropdownMenuSeparator />
+              {isInstallable && (
+                <>
+                  <DropdownMenuItem onClick={installApp}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Instaliraj aplikaciju
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                 <LogOut className="h-4 w-4 mr-2" />
                 Odjava
