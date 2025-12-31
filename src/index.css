@@ -270,23 +270,25 @@
   padding: 10mm 12mm;
   background: hsl(0 0% 100%);
   color: hsl(0 0% 0%);
+  /* Flexbox layout for proper footer positioning */
+  display: flex;
+  flex-direction: column;
 }
 
 .doc-body {
-  padding-bottom: var(--print-content-bottom-padding-mm);
+  flex: 1;
+  overflow: hidden;
 }
 
 .doc-footer {
-  position: absolute;
-  left: 12mm;
-  right: 12mm;
-  bottom: var(--print-footer-bottom-mm);
+  flex-shrink: 0;
   max-height: 38mm;
   overflow: hidden;
   break-inside: avoid;
   page-break-inside: avoid;
   margin: 0 !important;
   padding: 0 !important;
+  margin-top: auto !important;
 }
 
 .doc-footer * {

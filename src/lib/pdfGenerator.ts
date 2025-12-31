@@ -14,25 +14,45 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
   const a4Width = 794;
   const a4Height = 1123;
   
-  // Create a container for rendering
+  // Create a container for rendering - visible but off-screen via z-index
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  container.style.width = `${a4Width}px`;
-  container.style.height = `${a4Height}px`;
-  container.style.overflow = 'hidden';
-  container.style.backgroundColor = '#ffffff';
+  container.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: ${a4Width}px;
+    height: ${a4Height}px;
+    overflow: hidden;
+    background: #ffffff;
+    z-index: -9999;
+    pointer-events: none;
+  `;
   
-  // Style the clone to fit exactly
-  clone.style.width = `${a4Width}px`;
-  clone.style.height = `${a4Height}px`;
-  clone.style.minHeight = `${a4Height}px`;
-  clone.style.maxHeight = `${a4Height}px`;
-  clone.style.overflow = 'hidden';
-  clone.style.margin = '0';
-  clone.style.boxShadow = 'none';
-  clone.style.transform = 'none';
+  // Style the clone with flexbox to ensure footer renders correctly
+  clone.style.cssText = `
+    width: ${a4Width}px !important;
+    height: ${a4Height}px !important;
+    min-height: ${a4Height}px !important;
+    max-height: ${a4Height}px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+  `;
+  
+  // Ensure doc-body and doc-footer have correct flex styles
+  const docBody = clone.querySelector('.doc-body') as HTMLElement;
+  const docFooter = clone.querySelector('.doc-footer') as HTMLElement;
+  
+  if (docBody) {
+    docBody.style.cssText += 'flex: 1 !important; overflow: hidden !important;';
+  }
+  
+  if (docFooter) {
+    docFooter.style.cssText += 'flex-shrink: 0 !important; margin-top: auto !important;';
+  }
   
   container.appendChild(clone);
   document.body.appendChild(container);
@@ -81,20 +101,33 @@ export function downloadPdf(blob: Blob, filename: string): void {
 }
 
 /**
- * Opens the PDF in a new tab for printing
+ * Opens the PDF for printing using a hidden iframe (avoids popup blockers)
  */
 export function printPdf(blob: Blob): void {
   const url = URL.createObjectURL(blob);
-  const printWindow = window.open(url, '_blank');
   
-  if (printWindow) {
-    printWindow.onload = () => {
-      printWindow.print();
-    };
-  }
+  // Create hidden iframe for printing
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: none;';
+  iframe.src = url;
   
-  // Clean up URL after a delay
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 60000);
+  iframe.onload = () => {
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    } catch {
+      // Fallback: download the PDF
+      downloadPdf(blob, 'document.pdf');
+    }
+    
+    // Cleanup after delay
+    setTimeout(() => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+      URL.revokeObjectURL(url);
+    }, 60000);
+  };
+  
+  document.body.appendChild(iframe);
 }
