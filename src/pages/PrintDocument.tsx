@@ -257,7 +257,7 @@ export function DocumentContent({
       style={{ 
         fontFamily: template?.font_family || 'Arial', 
         width: '210mm', 
-        minHeight: '297mm',
+        height: '297mm',
         maxWidth: forPrint ? 'none' : '100%',
         margin: '0 auto', 
         padding: '10mm',
@@ -265,13 +265,14 @@ export function DocumentContent({
         fontSize: '11.5px', 
         color: '#000',
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
       {/* Header */}
       <MemorandumHeader />
       
       {/* Main content - padding-bottom reserves space for footer */}
-      <div style={{ paddingBottom: '40mm' }}>
+      <div style={{ paddingBottom: '42mm' }}>
         <DocumentBodyContent
           document={document}
           template={template}
@@ -281,17 +282,19 @@ export function DocumentContent({
         />
       </div>
       
-      {/* Footer - absolutely positioned at bottom */}
+      {/* Footer - absolutely positioned at bottom with zero margins */}
       <div 
         style={{
           position: 'absolute',
-          bottom: '10mm',
+          bottom: '12mm',
           left: '10mm',
           right: '10mm',
+          margin: 0,
+          padding: 0,
         }}
       >
-        <div className="text-center mb-2">
-          <p style={{ color: '#000', fontSize: '10px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2mm', lineHeight: '1' }}>
+          <p style={{ color: '#000', fontSize: '9px', margin: 0, padding: 0 }}>
             Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
           </p>
         </div>

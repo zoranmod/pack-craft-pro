@@ -46,113 +46,130 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
 
   return (
     <div 
-      className="bg-white text-black p-6 rounded border shadow-sm overflow-auto max-h-[700px] flex flex-col"
+      className="bg-white text-black rounded border shadow-sm overflow-hidden"
       style={{ 
         fontFamily: template.font_family, 
         fontSize: `${template.body_font_size}px`,
-        minHeight: '297mm',
-        width: '210mm'
+        height: '297mm',
+        width: '210mm',
+        padding: '10mm',
+        boxSizing: 'border-box',
+        position: 'relative',
       }}
     >
-      {/* Flex wrapper for content */}
-      <div className="flex-grow flex flex-col">
-      {/* Memorandum Header - identical for all documents */}
-      <MemorandumHeader />
+      {/* Main content with reserved space for footer */}
+      <div style={{ paddingBottom: '42mm' }}>
+        {/* Memorandum Header - identical for all documents */}
+        <MemorandumHeader />
 
-      {/* Document Title */}
-      <div className="text-center mb-6">
-        <h2 className="text-xl font-bold uppercase tracking-wide" style={{ color: template.primary_color }}>
-          {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
-        </h2>
-        <p className="text-gray-600 mt-1">Broj: {template.document_type.toUpperCase().slice(0,3)}-2025-0001</p>
-        <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
-      </div>
+        {/* Document Title */}
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold uppercase tracking-wide" style={{ color: template.primary_color }}>
+            {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
+          </h2>
+          <p className="text-gray-600 mt-1">Broj: {template.document_type.toUpperCase().slice(0,3)}-2025-0001</p>
+          <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
+        </div>
 
-      {/* Client Info */}
-      <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-200">
-        <p className="font-semibold text-sm mb-1">Kupac:</p>
-        <p className="font-medium">Naziv kupca d.o.o.</p>
-        <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
-        <p className="text-gray-600 text-sm">OIB: 98765432109</p>
-      </div>
+        {/* Client Info */}
+        <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-200">
+          <p className="font-semibold text-sm mb-1">Kupac:</p>
+          <p className="font-medium">Naziv kupca d.o.o.</p>
+          <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
+          <p className="text-gray-600 text-sm">OIB: 98765432109</p>
+        </div>
 
-      {/* Metadata */}
-      <div className="mb-4 text-sm flex flex-wrap gap-x-6 gap-y-1">
-        {template.show_payment_method && (
-          <div>
-            <span className="text-gray-600">Način plaćanja: </span>
-            <span className="font-medium">{template.default_payment_method}</span>
-          </div>
-        )}
-        {template.show_validity_days && (
-          <div>
-            <span className="text-gray-600">Rok valjanosti: </span>
-            <span className="font-medium">{template.default_validity_days} dana</span>
-          </div>
-        )}
-        {template.show_delivery_days && (
-          <div>
-            <span className="text-gray-600">Rok isporuke: </span>
-            <span className="font-medium">{template.default_delivery_days} dana</span>
-          </div>
-        )}
-      </div>
+        {/* Metadata */}
+        <div className="mb-4 text-sm flex flex-wrap gap-x-6 gap-y-1">
+          {template.show_payment_method && (
+            <div>
+              <span className="text-gray-600">Način plaćanja: </span>
+              <span className="font-medium">{template.default_payment_method}</span>
+            </div>
+          )}
+          {template.show_validity_days && (
+            <div>
+              <span className="text-gray-600">Rok valjanosti: </span>
+              <span className="font-medium">{template.default_validity_days} dana</span>
+            </div>
+          )}
+          {template.show_delivery_days && (
+            <div>
+              <span className="text-gray-600">Rok isporuke: </span>
+              <span className="font-medium">{template.default_delivery_days} dana</span>
+            </div>
+          )}
+        </div>
 
-      {/* Table */}
-      <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: template.primary_color, color: 'white' }}>
-            {visibleColumns.map((col) => (
-              <th key={col} className="p-2 text-left border border-gray-300 font-semibold">
-                {columnLabels[col] || col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {mockItems.map((item, index) => (
-            <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+        {/* Table */}
+        <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ backgroundColor: template.primary_color, color: 'white' }}>
               {visibleColumns.map((col) => (
-                <td key={col} className="p-2 border border-gray-300">
-                  {col === 'cijena' || col === 'cijena_s_rabatom' || col === 'pdv_iznos' || col === 'ukupno'
-                    ? formatCurrency(item[col as keyof typeof item] as number)
-                    : col === 'rabat' || col === 'pdv'
-                    ? `${item[col as keyof typeof item]}%`
-                    : item[col as keyof typeof item]}
-                </td>
+                <th key={col} className="p-2 text-left border border-gray-300 font-semibold">
+                  {columnLabels[col] || col}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {mockItems.map((item, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                {visibleColumns.map((col) => (
+                  <td key={col} className="p-2 border border-gray-300">
+                    {col === 'cijena' || col === 'cijena_s_rabatom' || col === 'pdv_iznos' || col === 'ukupno'
+                      ? formatCurrency(item[col as keyof typeof item] as number)
+                      : col === 'rabat' || col === 'pdv'
+                      ? `${item[col as keyof typeof item]}%`
+                      : item[col as keyof typeof item]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      {/* Totals */}
-      {hasPrices && (
-        <div className="flex justify-end mb-6">
-          <div className="w-56 text-sm">
-            <div className="flex justify-between py-1.5 border-b border-gray-300">
-              <span className="text-gray-600">Osnovica:</span>
-              <span>{formatCurrency(380)}</span>
-            </div>
-            {template.show_pdv_breakdown && (
+        {/* Totals */}
+        {hasPrices && (
+          <div className="flex justify-end mb-6">
+            <div className="w-56 text-sm">
               <div className="flex justify-between py-1.5 border-b border-gray-300">
-                <span className="text-gray-600">PDV (25%):</span>
-                <span>{formatCurrency(95)}</span>
+                <span className="text-gray-600">Osnovica:</span>
+                <span>{formatCurrency(380)}</span>
               </div>
-            )}
-            <div className="flex justify-between py-2 font-bold text-base" style={{ color: template.primary_color }}>
-              <span>UKUPNO:</span>
-              <span>{formatCurrency(475)}</span>
+              {template.show_pdv_breakdown && (
+                <div className="flex justify-between py-1.5 border-b border-gray-300">
+                  <span className="text-gray-600">PDV (25%):</span>
+                  <span>{formatCurrency(95)}</span>
+                </div>
+              )}
+              <div className="flex justify-between py-2 font-bold text-base" style={{ color: template.primary_color }}>
+                <span>UKUPNO:</span>
+                <span>{formatCurrency(475)}</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* End of flex-grow wrapper */}
+        )}
       </div>
 
-      {/* Memorandum Footer - identical for all documents */}
-      <MemorandumFooter />
+      {/* Footer - absolutely positioned at bottom with zero margins */}
+      <div 
+        style={{
+          position: 'absolute',
+          bottom: '12mm',
+          left: '10mm',
+          right: '10mm',
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '2mm', lineHeight: '1' }}>
+          <p style={{ color: '#000', fontSize: '9px', margin: 0, padding: 0 }}>
+            Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
+          </p>
+        </div>
+        <MemorandumFooter />
+      </div>
     </div>
   );
 };
