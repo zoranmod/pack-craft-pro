@@ -141,8 +141,8 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          toast.info('Otvaram dokument za preuzimanje PDF-a...');
-                          navigate(`/documents/${doc.id}?action=pdf`);
+                          toast.info('Spremam PDF...');
+                          navigate(`/documents/${doc.id}?action=pdf&return=true`);
                         }}
                       >
                         <Download className="mr-2 h-4 w-4" /> Spremi PDF

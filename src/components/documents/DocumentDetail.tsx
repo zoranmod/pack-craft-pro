@@ -140,17 +140,35 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   // Auto-trigger PDF download if action=pdf is in URL
   useEffect(() => {
     const action = searchParams.get('action');
+    const shouldReturn = searchParams.get('return') === 'true';
+    
     if (action === 'pdf' && document && printRef.current && !pdfTriggered && !isGeneratingPdf) {
       setPdfTriggered(true);
-      // Remove the action param from URL
+      // Remove the action params from URL
       searchParams.delete('action');
+      searchParams.delete('return');
       setSearchParams(searchParams, { replace: true });
       // Delay slightly to ensure DOM is ready
-      setTimeout(() => {
-        handleDownloadPdf();
+      setTimeout(async () => {
+        setIsGeneratingPdf(true);
+        try {
+          const pdfBlob = await generatePdfFromElement(printRef.current!);
+          const filename = getPdfFilename(document);
+          downloadPdf(pdfBlob, filename);
+          toast.success('PDF spremljen.');
+          // If return flag is set, go back after download
+          if (shouldReturn) {
+            setTimeout(() => navigate(-1), 300);
+          }
+        } catch (err) {
+          console.error('PDF generation error:', err);
+          toast.error('Greška pri spremanju PDF-a. Pokušajte ponovno.');
+        } finally {
+          setIsGeneratingPdf(false);
+        }
       }, 500);
     }
-  }, [document, searchParams, pdfTriggered, isGeneratingPdf]);
+  }, [document, searchParams, pdfTriggered, isGeneratingPdf, navigate]);
 
 
   if (error) {
