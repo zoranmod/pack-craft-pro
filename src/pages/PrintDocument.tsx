@@ -223,35 +223,35 @@ export function DocumentBodyContent({
           {/* Row 1: Robu preuzeo */}
           <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '6mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu preuzeo:</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm' }}></div>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', height: '0' }}></div>
             <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '65mm', borderBottom: '1px solid #666' }}></div>
-              <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
-            </div>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', height: '0' }}></div>
+          </div>
+          <div style={{ display: 'flex', paddingLeft: 'calc(100% - 65mm)', justifyContent: 'center' }}>
+            <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
           </div>
 
           {/* Row 2: Za tvrtku - auto-filled with preparedBy */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '10mm' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '8mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Za tvrtku:</span>
-            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', position: 'relative' }}>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', marginLeft: '2mm', height: '0', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
               {document.preparedBy && (
-                <span style={{ position: 'absolute', bottom: '1mm', left: '2mm', color: '#000', fontSize: '11px' }}>
+                <span style={{ color: '#000', fontSize: '11px', paddingBottom: '1mm' }}>
                   {document.preparedBy}
                 </span>
               )}
             </div>
             <span style={{ color: '#000', marginLeft: '8mm', marginRight: '8mm' }}>MP</span>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '65mm', borderBottom: '1px solid #666' }}></div>
-              <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
-            </div>
+            <div style={{ width: '65mm', borderBottom: '1px solid #666', height: '0' }}></div>
+          </div>
+          <div style={{ display: 'flex', paddingLeft: 'calc(100% - 65mm)', justifyContent: 'center' }}>
+            <span style={{ fontSize: '9px', color: '#000', marginTop: '1mm' }}>(potpis)</span>
           </div>
 
           {/* Row 3: Robu izdao skladištar */}
           <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: '10mm' }}>
             <span style={{ color: '#000', whiteSpace: 'nowrap' }}>Robu izdao skladištar (puno ime i prezime):</span>
-            <div style={{ flex: 1, borderBottom: '1px solid #666', marginLeft: '2mm', maxWidth: '100mm' }}></div>
+            <div style={{ flex: 1, borderBottom: '1px solid #666', marginLeft: '2mm', maxWidth: '100mm', height: '0' }}></div>
           </div>
         </div>
       )}
