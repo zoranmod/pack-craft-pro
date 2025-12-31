@@ -267,7 +267,7 @@
   overflow: hidden;
   position: relative;
   margin: 0;
-  padding: 8mm 12mm;
+  padding: 8mm 12mm 10mm;
   background: hsl(0 0% 100%);
   color: hsl(0 0% 0%);
   /* Flexbox layout for proper footer positioning */
@@ -278,17 +278,17 @@
 .doc-body {
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 .doc-footer {
   flex-shrink: 0;
-  max-height: 30mm;
+  max-height: 38mm;
   overflow: hidden;
   break-inside: avoid;
   page-break-inside: avoid;
   margin: 0 !important;
   padding: 0 !important;
-  padding-top: 4mm !important;
   margin-top: auto !important;
 }
 
