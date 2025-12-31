@@ -400,9 +400,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-6">
+      <div className="flex flex-col xl:grid xl:grid-cols-[1fr_320px] gap-6">
         {/* Document Preview */}
-        <div className="flex-1 min-w-0">
+        <div className="w-full overflow-x-auto">
           {isContract ? (
             <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
               <ContractDocumentView 
@@ -555,9 +555,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                     <p style={{ color: '#000', fontSize: '11.5px' }}>M.P.</p>
                   </div>
                   
-                  {/* Centered Prepared By & Signature */}
-                  <div className="flex justify-center">
-                    <div className="text-center">
+                  {/* Right-aligned container with centered text inside */}
+                  <div className="flex justify-end">
+                    <div className="text-center" style={{ minWidth: '200px' }}>
                       {document.preparedBy && (
                         <div className="mb-4">
                           <p style={{ color: '#000', fontSize: '11.5px' }}>Ponudu izradio/la:</p>
@@ -629,7 +629,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
 
         {/* Sidebar - responsive: below document on smaller screens, side panel on xl+ */}
-        <div className="w-full xl:w-80 xl:flex-shrink-0 space-y-5">
+        <div className="w-full space-y-5">
           {/* Document Info Card */}
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="font-semibold text-foreground mb-5">Informacije</h3>
