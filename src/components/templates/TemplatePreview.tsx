@@ -56,20 +56,25 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         {/* Memorandum Header - identical for all documents */}
         <MemorandumHeader />
 
-        {/* Document Header - 3-zone layout */}
-        <div className="flex justify-between items-start mb-4">
-          {/* Left: empty placeholder for balance */}
-          <div style={{ flex: '1' }}></div>
+        {/* Document Title - centered */}
+        <div className="text-center mb-4">
+          <h2 className="font-bold uppercase tracking-wide" style={{ color: template.primary_color, fontSize: '19px', letterSpacing: '0.5px' }}>
+            {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
+          </h2>
+        </div>
 
-          {/* Center: Document Title only - 20% larger */}
-          <div className="text-center" style={{ flex: '1' }}>
-            <h2 className="font-bold uppercase tracking-wide" style={{ color: template.primary_color, fontSize: '19px', letterSpacing: '0.5px' }}>
-              {documentTypeLabels[template.document_type as DocumentType] || 'Dokument'}
-            </h2>
+        {/* 2-column layout: buyer left, metadata right, aligned at top */}
+        <div className="grid grid-cols-2 gap-4 mb-5 items-start">
+          {/* Left: Client Info */}
+          <div className="p-3 bg-gray-50 rounded border border-gray-200">
+            <p className="font-semibold text-sm mb-1">Kupac:</p>
+            <p className="font-medium">Naziv kupca d.o.o.</p>
+            <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
+            <p className="text-gray-600 text-sm">OIB: 98765432109</p>
           </div>
 
-          {/* Right: Document number + metadata */}
-          <div className="text-right text-sm" style={{ flex: '1' }}>
+          {/* Right: Document metadata */}
+          <div className="text-right text-sm">
             <p className="font-semibold" style={{ marginBottom: '2px' }}>
               {template.document_type.toUpperCase().slice(0,3)}-2025-0001
             </p>
@@ -84,14 +89,6 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
               <p className="text-gray-600">Način plaćanja: {template.default_payment_method}</p>
             )}
           </div>
-        </div>
-
-        {/* Client Info */}
-        <div className="mb-5 p-3 bg-gray-50 rounded border border-gray-200">
-          <p className="font-semibold text-sm mb-1">Kupac:</p>
-          <p className="font-medium">Naziv kupca d.o.o.</p>
-          <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
-          <p className="text-gray-600 text-sm">OIB: 98765432109</p>
         </div>
         {/* Table */}
         <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>

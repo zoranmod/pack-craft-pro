@@ -14,6 +14,9 @@ interface ContractDocumentViewProps {
     oib?: string | null;
     iban?: string | null;
     logo_url?: string | null;
+    print_footer_bottom_mm?: number | null;
+    print_footer_max_height_mm?: number | null;
+    print_content_bottom_padding_mm?: number | null;
   } | null;
 }
 
@@ -54,26 +57,38 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
       (a, b) => a.sortOrder - b.sortOrder
     );
 
+    // Get print settings from companySettings or use defaults
+    const footerBottomMm = companySettings?.print_footer_bottom_mm ?? 14;
+    const footerMaxHeightMm = companySettings?.print_footer_max_height_mm ?? 14;
+    const contentBottomPaddingMm = companySettings?.print_content_bottom_padding_mm ?? 42;
+
+    // Apply CSS variables for print layout
+    const printStyles = {
+      '--print-footer-bottom-mm': `${footerBottomMm}mm`,
+      '--print-footer-max-height-mm': `${footerMaxHeightMm}mm`,
+      '--print-content-bottom-padding-mm': `${contentBottomPaddingMm}mm`,
+    } as React.CSSProperties;
+
     return (
-      <div ref={ref} className="a4-page font-serif">
+      <div ref={ref} className="a4-page font-serif" style={printStyles}>
         <div className="doc-body">
           {/* Memorandum Header - identical for all documents */}
           <MemorandumHeader />
 
-          {/* Contract Header - 3-zone layout */}
-          <div className="flex justify-between items-start mb-4">
-            {/* Left: empty placeholder for balance */}
-            <div style={{ flex: '1' }}></div>
+          {/* Contract Header - Title centered, then 2-column layout */}
+          <div className="text-center mb-4">
+            <h1 className="font-bold uppercase tracking-wide" style={{ fontSize: '19px' }}>
+              Ugovor o kupoprodaji
+            </h1>
+          </div>
 
-            {/* Center: Contract Title only - 20% larger */}
-            <div className="text-center" style={{ flex: '1' }}>
-              <h1 className="font-bold uppercase tracking-wide" style={{ fontSize: '19px' }}>
-                Ugovor o kupoprodaji
-              </h1>
-            </div>
+          {/* 2-column layout: seller/buyer left, metadata right */}
+          <div className="grid grid-cols-2 gap-4 mb-4 items-start">
+            {/* Left: placeholder - intro text goes below */}
+            <div></div>
 
             {/* Right: Document number + date */}
-            <div className="text-right text-sm" style={{ flex: '1' }}>
+            <div className="text-right text-sm">
               <p className="font-semibold" style={{ marginBottom: '2px' }}>
                 {document.number}
               </p>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale, Download, Clock, Archive } from 'lucide-react';
+import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale, Download, Clock, Archive, Printer, Plus, Minus } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,6 +62,9 @@ const Settings = () => {
         registration_number: companyData.registration_number || '',
         capital_amount: companyData.capital_amount || '',
         director_name: companyData.director_name || '',
+        print_footer_bottom_mm: companyData.print_footer_bottom_mm ?? 14,
+        print_footer_max_height_mm: companyData.print_footer_max_height_mm ?? 14,
+        print_content_bottom_padding_mm: companyData.print_content_bottom_padding_mm ?? 42,
       });
     }
   }, [companyData]);
@@ -743,6 +746,167 @@ const Settings = () => {
               Kreirajte vlastite predloške s prilagođenim zaglavljem, tablicom i podnožjem
             </p>
           </div>
+        </div>
+
+        {/* Print/PDF Layout Settings */}
+        <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Printer className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">Postavke ispisa / PDF</h2>
+              <p className="text-sm text-muted-foreground">Fino podešavanje layouta za ispis i PDF dokumente</p>
+            </div>
+          </div>
+          
+          {companyLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <p className="text-sm text-muted-foreground">
+                Koristite ove postavke ako footer "izlazi" na drugu stranicu pri ispisu ili PDF-u. 
+                Povećajte "Rezervirani prostor" ili smanjite "Pozicija od dna" dok footer ne ostane na prvoj stranici.
+              </p>
+              
+              {/* Footer bottom offset */}
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-medium">Pozicija footera od dna stranice</p>
+                    <p className="text-xs text-muted-foreground">Udaljenost footera od donjeg ruba A4 stranice</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_footer_bottom_mm: Math.max(5, (company.print_footer_bottom_mm || 14) - 1) })}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <div className="w-20">
+                      <Input
+                        type="number"
+                        min="5"
+                        max="40"
+                        step="1"
+                        value={company.print_footer_bottom_mm ?? 14}
+                        onChange={(e) => setCompany({ ...company, print_footer_bottom_mm: Number(e.target.value) })}
+                        className="text-center"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_footer_bottom_mm: Math.min(40, (company.print_footer_bottom_mm || 14) + 1) })}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground w-8">mm</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer max height */}
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-medium">Maksimalna visina footera (logo)</p>
+                    <p className="text-xs text-muted-foreground">Ograničava visinu footer slike/loga</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_footer_max_height_mm: Math.max(8, (company.print_footer_max_height_mm || 14) - 1) })}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <div className="w-20">
+                      <Input
+                        type="number"
+                        min="8"
+                        max="30"
+                        step="1"
+                        value={company.print_footer_max_height_mm ?? 14}
+                        onChange={(e) => setCompany({ ...company, print_footer_max_height_mm: Number(e.target.value) })}
+                        className="text-center"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_footer_max_height_mm: Math.min(30, (company.print_footer_max_height_mm || 14) + 1) })}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground w-8">mm</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content bottom padding / reserved footer space */}
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-medium">Rezervirani prostor za footer</p>
+                    <p className="text-xs text-muted-foreground">Padding na dnu sadržaja da footer ne prekriva tekst</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_content_bottom_padding_mm: Math.max(20, (company.print_content_bottom_padding_mm || 42) - 1) })}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <div className="w-20">
+                      <Input
+                        type="number"
+                        min="20"
+                        max="80"
+                        step="1"
+                        value={company.print_content_bottom_padding_mm ?? 42}
+                        onChange={(e) => setCompany({ ...company, print_content_bottom_padding_mm: Number(e.target.value) })}
+                        className="text-center"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCompany({ ...company, print_content_bottom_padding_mm: Math.min(80, (company.print_content_bottom_padding_mm || 42) + 1) })}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground w-8">mm</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={handleSaveCompany} disabled={saveCompany.isPending}>
+                  {saveCompany.isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Spremi postavke ispisa
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Backup & Data */}

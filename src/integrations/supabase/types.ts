@@ -179,6 +179,9 @@ export type Database = {
           phone_accounting: string | null
           phone_main: string | null
           phone_sales: string | null
+          print_content_bottom_padding_mm: number | null
+          print_footer_bottom_mm: number | null
+          print_footer_max_height_mm: number | null
           registration_court: string | null
           registration_number: string | null
           swift_1: string | null
@@ -205,6 +208,9 @@ export type Database = {
           phone_accounting?: string | null
           phone_main?: string | null
           phone_sales?: string | null
+          print_content_bottom_padding_mm?: number | null
+          print_footer_bottom_mm?: number | null
+          print_footer_max_height_mm?: number | null
           registration_court?: string | null
           registration_number?: string | null
           swift_1?: string | null
@@ -231,6 +237,9 @@ export type Database = {
           phone_accounting?: string | null
           phone_main?: string | null
           phone_sales?: string | null
+          print_content_bottom_padding_mm?: number | null
+          print_footer_bottom_mm?: number | null
+          print_footer_max_height_mm?: number | null
           registration_court?: string | null
           registration_number?: string | null
           swift_1?: string | null

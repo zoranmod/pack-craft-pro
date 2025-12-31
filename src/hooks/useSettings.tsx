@@ -66,6 +66,9 @@ export function useSaveCompanySettings() {
         registration_number: settings.registration_number,
         capital_amount: settings.capital_amount,
         director_name: settings.director_name,
+        print_footer_bottom_mm: settings.print_footer_bottom_mm,
+        print_footer_max_height_mm: settings.print_footer_max_height_mm,
+        print_content_bottom_padding_mm: settings.print_content_bottom_padding_mm,
       };
 
       if (existing) {
