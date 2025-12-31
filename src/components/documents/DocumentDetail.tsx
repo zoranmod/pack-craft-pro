@@ -141,7 +141,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               padding: 0;
             }
             img { max-width: 100%; height: auto; }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11px; }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12.5px; }
             th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
             th { font-weight: 600; color: #666; }
             .text-right { text-align: right; }
@@ -149,10 +149,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             .font-bold { font-weight: bold; }
             .font-semibold { font-weight: 600; }
             .font-medium { font-weight: 500; }
-            .text-sm { font-size: 11px; }
-            .text-xs { font-size: 10px; }
-            .text-xl { font-size: 18px; }
-            .text-base { font-size: 13px; }
+            .text-sm { font-size: 12.5px; }
+            .text-xs { font-size: 11.5px; }
+            .text-xl { font-size: 20px; }
+            .text-base { font-size: 15px; }
             .mb-1 { margin-bottom: 4px; }
             .mb-2 { margin-bottom: 8px; }
             .mb-4 { margin-bottom: 16px; }
@@ -400,9 +400,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="flex flex-col xl:flex-row gap-6">
         {/* Document Preview */}
-        <div className="lg:col-span-2">
+        <div className="flex-1 min-w-0">
           {isContract ? (
             <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
               <ContractDocumentView 
@@ -411,7 +411,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               />
             </div>
           ) : (
-            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', minHeight: '297mm', margin: '0 auto', fontSize: '10px', color: '#000' }}>
+            <div ref={printRef} className="bg-white rounded-xl shadow-card border border-border/50 p-6 flex flex-col" style={{ fontFamily: template?.font_family || 'Arial', width: '210mm', minHeight: '297mm', margin: '0 auto', fontSize: '11.5px', color: '#000' }}>
               {/* Flex wrapper for content - pushes footer to bottom */}
               <div className="flex-grow flex flex-col">
               {/* Memorandum Header - identical for all documents */}
@@ -419,12 +419,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Document Title - Centered */}
               <div className="text-center mb-4">
-                <h2 className="text-base font-bold" style={{ color: '#000' }}>{documentTypeLabels[document.type].toUpperCase()}</h2>
-                <p className="text-sm font-semibold" style={{ color: '#000' }}>{document.number}</p>
+                <h2 className="font-bold" style={{ color: '#000', fontSize: '16px' }}>{documentTypeLabels[document.type].toUpperCase()}</h2>
+                <p className="font-semibold" style={{ color: '#000', fontSize: '13px' }}>{document.number}</p>
               </div>
 
               {/* Client Info & Document Details */}
-              <div className="flex justify-between items-start mb-4" style={{ fontSize: '12px' }}>
+              <div className="flex justify-between items-start mb-4" style={{ fontSize: '13px' }}>
                 <div>
                   <h3 className="font-medium mb-1" style={{ color: '#000' }}>KUPAC / NARUČITELJ</h3>
                   <p className="font-semibold" style={{ color: '#000' }}>{document.clientName}</p>
@@ -456,7 +456,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Items Table */}
               <div className="mb-4 overflow-x-auto">
-                <table className="w-full" style={{ fontSize: '10px' }}>
+                <table className="w-full" style={{ fontSize: '11.5px' }}>
                   <thead>
                     <tr className="border-b-2 border-gray-800">
                       <th className="py-1 text-left font-semibold" style={{ color: '#000' }}>R.br.</th>
@@ -503,7 +503,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               {/* Totals - only show for document types with prices */}
               {hasPrices && (
                 <div className="flex justify-end mb-6">
-                  <div className="w-64 space-y-1" style={{ fontSize: '10px' }}>
+                  <div className="w-64 space-y-1" style={{ fontSize: '11.5px' }}>
                     <div className="flex justify-between">
                       <span style={{ color: '#000' }}>Osnovica:</span>
                       <span style={{ color: '#000' }}>
@@ -541,7 +541,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Notes */}
               {document.notes && (
-                <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{ fontSize: '10px' }}>
+                <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{ fontSize: '11.5px' }}>
                   <p className="font-medium mb-1" style={{ color: '#000' }}>Napomena</p>
                   <p style={{ color: '#000' }}>{document.notes}</p>
                 </div>
@@ -552,21 +552,21 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <div className="mt-6 pt-4 border-t border-gray-300">
                   {/* Centered Stamp */}
                   <div className="text-center mb-6">
-                    <p style={{ color: '#000', fontSize: '10px' }}>M.P.</p>
+                    <p style={{ color: '#000', fontSize: '11.5px' }}>M.P.</p>
                   </div>
                   
-                  {/* Right-aligned Prepared By & Signature */}
-                  <div className="flex justify-end">
-                    <div className="text-right">
+                  {/* Centered Prepared By & Signature */}
+                  <div className="flex justify-center">
+                    <div className="text-center">
                       {document.preparedBy && (
-                        <div className="mb-6">
-                          <p style={{ color: '#000', fontSize: '10px' }}>Ponudu izradio/la:</p>
-                          <p className="font-medium" style={{ color: '#000', fontSize: '10px' }}>{document.preparedBy}</p>
+                        <div className="mb-4">
+                          <p style={{ color: '#000', fontSize: '11.5px' }}>Ponudu izradio/la:</p>
+                          <p className="font-medium" style={{ color: '#000', fontSize: '11.5px' }}>{document.preparedBy}</p>
                         </div>
                       )}
-                      <div className="mt-8 text-center">
-                        <div className="w-40 border-b border-gray-400 mx-auto mb-1"></div>
-                        <p style={{ color: '#000', fontSize: '10px' }}>(Potpis)</p>
+                      <div className="mt-6">
+                        <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
+                        <p style={{ color: '#000', fontSize: '11.5px' }}>(Potpis)</p>
                       </div>
                     </div>
                   </div>
@@ -575,7 +575,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Signature Section for Otpremnica/Nalog */}
               {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && (
-                <div className="mt-8 pt-6 border-t border-gray-300" style={{ fontSize: '10px' }}>
+                <div className="mt-8 pt-6 border-t border-gray-300" style={{ fontSize: '11.5px' }}>
                   {/* Red 1: Robu preuzeo */}
                   <div className="flex items-end justify-between mb-6">
                     <div className="flex items-end gap-2">
@@ -619,7 +619,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
               {/* Legal Notice */}
               <div className="mt-6 text-center">
-                <p style={{ color: '#000', fontSize: '10px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
+                <p style={{ color: '#000', fontSize: '11.5px' }}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</p>
               </div>
 
               {/* Memorandum Footer - identical for all documents */}
@@ -628,8 +628,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-5">
+        {/* Sidebar - responsive: below document on smaller screens, side panel on xl+ */}
+        <div className="w-full xl:w-80 xl:flex-shrink-0 space-y-5">
           {/* Document Info Card */}
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="font-semibold text-foreground mb-5">Informacije</h3>
