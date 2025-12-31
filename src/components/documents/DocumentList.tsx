@@ -138,8 +138,10 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                           <Edit className="mr-2 h-4 w-4" /> Uredi
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="mr-2 h-4 w-4" /> Preuzmi PDF
+                      <DropdownMenuItem asChild>
+                        <Link to={`/documents/${doc.id}`}>
+                          <Download className="mr-2 h-4 w-4" /> Spremi PDF
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleCopy(doc)}
