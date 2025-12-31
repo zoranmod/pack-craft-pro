@@ -363,46 +363,10 @@ const PrintDocument = () => {
 
   return (
     <>
-      {/* Print styles - zero margin @page for maximum A4 usage */}
+      {/* Minimal inline styles - main print rules in index.css */}
       <style>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 0;
-          }
-          
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          .print-controls {
-            display: none !important;
-          }
-          
-          .a4-document {
-            width: 210mm !important;
-            min-height: 297mm !important;
-            max-width: none !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-          }
-          
-          .a4-footer {
-            break-inside: avoid !important;
-            page-break-inside: avoid !important;
-          }
-        }
-        
         @media screen {
-          body {
-            background: #e5e5e5;
-          }
+          body { background: #e5e5e5; }
         }
       `}</style>
 

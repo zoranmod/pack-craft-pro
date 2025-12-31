@@ -281,12 +281,17 @@
   left: 12mm;
   right: 12mm;
   bottom: var(--print-footer-bottom-mm);
+  max-height: 38mm;
+  overflow: hidden;
   break-inside: avoid;
   page-break-inside: avoid;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .doc-footer * {
   margin: 0 !important;
+  padding: 0 !important;
 }
 
 .doc-footer img {
@@ -302,8 +307,21 @@
   text-align: center;
   font-size: 9px;
   color: hsl(0 0% 30%);
-  padding-bottom: 4px !important;
-  line-height: 1.2;
+  padding-bottom: 3px !important;
+  line-height: 1.1;
+}
+
+/* Footer company info line - MUST NOT wrap to prevent 2nd page */
+.footer-company-info {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  font-size: 6.5px;
+  line-height: 1.0;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center;
+  color: hsl(0 0% 40%);
 }
 
 /*  ================================
