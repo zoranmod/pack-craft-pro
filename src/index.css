@@ -282,12 +282,13 @@
 
 .doc-footer {
   flex-shrink: 0;
-  max-height: 38mm;
+  max-height: 30mm;
   overflow: hidden;
   break-inside: avoid;
   page-break-inside: avoid;
   margin: 0 !important;
   padding: 0 !important;
+  padding-top: 4mm !important;
   margin-top: auto !important;
 }
 
