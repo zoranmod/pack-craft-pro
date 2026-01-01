@@ -89,7 +89,7 @@ const Index = () => {
           isOpen={sections.recentDocuments}
           onToggle={() => toggleSection('recentDocuments')}
         >
-          <RecentDocuments documents={documents} maxHeight="340px" />
+          <RecentDocuments documents={documents} maxHeight="205px" />
         </CollapsibleSection>
         
         <CollapsibleSection
@@ -97,7 +97,7 @@ const Index = () => {
           isOpen={sections.activities}
           onToggle={() => toggleSection('activities')}
         >
-          <ActivityLogList limit={12} maxHeight="340px" />
+          <ActivityLogList limit={12} maxHeight="205px" />
         </CollapsibleSection>
       </div>
 
