@@ -1,9 +1,10 @@
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DocumentForm } from '@/components/documents/DocumentForm';
 import { DocumentType, documentTypeLabels } from '@/types/document';
 
 const NewDocument = () => {
+  const location = useLocation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const isEditMode = !!id;
@@ -11,10 +12,14 @@ const NewDocument = () => {
   // Determine if we have a fixed type from the URL
   const typeParam = searchParams.get('type');
   const hasValidType = typeParam && typeParam in documentTypeLabels;
-  
+
   // If a specific type is passed in URL, lock it (module-specific entry)
   // If no type or editing, don't lock
   const fixedType = hasValidType ? (typeParam as DocumentType) : undefined;
+
+  // Force fresh form even when navigating to same route/type repeatedly
+  const nonce = (location.state as any)?.nonce ?? location.key;
+  const formKey = `${id ?? 'new'}-${typeParam ?? 'all'}-${nonce}`;
 
   // Generate title based on context
   const getTitle = () => {
@@ -33,7 +38,7 @@ const NewDocument = () => {
       title={getTitle()} 
       subtitle={isEditMode ? "Uredite postojeći dokument" : fixedType ? undefined : "Kreirajte novi poslovni dokument"}
     >
-      <DocumentForm fixedType={fixedType} />
+      <DocumentForm key={formKey} fixedType={fixedType} />
     </MainLayout>
   );
 };

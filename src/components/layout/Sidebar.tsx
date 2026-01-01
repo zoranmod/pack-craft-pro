@@ -308,14 +308,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
               {documentTypes.map((docType) => (
                 <DropdownMenuItem
                   key={docType.href}
-                  onSelect={() => {
+                  onSelect={(e) => {
+                    e.preventDefault();
                     setNewDocMenuOpen(false);
                     if (isMobile && onOpenChange) {
                       onOpenChange(false);
                     }
-                    // Use setTimeout to ensure dropdown closes before navigation
+                    // Ensure navigation always happens + force refresh even on same route
+                    const nonce = Date.now();
                     setTimeout(() => {
-                      navigate(docType.href);
+                      navigate(docType.href, { state: { nonce } });
                     }, 0);
                   }}
                   className="cursor-pointer"
