@@ -183,19 +183,22 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const NavItem = ({ item }: { item: NavItem }) => (
     <Link
       to={item.path}
-      onClick={handleLinkClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleLinkClick();
+      }}
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
+        "relative z-10 flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
         isActive(item.path)
           ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px] dark:bg-secondary"
           : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-muted/60"
       )}
     >
       <item.icon className={cn(
-        "h-4 w-4 flex-shrink-0 transition-colors duration-150",
+        "h-4 w-4 flex-shrink-0 pointer-events-none transition-colors duration-150",
         isActive(item.path) ? "text-primary" : "group-hover:text-foreground"
       )} />
-      <span className="truncate">{item.label}</span>
+      <span className="truncate pointer-events-none">{item.label}</span>
     </Link>
   );
 
