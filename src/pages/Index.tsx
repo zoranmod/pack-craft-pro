@@ -46,7 +46,7 @@ const Index = () => {
     { label: 'Novi ugovor', icon: FileSignature, href: '/documents/new?type=ugovor' },
     { label: 'Nova otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
     { label: 'Nalog dostava + montaža', icon: ClipboardList, href: '/documents/new?type=nalog-dostava-montaza' },
-    { label: 'Novi dokument', icon: Plus, href: '/documents/new' },
+    { label: 'Novi dokument', icon: Plus, href: '/documents/new' }, // No type = flexible
   ];
 
   return (

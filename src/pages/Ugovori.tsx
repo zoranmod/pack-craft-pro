@@ -70,7 +70,7 @@ const Ugovori = () => {
         onSearchChange={setSearchQuery}
         searchPlaceholder="Pretraži ugovore..."
         primaryActionLabel="Novi ugovor"
-        primaryActionHref="/contracts/new"
+        primaryActionHref="/documents/new?type=ugovor"
       />
 
       {isLoading ? (
@@ -87,7 +87,7 @@ const Ugovori = () => {
             {debouncedSearch ? 'Pokušajte s drugim pojmom' : 'Kreirajte prvi ugovor'}
           </p>
           {!debouncedSearch && (
-            <Link to="/contracts/new">
+            <Link to="/documents/new?type=ugovor">
               <Button variant="outline" className="gap-2">
                 <Plus className="h-4 w-4" />
                 Novi ugovor
