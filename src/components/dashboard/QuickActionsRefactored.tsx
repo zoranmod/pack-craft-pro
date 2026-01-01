@@ -8,12 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const pinnedActions = [
-  { label: 'Nova ponuda', icon: FileText, href: '/documents/new?type=ponuda' },
-  { label: 'Nova otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
-];
-
-const dropdownActions = [
+const documentTypes = [
   { label: 'Ponuda', icon: FileText, href: '/documents/new?type=ponuda' },
   { label: 'Ugovor', icon: FileSignature, href: '/documents/new?type=ugovor' },
   { label: 'Otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
@@ -25,47 +20,26 @@ export function QuickActionsRefactored() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {/* Pinned buttons */}
-      {pinnedActions.map((action) => (
-        <Button
-          key={action.label}
-          variant="outline"
-          size="sm"
-          className="h-9 px-3 bg-card hover:bg-muted/50 border-border transition-colors"
-          onClick={() => navigate(action.href)}
-        >
-          <action.icon className="h-4 w-4 mr-2 text-primary" />
-          <span className="text-sm font-medium">{action.label}</span>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="default" size="sm" className="h-9 px-4">
+          <Plus className="h-4 w-4 mr-2" />
+          <span className="text-sm font-medium">Novi dokument</span>
+          <ChevronDown className="h-3.5 w-3.5 ml-2 opacity-70" />
         </Button>
-      ))}
-
-      {/* Dropdown for all document types */}
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="default"
-            size="sm"
-            className="h-9 px-3"
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        {documentTypes.map((action) => (
+          <DropdownMenuItem
+            key={action.href}
+            onClick={() => navigate(action.href)}
+            className="cursor-pointer"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            <span className="text-sm font-medium">Novi dokument</span>
-            <ChevronDown className="h-3.5 w-3.5 ml-2 opacity-70" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          {dropdownActions.map((action) => (
-            <DropdownMenuItem
-              key={action.href}
-              onClick={() => navigate(action.href)}
-              className="cursor-pointer"
-            >
-              <action.icon className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>{action.label}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <action.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+            <span>{action.label}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
