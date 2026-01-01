@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -18,7 +18,9 @@ import {
   Shirt,
   ChevronDown,
   ChevronRight,
-  Stethoscope
+  Stethoscope,
+  Plus,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -28,6 +30,21 @@ import { useTheme } from '@/hooks/useTheme';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+const documentTypes = [
+  { label: 'Ponuda', icon: FileText, href: '/documents/new?type=ponuda' },
+  { label: 'Ugovor', icon: FileSignature, href: '/documents/new?type=ugovor' },
+  { label: 'Otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
+  { label: 'Nalog dostava + montaža', icon: ClipboardList, href: '/documents/new?type=nalog-dostava-montaza' },
+  { label: 'Račun', icon: Receipt, href: '/documents/new?type=racun' },
+];
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -96,9 +113,11 @@ interface SidebarProps {
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   const { data: companySettings } = useCompanySettings();
+  const [newDocMenuOpen, setNewDocMenuOpen] = useState(false);
   
   const STORAGE_KEY = 'sidebar-expanded-groups';
   
@@ -200,6 +219,50 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             <X className="h-4 w-4" />
           </button>
         )}
+      </div>
+
+      {/* New Document Action Button */}
+      <div className="px-2 py-2 border-b border-border">
+        <DropdownMenu modal={false} open={newDocMenuOpen} onOpenChange={setNewDocMenuOpen}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    "flex items-center gap-2 w-full rounded-md px-2.5 py-2 text-[13px] font-medium transition-all",
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  )}
+                >
+                  <Plus className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">Novi dokument</span>
+                  <ChevronDown className="h-3.5 w-3.5 ml-auto opacity-70" />
+                </button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="hidden">
+              Novi dokument
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="start" side="right" className="w-56">
+            {documentTypes.map((docType) => (
+              <DropdownMenuItem
+                key={docType.href}
+                onClick={() => {
+                  navigate(docType.href);
+                  setNewDocMenuOpen(false);
+                  if (isMobile && onOpenChange) {
+                    onOpenChange(false);
+                  }
+                }}
+                className="cursor-pointer"
+              >
+                <docType.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span>{docType.label}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Navigation */}

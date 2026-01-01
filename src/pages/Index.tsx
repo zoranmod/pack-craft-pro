@@ -3,7 +3,6 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentDocuments } from '@/components/dashboard/RecentDocuments';
-import { QuickActionsRefactored } from '@/components/dashboard/QuickActionsRefactored';
 import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { DeadlinesSection } from '@/components/dashboard/DeadlinesSection';
 import { AnalyticsSection } from '@/components/dashboard/AnalyticsSection';
@@ -82,11 +81,6 @@ const Index = () => {
           />
         </div>
       </CollapsibleSection>
-
-      {/* Quick Action - Always visible */}
-      <div className="mb-6">
-        <QuickActionsRefactored />
-      </div>
 
       {/* Recent Documents & Activities - Side by Side */}
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] mb-6">
