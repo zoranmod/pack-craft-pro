@@ -1,4 +1,5 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -12,7 +13,22 @@ interface MainLayoutProps {
 
 export function MainLayout({ children, title, subtitle, showGlobalSearch = false }: MainLayoutProps) {
   const isMobile = useIsMobile();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Defensive cleanup: in rare cases Radix layers can leave pointer-events locked after fast route changes.
+  useEffect(() => {
+    const raf = window.requestAnimationFrame(() => {
+      if (document.body.style.pointerEvents) {
+        document.body.style.pointerEvents = '';
+      }
+      if (document.documentElement.style.pointerEvents) {
+        document.documentElement.style.pointerEvents = '';
+      }
+    });
+
+    return () => window.cancelAnimationFrame(raf);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
