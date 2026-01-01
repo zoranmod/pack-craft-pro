@@ -63,6 +63,8 @@ export type Database = {
           barcode: string | null
           code: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           is_template: boolean
@@ -79,6 +81,8 @@ export type Database = {
           barcode?: string | null
           code?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           is_template?: boolean
@@ -95,6 +99,8 @@ export type Database = {
           barcode?: string | null
           code?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           is_template?: boolean
@@ -116,6 +122,8 @@ export type Database = {
           client_type: string
           created_at: string
           default_pdv: number
+          deleted_at: string | null
+          deleted_by: string | null
           email: string | null
           id: string
           name: string
@@ -132,6 +140,8 @@ export type Database = {
           client_type?: string
           created_at?: string
           default_pdv?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           id?: string
           name: string
@@ -148,6 +158,8 @@ export type Database = {
           client_type?: string
           created_at?: string
           default_pdv?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           id?: string
           name?: string
@@ -289,6 +301,8 @@ export type Database = {
           city: string | null
           contact_person: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           email: string | null
           id: string
           name: string
@@ -304,6 +318,8 @@ export type Database = {
           city?: string | null
           contact_person?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           id?: string
           name: string
@@ -319,6 +335,8 @@ export type Database = {
           city?: string | null
           contact_person?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           id?: string
           name?: string
@@ -549,6 +567,8 @@ export type Database = {
           contact_person: string | null
           created_at: string
           date: string
+          deleted_at: string | null
+          deleted_by: string | null
           delivery_address: string | null
           delivery_days: number | null
           id: string
@@ -574,6 +594,8 @@ export type Database = {
           contact_person?: string | null
           created_at?: string
           date?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           delivery_address?: string | null
           delivery_days?: number | null
           id?: string
@@ -599,6 +621,8 @@ export type Database = {
           contact_person?: string | null
           created_at?: string
           date?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           delivery_address?: string | null
           delivery_days?: number | null
           id?: string
@@ -945,6 +969,8 @@ export type Database = {
           city: string | null
           created_at: string
           date_of_birth: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           department: string | null
           email: string | null
           employment_end_date: string | null
@@ -968,6 +994,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           department?: string | null
           email?: string | null
           employment_end_date?: string | null
@@ -991,6 +1019,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           department?: string | null
           email?: string | null
           employment_end_date?: string | null

@@ -30,6 +30,7 @@ import Nalozi from "./pages/Nalozi";
 import Racuni from "./pages/Racuni";
 import Kalendar from "./pages/Kalendar";
 import Dobavljaci from "./pages/Dobavljaci";
+import Trash from "./pages/Trash";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/racuni" element={<ProtectedRoute><Racuni /></ProtectedRoute>} />
                 <Route path="/kalendar" element={<ProtectedRoute><Kalendar /></ProtectedRoute>} />
                 <Route path="/dobavljaci" element={<ProtectedRoute><Dobavljaci /></ProtectedRoute>} />
+                <Route path="/trash" element={<ProtectedRoute><Trash /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
                 <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />

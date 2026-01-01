@@ -22,6 +22,7 @@ export function useEmployees() {
       const { data, error } = await supabase
         .from('employees')
         .select('*')
+        .is('deleted_at', null)
         .order('last_name', { ascending: true });
       if (error) throw error;
       return data as Employee[];
@@ -71,12 +72,19 @@ export function useEmployees() {
 
   const deleteEmployee = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('employees').delete().eq('id', id);
+      // Soft delete
+      const { error } = await supabase
+        .from('employees')
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null
+        })
+        .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
-      toast.success('Zaposlenik uspješno obrisan');
+      toast.success('Premješteno u kantu za smeće.');
     },
     onError: (error) => {
       toast.error('Greška pri brisanju zaposlenika: ' + error.message);

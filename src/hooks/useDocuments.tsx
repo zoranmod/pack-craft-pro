@@ -120,6 +120,7 @@ export function useDocuments() {
       const { data: documents, error } = await supabase
         .from('documents')
         .select('*')
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -385,12 +386,17 @@ export function useUpdateDocumentStatus() {
 export function useDeleteDocument() {
   const queryClient = useQueryClient();
   const logActivity = useLogActivity();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ id, number }: { id: string; number?: string }) => {
+      // Soft delete - set deleted_at instead of hard delete
       const { error } = await supabase
         .from('documents')
-        .delete()
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -398,7 +404,7 @@ export function useDeleteDocument() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
-      toast.success('Dokument obrisan');
+      toast.success('Premješteno u kantu za smeće.');
       
       logActivity.mutate({
         action_type: 'delete',

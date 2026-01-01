@@ -58,7 +58,8 @@ export function useArticles(params: ArticlesParams = {}) {
 
       let query = supabase
         .from('articles')
-        .select('*', { count: 'exact' });
+        .select('*', { count: 'exact' })
+        .is('deleted_at', null);
 
       // Server-side search with input sanitization
       if (search.trim()) {

@@ -12,7 +12,8 @@ import {
   Calendar,
   ClipboardList,
   Package,
-  UsersRound
+  UsersRound,
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -36,6 +37,7 @@ const menuItems = [
   { icon: Truck, label: 'Dobavljači', path: '/dobavljaci' },
   { icon: UsersRound, label: 'Zaposlenici', path: '/employees' },
   { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
+  { icon: Trash2, label: 'Kanta za smeće', path: '/trash' },
 ];
 
 interface SidebarProps {

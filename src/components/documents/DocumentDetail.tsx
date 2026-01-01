@@ -81,7 +81,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   };
   
   // All available statuses for the dropdown
-  const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'rejected', 'completed', 'cancelled'];
+  // Visible statuses for the dropdown - excludes 'rejected'
+  const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'pending', 'completed', 'cancelled'];
 
   const handleDeleteDocument = async () => {
     if (!document) return;

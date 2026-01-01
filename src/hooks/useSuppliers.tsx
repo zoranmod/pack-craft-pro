@@ -42,6 +42,7 @@ export function useSuppliers() {
       const { data, error } = await supabase
         .from('dobavljaci')
         .select('*')
+        .is('deleted_at', null)
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -124,12 +125,17 @@ export function useUpdateSupplier() {
 
 export function useDeleteSupplier() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // Soft delete
       const { error } = await supabase
         .from('dobavljaci')
-        .delete()
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -137,8 +143,8 @@ export function useDeleteSupplier() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
       toast({
-        title: 'Dobavljač obrisan',
-        description: 'Dobavljač je uspješno obrisan.',
+        title: 'Premješteno u kantu za smeće',
+        description: 'Dobavljač je premješten u kantu za smeće.',
       });
     },
     onError: (error) => {

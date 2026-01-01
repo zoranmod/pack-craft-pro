@@ -54,6 +54,7 @@ export function useClients() {
       const { data, error } = await supabase
         .from('clients')
         .select('*')
+        .is('deleted_at', null)
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -157,15 +158,20 @@ export function useUpdateClient() {
 export function useDeleteClient() {
   const queryClient = useQueryClient();
   const logActivity = useLogActivity();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (idOrData: string | { id: string; name?: string }) => {
       const id = typeof idOrData === 'string' ? idOrData : idOrData.id;
       const name = typeof idOrData === 'string' ? undefined : idOrData.name;
       
+      // Soft delete
       const { error } = await supabase
         .from('clients')
-        .delete()
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -173,7 +179,7 @@ export function useDeleteClient() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
-      toast.success('Klijent uspješno obrisan');
+      toast.success('Premješteno u kantu za smeće.');
       
       logActivity.mutate({
         action_type: 'delete',
