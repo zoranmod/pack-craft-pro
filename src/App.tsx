@@ -31,6 +31,8 @@ import Racuni from "./pages/Racuni";
 import Kalendar from "./pages/Kalendar";
 import Dobavljaci from "./pages/Dobavljaci";
 import Trash from "./pages/Trash";
+import GodisnjiOdmori from "./pages/GodisnjiOdmori";
+import RadnaOdjeca from "./pages/RadnaOdjeca";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,8 @@ const App = () => (
                 <Route path="/racuni" element={<ProtectedRoute><Racuni /></ProtectedRoute>} />
                 <Route path="/kalendar" element={<ProtectedRoute><Kalendar /></ProtectedRoute>} />
                 <Route path="/dobavljaci" element={<ProtectedRoute><Dobavljaci /></ProtectedRoute>} />
+                <Route path="/godisnji-odmori" element={<ProtectedRoute><GodisnjiOdmori /></ProtectedRoute>} />
+                <Route path="/radna-odjeca" element={<ProtectedRoute><RadnaOdjeca /></ProtectedRoute>} />
                 <Route path="/trash" element={<ProtectedRoute><Trash /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
