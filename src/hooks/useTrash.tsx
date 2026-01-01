@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
-export type TrashEntityType = 'documents' | 'clients' | 'suppliers' | 'articles' | 'employees';
+export type TrashEntityType = 'documents' | 'clients' | 'suppliers' | 'articles' | 'employees' | 'leave-requests' | 'work-clothing';
 
 interface TrashItem {
   id: string;
@@ -77,6 +77,26 @@ export function useTrashItems(entityType: TrashEntityType) {
           error = result.error;
           break;
         }
+        case 'leave-requests': {
+          const result = await supabase
+            .from('employee_leave_requests')
+            .select('*')
+            .not('deleted_at', 'is', null)
+            .order('deleted_at', { ascending: false });
+          data = result.data || [];
+          error = result.error;
+          break;
+        }
+        case 'work-clothing': {
+          const result = await supabase
+            .from('employee_work_clothing')
+            .select('*')
+            .not('deleted_at', 'is', null)
+            .order('deleted_at', { ascending: false });
+          data = result.data || [];
+          error = result.error;
+          break;
+        }
       }
 
       if (error) throw error;
@@ -106,6 +126,14 @@ export function useTrashItems(entityType: TrashEntityType) {
           case 'employees':
             name = `${item.first_name} ${item.last_name}`;
             extra_info = item.position || item.email || '';
+            break;
+          case 'leave-requests':
+            name = `${item.start_date} - ${item.end_date}`;
+            extra_info = `${item.days_requested} dana, ${item.leave_type}`;
+            break;
+          case 'work-clothing':
+            name = item.item_name;
+            extra_info = item.size ? `Veličina: ${item.size}` : '';
             break;
         }
         
@@ -171,6 +199,22 @@ export function useRestoreItem() {
           error = result.error;
           break;
         }
+        case 'leave-requests': {
+          const result = await supabase
+            .from('employee_leave_requests')
+            .update({ deleted_at: null, deleted_by: null })
+            .eq('id', id);
+          error = result.error;
+          break;
+        }
+        case 'work-clothing': {
+          const result = await supabase
+            .from('employee_work_clothing')
+            .update({ deleted_at: null, deleted_by: null })
+            .eq('id', id);
+          error = result.error;
+          break;
+        }
       }
 
       if (error) throw error;
@@ -194,6 +238,14 @@ export function useRestoreItem() {
           break;
         case 'employees':
           queryClient.invalidateQueries({ queryKey: ['employees'] });
+          break;
+        case 'leave-requests':
+          queryClient.invalidateQueries({ queryKey: ['all-leave-requests'] });
+          queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+          break;
+        case 'work-clothing':
+          queryClient.invalidateQueries({ queryKey: ['all-work-clothing'] });
+          queryClient.invalidateQueries({ queryKey: ['work-clothing'] });
           break;
       }
       toast.success('Vraćeno iz kante.');
@@ -237,6 +289,16 @@ export function usePermanentDelete() {
           error = result.error;
           break;
         }
+        case 'leave-requests': {
+          const result = await supabase.from('employee_leave_requests').delete().eq('id', id);
+          error = result.error;
+          break;
+        }
+        case 'work-clothing': {
+          const result = await supabase.from('employee_work_clothing').delete().eq('id', id);
+          error = result.error;
+          break;
+        }
       }
 
       if (error) throw error;
@@ -267,12 +329,14 @@ export function useBulkDeleteOld() {
       const results: Record<string, number> = {};
 
       // Delete from each table individually
-      const tables: { key: string; table: 'documents' | 'clients' | 'dobavljaci' | 'articles' | 'employees' }[] = [
+      const tables: { key: string; table: 'documents' | 'clients' | 'dobavljaci' | 'articles' | 'employees' | 'employee_leave_requests' | 'employee_work_clothing' }[] = [
         { key: 'documents', table: 'documents' },
         { key: 'clients', table: 'clients' },
         { key: 'suppliers', table: 'dobavljaci' },
         { key: 'articles', table: 'articles' },
         { key: 'employees', table: 'employees' },
+        { key: 'leave-requests', table: 'employee_leave_requests' },
+        { key: 'work-clothing', table: 'employee_work_clothing' },
       ];
 
       for (const { key, table } of tables) {
@@ -303,6 +367,8 @@ export function useBulkDeleteOld() {
             suppliers: 'Dobavljači',
             articles: 'Artikli',
             employees: 'Zaposlenici',
+            'leave-requests': 'Godišnji odmori',
+            'work-clothing': 'Radna odjeća',
           };
           return `${labels[type]}: ${count}`;
         })

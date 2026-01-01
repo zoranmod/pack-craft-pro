@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, RotateCcw, Search, AlertTriangle, FileText, Users, Package, UsersRound, Truck, X } from 'lucide-react';
+import { Trash2, RotateCcw, Search, AlertTriangle, FileText, Users, Package, UsersRound, Truck, X, Palmtree, Shirt } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,8 @@ const TABS: { value: TrashEntityType; label: string; icon: React.ComponentType<{
   { value: 'suppliers', label: 'Dobavljači', icon: Truck },
   { value: 'articles', label: 'Artikli', icon: Package },
   { value: 'employees', label: 'Zaposlenici', icon: UsersRound },
+  { value: 'leave-requests', label: 'Godišnji', icon: Palmtree },
+  { value: 'work-clothing', label: 'Odjeća', icon: Shirt },
 ];
 
 const Trash = () => {
@@ -111,7 +113,7 @@ const Trash = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TrashEntityType)}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             {TABS.map(tab => (
               <TabsTrigger key={tab.value} value={tab.value} className="gap-2">
                 <tab.icon className="h-4 w-4" />
