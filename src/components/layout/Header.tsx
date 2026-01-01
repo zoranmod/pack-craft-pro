@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, LogOut, Menu, Sun, Moon, X, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,9 +27,17 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
   const { theme, toggleTheme } = useTheme();
   const { isInstallable, installApp } = usePWAInstall();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Force close user menu on route change to prevent stuck overlays
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
+    setUserMenuOpen(false);
     await signOut();
   };
 
@@ -104,8 +112,8 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
           )}
         </Button>
 
-        {/* User Dropdown */}
-        <DropdownMenu>
+        {/* User Dropdown - modal={false} prevents scroll locking that can block sidebar */}
+        <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen} modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
               <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
@@ -120,7 +128,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
             <DropdownMenuSeparator />
             {isInstallable && (
               <>
-                <DropdownMenuItem onClick={installApp}>
+                <DropdownMenuItem onClick={() => { setUserMenuOpen(false); installApp(); }}>
                   <Download className="h-4 w-4 mr-2" />
                   Instaliraj aplikaciju
                 </DropdownMenuItem>
