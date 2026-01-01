@@ -40,7 +40,11 @@ const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
   return { subtotal, total };
 };
 
-export function DocumentForm() {
+interface DocumentFormProps {
+  fixedType?: DocumentType;
+}
+
+export function DocumentForm({ fixedType }: DocumentFormProps) {
   const navigate = useNavigate();
   const { id: documentId } = useParams();
   const [searchParams] = useSearchParams();
@@ -50,10 +54,16 @@ export function DocumentForm() {
   const { user } = useAuth();
   const { data: userProfile } = useUserProfile();
 
+  // Determine document type: fixedType > URL param > default
   const typeParam = searchParams.get('type');
   const typeFromUrl: DocumentType = typeParam && typeParam in documentTypeLabels
     ? (typeParam as DocumentType)
     : 'ponuda';
+  
+  // If fixedType is provided, use it; otherwise use URL param
+  const initialType = fixedType || typeFromUrl;
+  // Type is locked if fixedType is provided OR in edit mode
+  const isTypeLocked = !!fixedType || isEditMode;
 
   const createDocument = useCreateDocument();
   const updateDocument = useUpdateDocument();
@@ -68,7 +78,7 @@ export function DocumentForm() {
   };
 
   const [formData, setFormData] = useState(() => ({
-    type: typeFromUrl,
+    type: initialType,
     clientName: '',
     clientOib: '',
     clientAddress: '',
@@ -114,14 +124,13 @@ export function DocumentForm() {
     }
   }, [activeTemplate, selectedTemplateId]);
 
-  // When switching between "Nova ponuda / otpremnica / ..." we stay on /documents/new,
-  // only the query param changes. Sync form type with URL.
+  // Sync with URL type param only if type is NOT locked
   useEffect(() => {
-    if (formData.type !== typeFromUrl) {
+    if (!isTypeLocked && formData.type !== typeFromUrl) {
       setFormData(prev => ({ ...prev, type: typeFromUrl }));
-      setSelectedTemplateId(null); // Reset template when type changes
+      setSelectedTemplateId(null);
     }
-  }, [typeFromUrl]);
+  }, [typeFromUrl, isTypeLocked]);
 
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
     { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
@@ -469,24 +478,35 @@ export function DocumentForm() {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Document Type */}
+          {/* Document Type - show dropdown only when NOT locked */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h2 className="font-semibold text-foreground mb-4">Vrsta dokumenta</h2>
-            <Select
-              value={formData.type}
-              onValueChange={(value: DocumentType) => setFormData({ ...formData, type: value })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(documentTypeLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isTypeLocked ? (
+              // Read-only display when type is locked
+              <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md border border-border">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">
+                  {documentTypeLabels[formData.type]}
+                </span>
+              </div>
+            ) : (
+              // Editable dropdown when type is not locked
+              <Select
+                value={formData.type}
+                onValueChange={(value: DocumentType) => setFormData({ ...formData, type: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(documentTypeLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             {/* Template Selection */}
             {allTemplates.length > 0 && (
