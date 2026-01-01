@@ -61,13 +61,6 @@ interface NavGroup {
 // Grouped navigation
 const navGroups: NavGroup[] = [
   {
-    id: 'main',
-    label: '',
-    items: [
-      { icon: LayoutDashboard, label: 'Početna', path: '/' },
-    ],
-  },
-  {
     id: 'dokumenti',
     label: 'Dokumenti',
     items: [
@@ -140,10 +133,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     };
     
     navGroups.forEach(group => {
-      if (group.label && group.items.some(item => 
-        item.path === '/' 
-          ? location.pathname === '/'
-          : location.pathname === item.path || location.pathname.startsWith(item.path + '/')
+      if (group.items.some(item => 
+        location.pathname === item.path || location.pathname.startsWith(item.path + '/')
       )) {
         initialState[group.id] = true;
       }
@@ -221,87 +212,92 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         )}
       </div>
 
-      {/* New Document Action Button */}
-      <div className="px-2 py-2 border-b border-border">
-        <DropdownMenu modal={false} open={newDocMenuOpen} onOpenChange={setNewDocMenuOpen}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={cn(
-                    "flex items-center gap-2 w-full rounded-md px-2.5 py-2 text-[13px] font-medium transition-all",
-                    "bg-primary text-primary-foreground hover:bg-primary/90",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  )}
-                >
-                  <Plus className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">Novi dokument</span>
-                  <ChevronDown className="h-3.5 w-3.5 ml-auto opacity-70" />
-                </button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="hidden">
-              Novi dokument
-            </TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="start" side="right" className="w-56">
-            {documentTypes.map((docType) => (
-              <DropdownMenuItem
-                key={docType.href}
-                onClick={() => {
-                  navigate(docType.href);
-                  setNewDocMenuOpen(false);
-                  if (isMobile && onOpenChange) {
-                    onOpenChange(false);
-                  }
-                }}
-                className="cursor-pointer"
-              >
-                <docType.icon className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>{docType.label}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 px-2 py-2 overflow-y-auto space-y-0.5">
-        {navGroups.map((group) => {
-          if (!group.label) {
-            // Ungrouped items (Početna, Kanta za smeće)
-            return (
-              <div key={group.id} className="space-y-0.5">
-                {group.items.map((item) => (
-                  <NavItem key={item.path} item={item} />
-                ))}
-              </div>
-            );
-          }
+        {/* Početna - always first and visible */}
+        <Link
+          to="/"
+          onClick={handleLinkClick}
+          className={cn(
+            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
+            isActive('/')
+              ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px] dark:bg-secondary"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
+        >
+          <LayoutDashboard className={cn(
+            "h-4 w-4 flex-shrink-0",
+            isActive('/') && "text-primary"
+          )} />
+          <span className="truncate">Početna</span>
+        </Link>
 
-          // Grouped items with collapsible
-          return (
-            <Collapsible
-              key={group.id}
-              open={expandedGroups[group.id]}
-              onOpenChange={() => toggleGroup(group.id)}
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors">
-                <span>{group.label}</span>
-                {expandedGroups[group.id] ? (
-                  <ChevronDown className="h-3 w-3" />
-                ) : (
-                  <ChevronRight className="h-3 w-3" />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-0.5 mt-0.5">
-                {group.items.map((item) => (
-                  <NavItem key={item.path} item={item} />
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          );
-        })}
+        {/* Novi dokument - always visible, above DOKUMENTI section */}
+        <div className="pt-2">
+          <DropdownMenu modal={false} open={newDocMenuOpen} onOpenChange={setNewDocMenuOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={cn(
+                      "flex items-center gap-2 w-full rounded-md px-2.5 py-2 text-[13px] font-medium transition-all",
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    )}
+                  >
+                    <Plus className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Novi dokument</span>
+                    <ChevronDown className="h-3.5 w-3.5 ml-auto opacity-70" />
+                  </button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="hidden">
+                Novi dokument
+              </TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="start" side="right" className="w-56">
+              {documentTypes.map((docType) => (
+                <DropdownMenuItem
+                  key={docType.href}
+                  onClick={() => {
+                    navigate(docType.href);
+                    setNewDocMenuOpen(false);
+                    if (isMobile && onOpenChange) {
+                      onOpenChange(false);
+                    }
+                  }}
+                  className="cursor-pointer"
+                >
+                  <docType.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <span>{docType.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Grouped navigation sections */}
+        {navGroups.map((group) => (
+          <Collapsible
+            key={group.id}
+            open={expandedGroups[group.id]}
+            onOpenChange={() => toggleGroup(group.id)}
+          >
+            <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 mt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors">
+              <span>{group.label}</span>
+              {expandedGroups[group.id] ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-0.5 mt-0.5">
+              {group.items.map((item) => (
+                <NavItem key={item.path} item={item} />
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        ))}
       </nav>
 
       {/* Bottom Items (Trash) */}
