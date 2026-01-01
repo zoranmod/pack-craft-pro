@@ -7,140 +7,140 @@
 @layer base {
   :root {
     /* =============================================
-       AKORD UI TOKENS - Stripe-like Enterprise Clean
+       AKORD UI TOKENS - Warm White/Gray + Amber Accent
        Single source of truth for light/dark themes
        ============================================= */
 
-    /* Core backgrounds */
+    /* Core backgrounds: Warm white */
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 24 10% 12%;
 
     /* Card surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 24 10% 12%;
 
     /* Popover/dropdown surfaces */
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 24 10% 12%;
 
-    /* Primary: Akord Yellow (premium, not neon) */
-    --primary: 45 95% 50%;
-    --primary-foreground: 222 47% 11%;
+    /* Primary: Akord Amber (premium orange-gold) */
+    --primary: 38 92% 55%;
+    --primary-foreground: 24 10% 12%;
 
-    /* Secondary: Stripe-like neutral */
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary: Warm neutral */
+    --secondary: 30 10% 96%;
+    --secondary-foreground: 24 10% 12%;
 
-    /* Muted: Subtle backgrounds and text */
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    /* Muted: Warm subtle backgrounds and text */
+    --muted: 30 10% 96%;
+    --muted-foreground: 24 6% 40%;
 
-    /* Accent: Uses Akord Yellow for highlights */
-    --accent: 45 95% 50%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent: Uses Akord Amber for highlights */
+    --accent: 38 92% 55%;
+    --accent-foreground: 24 10% 12%;
 
     /* Destructive: Clean red */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Success: Enterprise green */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
     /* Warning: Matches primary for consistency */
-    --warning: 45 95% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 24 10% 12%;
 
-    /* Borders and inputs */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 45 95% 50%;
+    /* Borders and inputs: Warm gray */
+    --border: 30 7% 88%;
+    --input: 30 7% 88%;
+    --ring: 38 92% 55%;
 
     /* Badge neutral */
-    --badge-neutral: 214 32% 91%;
+    --badge-neutral: 30 7% 88%;
 
     /* Radius: Stripe-like subtle rounding */
     --radius: 10px;
 
-    /* Sidebar tokens */
+    /* Sidebar tokens: Warm palette */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 45 95% 50%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 45 80% 95%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 45 95% 50%;
+    --sidebar-foreground: 24 10% 12%;
+    --sidebar-primary: 38 92% 55%;
+    --sidebar-primary-foreground: 24 10% 12%;
+    --sidebar-accent: 38 50% 96%;
+    --sidebar-accent-foreground: 24 10% 12%;
+    --sidebar-border: 30 7% 88%;
+    --sidebar-ring: 38 92% 55%;
 
     /* Minimal shadows (Stripe-like: borders > shadows) */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.04);
+    --shadow-sm: 0 1px 2px 0 hsl(24 10% 0% / 0.03);
+    --shadow-md: 0 4px 6px -1px hsl(24 10% 0% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(24 10% 0% / 0.08);
+    --shadow-card: 0 1px 3px hsl(24 10% 0% / 0.04);
   }
 
   .dark {
     /* =============================================
-       DARK MODE TOKENS
+       DARK MODE TOKENS - Warm Charcoal (not blue)
        ============================================= */
 
-    /* Core backgrounds: Deep blue-gray (not pure black) */
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
+    /* Core backgrounds: Warm charcoal */
+    --background: 24 10% 7%;
+    --foreground: 30 10% 96%;
 
-    /* Card surfaces: Slightly elevated */
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
+    /* Card surfaces: Slightly elevated warm charcoal */
+    --card: 24 10% 9%;
+    --card-foreground: 30 10% 96%;
 
     /* Popover/dropdown surfaces */
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 24 10% 9%;
+    --popover-foreground: 30 10% 96%;
 
-    /* Primary: Akord Yellow (slightly softer in dark) */
-    --primary: 45 95% 55%;
-    --primary-foreground: 222 47% 10%;
+    /* Primary: Akord Amber (slightly brighter in dark) */
+    --primary: 38 92% 60%;
+    --primary-foreground: 24 10% 10%;
 
-    /* Secondary: Dark neutral */
-    --secondary: 217 33% 16%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary: Warm dark neutral */
+    --secondary: 24 8% 14%;
+    --secondary-foreground: 30 10% 96%;
 
-    /* Muted: Dark subtle backgrounds */
-    --muted: 217 33% 16%;
-    --muted-foreground: 215 20% 65%;
+    /* Muted: Warm dark subtle backgrounds */
+    --muted: 24 8% 14%;
+    --muted-foreground: 30 8% 70%;
 
-    /* Accent: Akord Yellow for dark mode */
-    --accent: 45 95% 55%;
-    --accent-foreground: 222 47% 10%;
+    /* Accent: Akord Amber for dark mode */
+    --accent: 38 92% 60%;
+    --accent-foreground: 24 10% 10%;
 
     /* Destructive: Softer red for dark */
     --destructive: 0 62% 55%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Success */
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
 
     /* Warning */
-    --warning: 45 95% 55%;
-    --warning-foreground: 222 47% 10%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 24 10% 10%;
 
-    /* Borders and inputs */
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 45 95% 55%;
+    /* Borders and inputs: Warm charcoal borders */
+    --border: 24 6% 18%;
+    --input: 24 6% 18%;
+    --ring: 38 92% 60%;
 
     /* Badge neutral */
-    --badge-neutral: 217 33% 22%;
+    --badge-neutral: 24 8% 22%;
 
-    /* Sidebar tokens */
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 45 95% 55%;
-    --sidebar-primary-foreground: 222 47% 10%;
-    --sidebar-accent: 217 33% 16%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 18%;
-    --sidebar-ring: 45 95% 55%;
+    /* Sidebar tokens: Warm charcoal */
+    --sidebar-background: 24 10% 8%;
+    --sidebar-foreground: 30 10% 96%;
+    --sidebar-primary: 38 92% 60%;
+    --sidebar-primary-foreground: 24 10% 10%;
+    --sidebar-accent: 24 8% 14%;
+    --sidebar-accent-foreground: 30 10% 96%;
+    --sidebar-border: 24 6% 18%;
+    --sidebar-ring: 38 92% 60%;
 
     /* Shadows: More visible on dark backgrounds */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
@@ -218,11 +218,11 @@
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: hsl(216 8% 25%);
+    background: hsl(24 8% 25%);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: hsl(216 8% 35%);
+    background: hsl(24 8% 35%);
   }
 }
 
