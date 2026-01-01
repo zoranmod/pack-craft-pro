@@ -6,126 +6,147 @@
 
 @layer base {
   :root {
-    /* Primary colors - Modern business look */
+    /* =============================================
+       AKORD UI TOKENS - Stripe-like Enterprise Clean
+       Single source of truth for light/dark themes
+       ============================================= */
+
+    /* Core backgrounds */
     --background: 0 0% 100%;
-    --foreground: 0 0% 11%;
+    --foreground: 222 47% 11%;
 
-    /* Card background: #F7F8FA */
-    --card: 220 14% 97%;
-    --card-foreground: 0 0% 11%;
+    /* Card surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
+    /* Popover/dropdown surfaces */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 11%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary accent: #FFB800 */
-    --primary: 43 100% 50%;
-    --primary-foreground: 0 0% 10%;
+    /* Primary: Akord Yellow (premium, not neon) */
+    --primary: 45 95% 50%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 220 14% 97%;
-    --secondary-foreground: 0 0% 11%;
+    /* Secondary: Stripe-like neutral */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 14% 96%;
-    /* Text secondary: #6D6D6D */
-    --muted-foreground: 0 0% 43%;
+    /* Muted: Subtle backgrounds and text */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 43 100% 95%;
-    --accent-foreground: 0 0% 11%;
+    /* Accent: Uses Akord Yellow for highlights */
+    --accent: 45 95% 50%;
+    --accent-foreground: 222 47% 11%;
 
-    /* Danger: #FF6B6B */
-    --destructive: 0 100% 71%;
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive: Clean red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
-    /* Success: #3CC47C */
-    --success: 150 54% 50%;
+    /* Success: Enterprise green */
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning stays similar to primary */
-    --warning: 43 100% 50%;
-    --warning-foreground: 0 0% 10%;
+    /* Warning: Matches primary for consistency */
+    --warning: 45 95% 50%;
+    --warning-foreground: 222 47% 11%;
 
-    /* Border: #E5E5E5 */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 43 100% 50%;
+    /* Borders and inputs */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 45 95% 50%;
 
-    /* Neutral badge: #DCE1E7 */
-    --badge-neutral: 216 17% 89%;
+    /* Badge neutral */
+    --badge-neutral: 214 32% 91%;
 
-    --radius: 0.5rem;
+    /* Radius: Stripe-like subtle rounding */
+    --radius: 10px;
 
+    /* Sidebar tokens */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 11%;
-    --sidebar-primary: 43 100% 50%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 43 100% 95%;
-    --sidebar-accent-foreground: 0 0% 11%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 43 100% 50%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 45 95% 50%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 45 80% 95%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 45 95% 50%;
 
-    /* Minimal shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.02);
-    --shadow-md: 0 2px 4px -1px hsl(0 0% 0% / 0.04);
-    --shadow-lg: 0 4px 6px -2px hsl(0 0% 0% / 0.05);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.03);
+    /* Minimal shadows (Stripe-like: borders > shadows) */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.04);
   }
 
   .dark {
-    /* Dark mode background: #1D1D1D */
-    --background: 0 0% 11%;
-    /* Light text: #EDEDED */
-    --foreground: 0 0% 93%;
+    /* =============================================
+       DARK MODE TOKENS
+       ============================================= */
 
-    /* Cards slightly lighter */
-    --card: 0 0% 14%;
-    --card-foreground: 0 0% 93%;
+    /* Core backgrounds: Deep blue-gray (not pure black) */
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
 
-    --popover: 0 0% 14%;
-    --popover-foreground: 0 0% 93%;
+    /* Card surfaces: Slightly elevated */
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
 
-    /* Primary accent stays bold: #FFB800 */
-    --primary: 43 100% 50%;
-    --primary-foreground: 0 0% 10%;
+    /* Popover/dropdown surfaces */
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
 
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 0 0% 93%;
+    /* Primary: Akord Yellow (slightly softer in dark) */
+    --primary: 45 95% 55%;
+    --primary-foreground: 222 47% 10%;
 
-    --muted: 0 0% 18%;
-    --muted-foreground: 0 0% 60%;
+    /* Secondary: Dark neutral */
+    --secondary: 217 33% 16%;
+    --secondary-foreground: 210 40% 98%;
 
-    --accent: 43 50% 18%;
-    --accent-foreground: 0 0% 93%;
+    /* Muted: Dark subtle backgrounds */
+    --muted: 217 33% 16%;
+    --muted-foreground: 215 20% 65%;
 
-    /* Danger: #FF6B6B */
-    --destructive: 0 100% 71%;
-    --destructive-foreground: 0 0% 100%;
+    /* Accent: Akord Yellow for dark mode */
+    --accent: 45 95% 55%;
+    --accent-foreground: 222 47% 10%;
 
-    /* Success: #3CC47C */
-    --success: 150 54% 50%;
+    /* Destructive: Softer red for dark */
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Success */
+    --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 43 100% 50%;
-    --warning-foreground: 0 0% 10%;
+    /* Warning */
+    --warning: 45 95% 55%;
+    --warning-foreground: 222 47% 10%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 43 100% 50%;
+    /* Borders and inputs */
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 45 95% 55%;
 
-    --badge-neutral: 0 0% 25%;
+    /* Badge neutral */
+    --badge-neutral: 217 33% 22%;
 
-    --sidebar-background: 0 0% 12%;
-    --sidebar-foreground: 0 0% 93%;
-    --sidebar-primary: 43 100% 50%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 43 50% 18%;
-    --sidebar-accent-foreground: 0 0% 93%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 43 100% 50%;
+    /* Sidebar tokens */
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 45 95% 55%;
+    --sidebar-primary-foreground: 222 47% 10%;
+    --sidebar-accent: 217 33% 16%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 45 95% 55%;
 
-    /* Shadows - subtle on dark */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
-    --shadow-md: 0 2px 4px -1px hsl(0 0% 0% / 0.5);
-    --shadow-lg: 0 4px 6px -2px hsl(0 0% 0% / 0.6);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.3);
+    /* Shadows: More visible on dark backgrounds */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2);
   }
 }
 
@@ -344,31 +365,31 @@
 
 /*  ================================
     GLOBAL APP STYLE UPGRADE
-    modern minimal + glass UI feel
+    Uses Akord UI tokens defined above
     ================================ */
 
 :root {
-  --bg-light: #f7f7f7;
-  --bg-dark: #101014;
-  --card-light: #ffffff;
-  --card-dark: #18181d;
-  --accent: #f3b326; /* žuta boja loga - ostaje akcent */
-  --text-light: #1c1c1e;
-  --text-muted: #6c6c75;
-  --border-light: #e5e5ea;
-  --radius: 14px;
-  --shadow-soft: 0px 4px 18px rgba(0, 0, 0, 0.06);
-  --shadow-strong: 0px 6px 26px rgba(0, 0, 0, 0.14);
+  /* Legacy aliases - now point to semantic tokens */
+  --bg-light: hsl(var(--background));
+  --bg-dark: hsl(var(--background));
+  --card-light: hsl(var(--card));
+  --card-dark: hsl(var(--card));
+  --accent: hsl(var(--primary));
+  --text-light: hsl(var(--foreground));
+  --text-muted: hsl(var(--muted-foreground));
+  --border-light: hsl(var(--border));
+  --shadow-soft: var(--shadow-md);
+  --shadow-strong: var(--shadow-lg);
 }
 
 /* -------- Base Layout -------- */
 
 html,
 body {
-  background: var(--bg-light);
+  background: hsl(var(--background));
   font-smooth: always;
   -webkit-font-smoothing: antialiased;
-  color: var(--text-light);
+  color: hsl(var(--foreground));
 }
 
 /*  ------------------------------
@@ -377,21 +398,18 @@ body {
 
 .card,
 .panel,
-.box,
-.container,
-section {
-  background: var(--card-light);
+.box {
+  background: hsl(var(--card));
   border-radius: var(--radius);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-soft);
-  transition: 0.25s ease;
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-card);
+  transition: 0.2s ease;
 }
 
 .card:hover,
 .panel:hover,
 .box:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-strong);
+  box-shadow: var(--shadow-md);
 }
 
 /* --------- Buttons --------- */
@@ -411,30 +429,32 @@ button:hover,
   transform: translateY(-1px);
 }
 
-/* gold accent buttons */
+/* Akord yellow accent buttons */
 button.primary,
 .btn-primary {
-  background: var(--accent);
-  color: #000;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
 }
 
 button.secondary,
 .btn-secondary {
-  background: #fff;
-  border: 1px solid var(--border-light);
+  background: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--secondary-foreground));
 }
 
 /* Top dashboard stat cards */
 .stat-card {
-  background: var(--card-light);
+  background: hsl(var(--card));
   border-radius: var(--radius);
   padding: 22px;
-  box-shadow: var(--shadow-soft);
-  transition: 0.3s;
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-card);
+  transition: 0.2s;
 }
 
 .stat-card:hover {
-  box-shadow: var(--shadow-strong);
+  box-shadow: var(--shadow-md);
 }
 
 /* Badges (Završeno, Nacrt...) */
@@ -460,176 +480,70 @@ button.secondary,
 
 /* Dokument list rows */
 .row-item {
-  background: #fff;
-  border-bottom: 1px solid #eee;
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
   padding: 13px 14px;
-  border-radius: 12px;
+  border-radius: 8px;
   margin-bottom: 6px;
-  transition: 0.22s;
+  transition: 0.15s;
 }
 .row-item:hover {
-  background: #fafafa;
-  transform: translateX(3px);
+  background: hsl(var(--muted));
 }
 
 /* Aktivnosti list */
 .activity-item {
   padding: 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  transition: 0.2s;
+  border-bottom: 1px solid hsl(var(--border));
+  transition: 0.15s;
 }
 .activity-item:hover {
-  background: #f2f2f2;
+  background: hsl(var(--muted));
 }
 
 /* Input & fields */
 input,
 select,
 textarea {
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 14px;
-  border: 1px solid var(--border-light);
-  transition: 0.2s;
+  border: 1px solid hsl(var(--input));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: 0.15s;
 }
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(243, 179, 38, 0.25);
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+  outline: none;
 }
 
 /* Table */
 table {
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
 }
 table tr:hover {
-  background: #fafafa;
+  background: hsl(var(--muted));
 }
 
-/* OPTIONAL — Dark mode activation handled later */
-.dark {
-  background: var(--bg-dark);
-  color: #fff;
-}
 /* ================================
-   DARK MODE PATCH
+   DARK MODE - Uses semantic tokens
+   All colors now reference CSS variables
    ================================ */
 
-.dark,
-.dark body {
-  background: var(--bg-dark) !important;
-  color: #e6e6e6 !important;
-}
-
-/* Cards / container */
-.dark .card,
-.dark .panel,
-.dark .box,
-.dark .container,
-.dark section,
-.dark .stat-card {
-  background: #1a1b20 !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  box-shadow: none !important;
-}
-
-.dark .card:hover,
-.dark .panel:hover,
-.dark .box:hover,
-.dark .stat-card:hover {
-  background: #202127 !important;
-  transform: translateY(-2px);
-}
-
-/* Sidebar */
-.dark .sidebar,
-.dark nav {
-  background: #131316 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.dark .sidebar a,
-.dark nav a {
-  color: #d9d9d9 !important;
-}
-
-.dark .sidebar a:hover {
-  background: #1f1f24;
-}
-
-/* Top header */
-.dark header,
-.dark .topbar,
-.dark .navbar {
-  background: #121214 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-/* Buttons */
-.dark button.primary,
-.dark .btn-primary {
-  background: var(--accent) !important;
-  color: #000 !important;
-}
-
-.dark button.secondary,
-.dark .btn-secondary {
-  background: #26262d !important;
-  border-color: #2d2d34 !important;
-  color: #ddd !important;
-}
-
-.dark .action:hover,
-.dark .btn:hover {
-  opacity: 0.85;
-}
-
-/* Input fields */
-.dark input,
-.dark select,
-.dark textarea {
-  background: #1b1c21 !important;
-  border-color: #2a2b31 !important;
-  color: #fff !important;
-}
-
-.dark input:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(243, 179, 38, 0.25) !important;
-}
-
-/* Lists */
-.dark .row-item {
-  background: #1b1c21 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-}
-
-.dark .row-item:hover {
-  background: #22232a !important;
-}
-
-.dark .activity-item:hover {
-  background: #202127 !important;
-}
-
-/* Table */
-.dark table tr:hover {
-  background: #23242a !important;
-}
-
-/* Badges */
+/* Badges for dark mode */
 .dark .badge-green {
-  background: #153a22;
-  color: #58d992;
+  background: hsl(142 40% 15%);
+  color: hsl(142 70% 60%);
 }
 .dark .badge-red {
-  background: #3d1b1b;
-  color: #ff7b7b;
+  background: hsl(0 40% 18%);
+  color: hsl(0 70% 70%);
 }
 .dark .badge-blue {
-  background: #1c2946;
-  color: #6da8ff;
+  background: hsl(217 40% 18%);
+  color: hsl(217 70% 70%);
 }
