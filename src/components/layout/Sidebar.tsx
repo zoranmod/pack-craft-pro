@@ -17,7 +17,8 @@ import {
   Palmtree,
   Shirt,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Stethoscope
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -76,6 +77,7 @@ const navGroups: NavGroup[] = [
     label: 'Pregledi',
     items: [
       { icon: Palmtree, label: 'Godišnji odmori', path: '/godisnji-odmori' },
+      { icon: Stethoscope, label: 'Bolovanja', path: '/bolovanja' },
       { icon: Shirt, label: 'Radna odjeća', path: '/radna-odjeca' },
       { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
     ],

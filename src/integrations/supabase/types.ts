@@ -1058,6 +1058,44 @@ export type Database = {
         }
         Relationships: []
       }
+      leave_request_excluded_dates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          deleted_at: string | null
+          id: string
+          leave_request_id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          deleted_at?: string | null
+          id?: string
+          leave_request_id: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          deleted_at?: string | null
+          id?: string
+          leave_request_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_request_excluded_dates_leave_request_id_fkey"
+            columns: ["leave_request_id"]
+            isOneToOne: false
+            referencedRelation: "employee_leave_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string

@@ -33,6 +33,7 @@ import Dobavljaci from "./pages/Dobavljaci";
 import Trash from "./pages/Trash";
 import GodisnjiOdmori from "./pages/GodisnjiOdmori";
 import RadnaOdjeca from "./pages/RadnaOdjeca";
+import Bolovanja from "./pages/Bolovanja";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
                 <Route path="/kalendar" element={<ProtectedRoute><Kalendar /></ProtectedRoute>} />
                 <Route path="/dobavljaci" element={<ProtectedRoute><Dobavljaci /></ProtectedRoute>} />
                 <Route path="/godisnji-odmori" element={<ProtectedRoute><GodisnjiOdmori /></ProtectedRoute>} />
+                <Route path="/bolovanja" element={<ProtectedRoute><Bolovanja /></ProtectedRoute>} />
                 <Route path="/radna-odjeca" element={<ProtectedRoute><RadnaOdjeca /></ProtectedRoute>} />
                 <Route path="/trash" element={<ProtectedRoute><Trash /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
