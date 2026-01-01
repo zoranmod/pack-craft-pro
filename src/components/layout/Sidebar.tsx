@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -111,6 +111,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const { theme } = useTheme();
   const { data: companySettings } = useCompanySettings();
   const [newDocMenuOpen, setNewDocMenuOpen] = useState(false);
+  const navPointerHandledRef = useRef(false);
   
   const STORAGE_KEY = 'sidebar-expanded-groups';
   
@@ -167,6 +168,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     }
   };
 
+  // Navigation helper: use imperative navigation to avoid occasional swallowed Link clicks
+  const navigateTo = (path: string) => {
+    navigate(path);
+    handleLinkClick();
+  };
+
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
@@ -183,9 +190,31 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const NavItem = ({ item }: { item: NavItem }) => (
     <Link
       to={item.path}
-      onClick={(e) => {
+      onPointerDown={(e) => {
+        // If a Radix dismiss layer swallows the click, navigate on pointer down (mouse/touch).
+        // Keep modified clicks (new tab etc.) intact.
+        if (e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        navPointerHandledRef.current = true;
+        // reset after the click phase
+        setTimeout(() => {
+          navPointerHandledRef.current = false;
+        }, 0);
+
+        e.preventDefault();
         e.stopPropagation();
-        handleLinkClick();
+        navigateTo(item.path);
+      }}
+      onClick={(e) => {
+        // Keyboard activation lands here (no pointer down); also fallback.
+        if (navPointerHandledRef.current) {
+          e.preventDefault();
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        navigateTo(item.path);
       }}
       className={cn(
         "relative z-10 flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
@@ -225,7 +254,18 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         {/* Početna - always first and visible */}
         <Link
           to="/"
-          onClick={handleLinkClick}
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            e.stopPropagation();
+            navigateTo('/');
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigateTo('/');
+          }}
           className={cn(
             "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
             isActive('/')
@@ -323,7 +363,18 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       <div className="border-t border-border px-2 py-2">
         <Link
           to="/settings"
-          onClick={handleLinkClick}
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            e.stopPropagation();
+            navigateTo('/settings');
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigateTo('/settings');
+          }}
           className={cn(
             "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
             isActive('/settings')
