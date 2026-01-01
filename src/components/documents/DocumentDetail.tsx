@@ -15,7 +15,7 @@ import { MemorandumHeader } from './MemorandumHeader';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { openPrintDialog } from '@/lib/pdfGenerator';
+import { generatePdfFromElement, downloadPdf } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +54,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
@@ -141,29 +142,41 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     return `${prefix}-${numberPart}.pdf`;
   };
 
-  // Open print dialog for vector PDF with selectable text
-  const handleDownloadPdf = () => {
-    if (!document) return;
-    openPrintDialog(document.id);
-    toast.info('Odaberite "Spremi kao PDF" u dijalogu za ispis.');
+  // Generate and download PDF directly
+  const handleDownloadPdf = async () => {
+    if (!document || !printRef.current) return;
+    
+    setIsGeneratingPdf(true);
+    toast.info('Generiram PDF...');
+    
+    try {
+      const pdfBlob = await generatePdfFromElement(printRef.current);
+      const filename = getPdfFilename(document);
+      downloadPdf(pdfBlob, filename);
+      toast.success('PDF spremljen.');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      toast.error('Greška pri spremanju PDF-a.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   // Auto-trigger PDF if action=pdf is in URL
   useEffect(() => {
     const action = searchParams.get('action');
     
-    if (action === 'pdf' && document && !pdfTriggered) {
+    if (action === 'pdf' && document && printRef.current && !pdfTriggered && !isGeneratingPdf) {
       setPdfTriggered(true);
-      // Remove the action params from URL
       searchParams.delete('action');
       searchParams.delete('return');
       setSearchParams(searchParams, { replace: true });
-      // Open print dialog
+      
       setTimeout(() => {
-        openPrintDialog(document.id);
-      }, 300);
+        handleDownloadPdf();
+      }, 500);
     }
-  }, [document, searchParams, pdfTriggered]);
+  }, [document, searchParams, pdfTriggered, isGeneratingPdf]);
 
 
   if (error) {
@@ -259,9 +272,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             size="sm" 
             className="rounded-lg" 
             onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
           >
             <Download className="mr-2 h-4 w-4" />
-            Spremi PDF
+            {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
           </Button>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
