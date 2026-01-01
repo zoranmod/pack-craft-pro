@@ -29,11 +29,11 @@ export function DeadlinesSection() {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full">
-      <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)]">
+    <div className="bg-card rounded-xl border border-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full flex flex-col">
+      <div className="px-6 py-4 border-b border-[hsl(220_13%_91%)] dark:border-[hsl(0_0%_20%)] shrink-0">
         <h3 className="font-semibold text-foreground text-[15px]">Rokovi i isporuke</h3>
       </div>
-      <div>
+      <div className="overflow-y-auto flex-1" style={{ maxHeight: '205px' }}>
         {mockDeadlines.map((item, index) => {
           const config = typeConfig[item.type];
           const Icon = config.icon;
