@@ -245,9 +245,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 <DropdownMenuTrigger asChild>
                   <button
                     className={cn(
-                      "flex items-center gap-2 w-full rounded-md px-2.5 py-2 text-[13px] font-medium transition-all",
-                      "bg-primary text-primary-foreground hover:bg-primary/90",
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      "flex items-center gap-2 w-full rounded-md px-2.5 py-2 text-[13px] font-medium transition-all duration-150",
+                      "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-muted/60",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      newDocMenuOpen && "bg-muted/70 text-foreground dark:bg-muted/60"
                     )}
                   >
                     <Plus className="h-4 w-4 flex-shrink-0" />
