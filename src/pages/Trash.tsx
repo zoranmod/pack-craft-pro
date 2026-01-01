@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Trash2, RotateCcw, Search, AlertTriangle, FileText, Users, Package, UsersRound, Truck, X, Palmtree, Shirt } from 'lucide-react';
+import { Trash2, RotateCcw, AlertTriangle, FileText, Users, Package, UsersRound, Truck, Palmtree, Shirt } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/ui/search-input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
@@ -82,25 +82,12 @@ const Trash = () => {
       <div className="space-y-6">
         {/* Header with search and bulk action */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Pretraži u kanti..."
-              className="pl-9 pr-9"
-            />
-            {search && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                onClick={() => setSearch('')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Pretraži u kanti..."
+            className="flex-1 max-w-md"
+          />
           <Button 
             variant="destructive" 
             onClick={() => setBulkDeleteOpen(true)}

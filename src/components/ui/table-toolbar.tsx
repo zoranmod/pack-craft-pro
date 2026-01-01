@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Filter, X, Search } from 'lucide-react';
+import { Plus, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/ui/search-input';
 import {
   Select,
   SelectContent,
@@ -51,25 +51,12 @@ export function TableToolbar({
         <div className="flex items-center gap-3 flex-wrap flex-1">
           {/* Search input */}
           {onSearchChange && (
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder={searchPlaceholder}
-                className="pl-9 pr-9"
-              />
-              {searchValue && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                  onClick={() => onSearchChange('')}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            <SearchInput
+              value={searchValue}
+              onChange={onSearchChange}
+              placeholder={searchPlaceholder}
+              className="flex-1 max-w-md"
+            />
           )}
           
           {showStatusFilter && onStatusFilterChange && (

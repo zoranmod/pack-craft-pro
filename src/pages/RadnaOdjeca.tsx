@@ -3,6 +3,7 @@ import { format, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { SearchInput } from '@/components/ui/search-input';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -261,25 +262,12 @@ const RadnaOdjeca = () => {
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex flex-wrap gap-3 items-center">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Pretraži po imenu ili stavci..."
-                className="pl-9 pr-9 w-72"
-              />
-              {search && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                  onClick={() => setSearch('')}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Pretraži po imenu ili stavci..."
+              className="w-72"
+            />
             <Select value={itemTypeFilter} onValueChange={setItemTypeFilter}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Stavka" />

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, User, Phone, Mail, MapPin, Building2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { SearchInput } from '@/components/ui/search-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -107,25 +108,12 @@ const Clients = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Pretraži klijente..."
-              className="pl-9 pr-9"
-            />
-            {search && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                onClick={() => setSearch('')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Pretraži klijente..."
+            className="flex-1 max-w-md"
+          />
           <Button onClick={openNew} className="gap-2">
             <Plus className="h-4 w-4" />
             Dodaj klijenta
