@@ -83,16 +83,14 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               className="w-full pl-9 pr-10 h-10 bg-background border-border text-sm"
             />
             {searchQuery && (
-              <Button
+              <button
                 type="button"
-                variant="ghost"
-                size="icon"
                 aria-label="Očisti pretragu"
-                className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm hover:bg-muted transition-colors"
                 onClick={clearSearch}
               >
                 <X className="h-4 w-4 text-muted-foreground" />
-              </Button>
+              </button>
             )}
           </div>
         )}
