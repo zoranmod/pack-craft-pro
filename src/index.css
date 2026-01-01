@@ -7,37 +7,38 @@
 @layer base {
   :root {
     /* =============================================
-       AKORD UI TOKENS - Warm White/Gray + Amber Accent
+       AKORD UI TOKENS - Pure White/Gray + Amber Accent
        Single source of truth for light/dark themes
+       Light mode: clean white/gray, no warm tones
        ============================================= */
 
-    /* Core backgrounds: Warm white */
+    /* Core backgrounds: Pure white */
     --background: 0 0% 100%;
-    --foreground: 24 10% 12%;
+    --foreground: 0 0% 9%;
 
     /* Card surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 12%;
+    --card-foreground: 0 0% 9%;
 
     /* Popover/dropdown surfaces */
     --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 12%;
+    --popover-foreground: 0 0% 9%;
 
-    /* Primary: Akord Amber (premium orange-gold) */
+    /* Primary: Akord Amber (premium orange-gold) - ONLY accent color */
     --primary: 38 92% 55%;
-    --primary-foreground: 24 10% 12%;
+    --primary-foreground: 0 0% 9%;
 
-    /* Secondary: Warm neutral */
-    --secondary: 30 10% 96%;
-    --secondary-foreground: 24 10% 12%;
+    /* Secondary: Neutral gray */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    /* Muted: Warm subtle backgrounds and text */
-    --muted: 30 10% 96%;
-    --muted-foreground: 24 6% 40%;
+    /* Muted: Neutral gray for backgrounds and text */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* Accent: Uses Akord Amber for highlights */
     --accent: 38 92% 55%;
-    --accent-foreground: 24 10% 12%;
+    --accent-foreground: 0 0% 9%;
 
     /* Destructive: Clean red */
     --destructive: 0 84% 60%;
@@ -49,34 +50,34 @@
 
     /* Warning: Matches primary for consistency */
     --warning: 38 92% 55%;
-    --warning-foreground: 24 10% 12%;
+    --warning-foreground: 0 0% 9%;
 
-    /* Borders and inputs: Warm gray */
-    --border: 30 7% 88%;
-    --input: 30 7% 88%;
+    /* Borders and inputs: Neutral gray */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 38 92% 55%;
 
     /* Badge neutral */
-    --badge-neutral: 30 7% 88%;
+    --badge-neutral: 0 0% 90%;
 
     /* Radius: Stripe-like subtle rounding */
     --radius: 10px;
 
-    /* Sidebar tokens: Warm palette */
+    /* Sidebar tokens: Pure neutral */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 24 10% 12%;
+    --sidebar-foreground: 0 0% 9%;
     --sidebar-primary: 38 92% 55%;
-    --sidebar-primary-foreground: 24 10% 12%;
-    --sidebar-accent: 38 50% 96%;
-    --sidebar-accent-foreground: 24 10% 12%;
-    --sidebar-border: 30 7% 88%;
+    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
     --sidebar-ring: 38 92% 55%;
 
     /* Minimal shadows (Stripe-like: borders > shadows) */
-    --shadow-sm: 0 1px 2px 0 hsl(24 10% 0% / 0.03);
-    --shadow-md: 0 4px 6px -1px hsl(24 10% 0% / 0.05);
-    --shadow-lg: 0 10px 15px -3px hsl(24 10% 0% / 0.08);
-    --shadow-card: 0 1px 3px hsl(24 10% 0% / 0.04);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.04);
   }
 
   .dark {

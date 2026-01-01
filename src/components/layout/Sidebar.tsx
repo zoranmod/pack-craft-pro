@@ -151,6 +151,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       // localStorage unavailable
     }
   }, [expandedGroups]);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setNewDocMenuOpen(false);
+  }, [location.pathname]);
   
   const defaultLogo = theme === 'dark' ? logoDark : logoLight;
   const logo = companySettings?.logo_url || defaultLogo;
@@ -259,12 +264,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
               {documentTypes.map((docType) => (
                 <DropdownMenuItem
                   key={docType.href}
-                  onClick={() => {
-                    navigate(docType.href);
+                  onSelect={() => {
                     setNewDocMenuOpen(false);
                     if (isMobile && onOpenChange) {
                       onOpenChange(false);
                     }
+                    // Use setTimeout to ensure dropdown closes before navigation
+                    setTimeout(() => {
+                      navigate(docType.href);
+                    }, 0);
                   }}
                   className="cursor-pointer"
                 >
