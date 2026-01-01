@@ -17,7 +17,7 @@ export function MainLayout({ children, title, subtitle, showGlobalSearch = false
   return (
     <div className="min-h-screen bg-background">
       <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-      <div className={isMobile ? "" : "pl-52 transition-all duration-300"}>
+      <div className={isMobile ? "" : "pl-48 transition-all duration-300"}>
         <Header 
           title={title} 
           subtitle={subtitle} 
