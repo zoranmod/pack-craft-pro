@@ -189,7 +189,7 @@ export function NewClientModal({
                   id="contact-person"
                   value={contactPerson}
                   onChange={(e) => setContactPerson(e.target.value)}
-                  placeholder="Ime kontakt osobe"
+                  placeholder="Ime, prezime, broj telefona"
                 />
               </div>
             </>

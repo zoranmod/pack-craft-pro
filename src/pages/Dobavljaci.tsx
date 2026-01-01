@@ -232,7 +232,7 @@ const Dobavljaci = () => {
                   id="contact_person"
                   value={formData.contact_person}
                   onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
-                  placeholder="Ime i prezime"
+                  placeholder="Ime, prezime, broj telefona"
                   className="mt-1.5"
                 />
               </div>
