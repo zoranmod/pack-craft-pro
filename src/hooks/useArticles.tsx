@@ -185,6 +185,7 @@ export function useUpdateArticle() {
 
 export function useDeleteArticle() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const logActivity = useLogActivity();
 
   return useMutation({
@@ -192,9 +193,13 @@ export function useDeleteArticle() {
       const id = typeof idOrData === 'string' ? idOrData : idOrData.id;
       const name = typeof idOrData === 'string' ? undefined : idOrData.name;
       
+      // Soft delete - set deleted_at and deleted_by
       const { error } = await supabase
         .from('articles')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -202,7 +207,9 @@ export function useDeleteArticle() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
-      toast.success('Artikl uspješno obrisan');
+      queryClient.invalidateQueries({ queryKey: ['article-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['trash'] });
+      toast.success('Premješteno u kantu za smeće');
       
       logActivity.mutate({
         action_type: 'delete',
@@ -217,7 +224,7 @@ export function useDeleteArticle() {
   });
 }
 
-// Hook for fetching only templates
+// Hook for fetching only templates (excluding deleted)
 export function useArticleTemplates() {
   const { user } = useAuth();
 
@@ -228,6 +235,7 @@ export function useArticleTemplates() {
         .from('articles')
         .select('*')
         .eq('is_template', true)
+        .is('deleted_at', null)
         .order('name', { ascending: true });
 
       if (error) throw error;
