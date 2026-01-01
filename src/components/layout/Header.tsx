@@ -75,21 +75,23 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
           <div className="relative w-full max-w-[520px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
-              type="search"
+              type="text"
               placeholder="Pretraži dokumente"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-full pl-9 pr-9 h-10 bg-background border-border text-sm"
+              className="w-full pl-9 pr-10 h-10 bg-background border-border text-sm"
             />
             {searchQuery && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Očisti pretragu"
+                className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8"
                 onClick={clearSearch}
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 text-muted-foreground" />
               </Button>
             )}
           </div>
