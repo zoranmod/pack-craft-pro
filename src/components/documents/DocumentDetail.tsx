@@ -13,7 +13,7 @@ import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
 import { useArticles } from '@/hooks/useArticles';
-import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument } from '@/hooks/useDocuments';
+import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
 import { generatePdfFromElement, downloadPdf } from '@/lib/pdfGenerator';
 import {
@@ -22,6 +22,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { DocumentBodyContent } from '@/pages/PrintDocument';
 
 interface DocumentDetailProps {
@@ -52,6 +62,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const copyDocument = useCopyDocument();
   const updateStatus = useUpdateDocumentStatus();
   const convertDocument = useConvertDocument();
+  const deleteDocument = useDeleteDocument();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
   const handleConvertDocument = async (targetType: DocumentType) => {
     if (!document) return;
@@ -69,7 +81,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   };
   
   // All available statuses for the dropdown
-  const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'completed', 'cancelled'];
+  const allStatuses: DocumentStatus[] = ['draft', 'sent', 'accepted', 'rejected', 'completed', 'cancelled'];
+
+  const handleDeleteDocument = async () => {
+    if (!document) return;
+    try {
+      await deleteDocument.mutateAsync({ id: document.id, number: document.number });
+      navigate('/documents');
+    } catch (error) {
+      // Error toast is handled in hook
+    } finally {
+      setDeleteDialogOpen(false);
+    }
+  };
   
   const handleStatusChange = (newStatus: DocumentStatus) => {
     if (!document) return;
@@ -395,7 +419,11 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 {isGeneratingPdf ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
               <Separator className="my-3" />
-              <Button variant="outline" className="w-full justify-start rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
                 <Trash2 className="mr-3 h-4 w-4" />
                 Obriši dokument
               </Button>
@@ -403,6 +431,28 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           </div>
         </div>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati dokument?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Jeste li sigurni da želite obrisati dokument {document.number}? 
+              Ova radnja se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Odustani</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDocument}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
