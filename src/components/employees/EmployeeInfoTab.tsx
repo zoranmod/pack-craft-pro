@@ -1,13 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import type { Employee } from '@/types/employee';
 import { User, Mail, Phone, MapPin, Briefcase, Calendar } from 'lucide-react';
 import { EmployeePermissionsSummary } from './EmployeePermissionsSummary';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
+import { useEmployees } from '@/hooks/useEmployees';
+import { toast } from 'sonner';
 
 interface EmployeeInfoTabProps {
   employee: Employee;
 }
 
 export function EmployeeInfoTab({ employee }: EmployeeInfoTabProps) {
+  const { hasFullAccess } = useCurrentEmployee();
+  const { updateEmployee } = useEmployees();
+
   const formatDate = (date?: string) => {
     if (!date) return '-';
     const d = new Date(date);
@@ -15,6 +23,18 @@ export function EmployeeInfoTab({ employee }: EmployeeInfoTabProps) {
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}.${month}.${year}.`;
+  };
+
+  const handleWorksSaturdayChange = async (checked: boolean) => {
+    try {
+      await updateEmployee.mutateAsync({
+        id: employee.id,
+        works_saturday: checked,
+      });
+      toast.success(checked ? 'Radna subota uključena' : 'Radna subota isključena');
+    } catch (error) {
+      toast.error('Greška pri ažuriranju');
+    }
   };
 
   return (
@@ -114,6 +134,21 @@ export function EmployeeInfoTab({ employee }: EmployeeInfoTabProps) {
               <p className="font-medium">{formatDate(employee.employment_end_date)}</p>
             </div>
           </div>
+          {hasFullAccess && (
+            <div className="pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="works-saturday" className="font-medium">Radna subota</Label>
+                  <p className="text-xs text-muted-foreground">Subota se broji kao radni dan za godišnji</p>
+                </div>
+                <Switch
+                  id="works-saturday"
+                  checked={employee.works_saturday ?? false}
+                  onCheckedChange={handleWorksSaturdayChange}
+                />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

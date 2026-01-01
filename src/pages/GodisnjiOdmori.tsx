@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isWeekend, isSameDay, isWithinInterval, parseISO } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend, isSameDay, isWithinInterval, parseISO, getDay } from 'date-fns';
 import { hr } from 'date-fns/locale';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEmployees } from '@/hooks/useEmployees';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
 import {
   useAllLeaveRequests,
   useCreateLeaveRequest,
@@ -54,7 +55,8 @@ import {
   useMonthPlanned,
   LeaveRequestWithEmployee,
 } from '@/hooks/useLeaveOverview';
-import { differenceInBusinessDays, addDays } from 'date-fns';
+import { calculateWorkingDays } from '@/lib/workingDays';
+import type { Employee } from '@/types/employee';
 
 const LEAVE_TYPES = [
   { value: 'godišnji', label: 'Godišnji odmor' },
@@ -114,6 +116,7 @@ const GodisnjiOdmori = () => {
 
   // Data hooks
   const { employees } = useEmployees();
+  const { hasFullAccess } = useCurrentEmployee();
   const { data: leaveRequests = [], isLoading } = useAllLeaveRequests({
     year: yearFilter !== 'all' ? parseInt(yearFilter) : undefined,
     status: statusFilter,
@@ -128,6 +131,23 @@ const GodisnjiOdmori = () => {
   const { data: monthPlanned = 0 } = useMonthPlanned();
 
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
+  // Create employee map for quick lookup
+  const employeeMap = useMemo(() => {
+    const map = new Map<string, Employee>();
+    employees.forEach(emp => map.set(emp.id, emp));
+    return map;
+  }, [employees]);
+
+  // Get selected employee's works_saturday setting
+  const selectedEmployee = form.employee_id ? employeeMap.get(form.employee_id) : null;
+  const worksSaturday = selectedEmployee?.works_saturday ?? false;
+
+  // Calculate working days based on selected employee
+  const calculatedDays = useMemo(() => {
+    if (!form.start_date || !form.end_date) return 0;
+    return calculateWorkingDays(form.start_date, form.end_date, worksSaturday);
+  }, [form.start_date, form.end_date, worksSaturday]);
 
   const resetForm = () => {
     setForm({
@@ -159,15 +179,13 @@ const GodisnjiOdmori = () => {
     setIsAddOpen(true);
   };
 
-  const calculateBusinessDays = (start: string, end: string) => {
-    if (!start || !end) return 0;
-    return differenceInBusinessDays(parseISO(end), parseISO(start)) + 1;
-  };
-
   const handleSubmit = async () => {
     if (!form.employee_id || !form.start_date || !form.end_date) return;
 
-    const days = calculateBusinessDays(form.start_date, form.end_date);
+    // Get works_saturday for the employee being edited
+    const emp = employeeMap.get(form.employee_id);
+    const empWorksSaturday = emp?.works_saturday ?? false;
+    const days = calculateWorkingDays(form.start_date, form.end_date, empWorksSaturday);
 
     if (editingItem) {
       await updateLeave.mutateAsync({
@@ -350,7 +368,7 @@ const GodisnjiOdmori = () => {
                       <TableRow>
                         <TableHead>Zaposlenik</TableHead>
                         <TableHead>Od – Do</TableHead>
-                        <TableHead>Broj dana</TableHead>
+                        <TableHead>Radnih dana</TableHead>
                         <TableHead>Tip</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Napomena</TableHead>
@@ -383,13 +401,15 @@ const GodisnjiOdmori = () => {
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setDeleteId(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
+                              {hasFullAccess && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setDeleteId(item.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -429,16 +449,22 @@ const GodisnjiOdmori = () => {
                   {daysInMonth.map((day) => {
                     const leaves = getLeaveForDay(day);
                     const isToday = isSameDay(day, new Date());
+                    const dayOfWeek = getDay(day);
+                    const isSunday = dayOfWeek === 0;
+                    const isSaturday = dayOfWeek === 6;
+                    
                     return (
                       <div
                         key={day.toISOString()}
                         className={`h-20 p-1 rounded border ${
-                          isWeekend(day)
-                            ? 'bg-muted/30'
-                            : 'bg-card'
+                          isSunday 
+                            ? 'bg-muted/40' 
+                            : isSaturday 
+                              ? 'bg-muted/30' 
+                              : 'bg-card'
                         } ${isToday ? 'border-primary' : 'border-border/50'}`}
                       >
-                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
+                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-primary' : isSunday ? 'text-red-500' : 'text-muted-foreground'}`}>
                           {format(day, 'd')}
                         </div>
                         <div className="space-y-0.5 overflow-hidden">
@@ -491,6 +517,7 @@ const GodisnjiOdmori = () => {
                     {employees.map((emp) => (
                       <SelectItem key={emp.id} value={emp.id}>
                         {emp.first_name} {emp.last_name}
+                        {emp.works_saturday && <span className="text-muted-foreground ml-2">(radna sub.)</span>}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -516,8 +543,11 @@ const GodisnjiOdmori = () => {
               </div>
             </div>
             {form.start_date && form.end_date && (
-              <div className="text-sm text-muted-foreground">
-                Broj radnih dana: <strong>{calculateBusinessDays(form.start_date, form.end_date)}</strong>
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-sm">
+                  Radnih dana: <strong className="text-primary">{calculatedDays}</strong>
+                  {worksSaturday && <span className="text-muted-foreground ml-2">(uključuje subote)</span>}
+                </p>
               </div>
             )}
             <div className="space-y-2">
@@ -533,7 +563,7 @@ const GodisnjiOdmori = () => {
                 </SelectContent>
               </Select>
             </div>
-            {editingItem && (
+            {editingItem && hasFullAccess && (
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select value={form.status} onValueChange={(v) => setForm(prev => ({ ...prev, status: v }))}>

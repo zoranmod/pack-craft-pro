@@ -706,6 +706,7 @@ export type Database = {
           created_at: string
           employee_id: string
           id: string
+          manual_adjustment_days: number | null
           total_days: number
           updated_at: string
           used_days: number
@@ -716,6 +717,7 @@ export type Database = {
           created_at?: string
           employee_id: string
           id?: string
+          manual_adjustment_days?: number | null
           total_days?: number
           updated_at?: string
           used_days?: number
@@ -726,6 +728,7 @@ export type Database = {
           created_at?: string
           employee_id?: string
           id?: string
+          manual_adjustment_days?: number | null
           total_days?: number
           updated_at?: string
           used_days?: number
@@ -999,6 +1002,7 @@ export type Database = {
           status: string
           updated_at: string
           user_id: string
+          works_saturday: boolean | null
         }
         Insert: {
           address?: string | null
@@ -1024,6 +1028,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id: string
+          works_saturday?: boolean | null
         }
         Update: {
           address?: string | null
@@ -1049,6 +1054,7 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+          works_saturday?: boolean | null
         }
         Relationships: []
       }
