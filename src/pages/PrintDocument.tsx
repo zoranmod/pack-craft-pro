@@ -7,6 +7,7 @@ import { useArticles } from '@/hooks/useArticles';
 import { Document, documentTypeLabels } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
 import { ContractDocumentView } from '@/components/documents/ContractDocumentView';
+import { SignatureBlock } from '@/components/documents/SignatureBlock';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -201,18 +202,12 @@ export function DocumentBodyContent({
             <p style={{ color: '#000', fontSize: '11.5px' }}>M.P.</p>
           </div>
           <div className="flex justify-end">
-            <div className="text-center" style={{ minWidth: '200px' }}>
-              {document.preparedBy && (
-                <div className="mb-3">
-                  <p style={{ color: '#000', fontSize: '11.5px' }}>Ponudu izradio/la:</p>
-                  <p className="font-medium" style={{ color: '#000', fontSize: '11.5px' }}>{document.preparedBy}</p>
-                </div>
-              )}
-              <div className="mt-3">
-                <div className="w-48 border-b border-gray-400 mx-auto mb-1"></div>
-                <p style={{ color: '#000', fontSize: '11.5px' }}>(Potpis)</p>
-              </div>
-            </div>
+            <SignatureBlock
+              label="Ponudu izradio/la:"
+              name={document.preparedBy || undefined}
+              caption="(Potpis)"
+              widthMm={75}
+            />
           </div>
         </div>
       )}
