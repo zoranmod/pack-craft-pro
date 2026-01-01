@@ -186,16 +186,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      {/* Compact Logo Header */}
-      <div className="flex items-center justify-between h-12 px-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="Company logo" className="h-6 w-6 object-contain" />
-          <span className="font-semibold text-sm text-foreground truncate">{companyName}</span>
+      {/* Logo Header - aligned with nav typography */}
+      <div className="flex items-center justify-between h-14 px-3 border-b border-border">
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="Company logo" className="h-5 w-5 object-contain shrink-0" />
+          <span className="text-[13px] font-semibold text-foreground truncate leading-tight">{companyName}</span>
         </div>
         {isMobile && (
           <button
             onClick={() => onOpenChange?.(false)}
-            className="p-1 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+            className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
