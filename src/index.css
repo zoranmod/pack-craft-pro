@@ -83,18 +83,19 @@
     /* =============================================
        DARK MODE TOKENS - True Neutral Charcoal
        Zero saturation for clean enterprise look
+       Improved readability with subtle separation
        ============================================= */
 
     /* Core backgrounds: Neutral charcoal */
     --background: 0 0% 7%;
     --foreground: 0 0% 96%;
 
-    /* Card surfaces: Slightly elevated neutral */
-    --card: 0 0% 10%;
+    /* Card surfaces: Slightly lighter for separation */
+    --card: 0 0% 11%;
     --card-foreground: 0 0% 96%;
 
-    /* Popover/dropdown surfaces */
-    --popover: 0 0% 10%;
+    /* Popover/dropdown surfaces: Match cards */
+    --popover: 0 0% 11%;
     --popover-foreground: 0 0% 96%;
 
     /* Primary: Akord Amber (only warm accent) */
@@ -102,12 +103,12 @@
     --primary-foreground: 0 0% 10%;
 
     /* Secondary: Neutral dark */
-    --secondary: 0 0% 14%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 96%;
 
-    /* Muted: Neutral subtle backgrounds */
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 70%;
+    /* Muted: Clearer for better visibility */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 72%;
 
     /* Accent: Akord Amber for dark mode */
     --accent: 38 92% 60%;
@@ -125,29 +126,29 @@
     --warning: 38 92% 60%;
     --warning-foreground: 0 0% 10%;
 
-    /* Borders and inputs: Neutral charcoal borders */
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
+    /* Borders and inputs: Clearer separation */
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
     --ring: 38 92% 60%;
 
     /* Badge neutral */
-    --badge-neutral: 0 0% 22%;
+    --badge-neutral: 0 0% 24%;
 
     /* Sidebar tokens: Neutral charcoal */
-    --sidebar-background: 0 0% 8%;
+    --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 96%;
     --sidebar-primary: 38 92% 60%;
     --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 0 0% 18%;
+    --sidebar-border: 0 0% 22%;
     --sidebar-ring: 38 92% 60%;
 
-    /* Shadows: Subtle on dark backgrounds */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2);
+    /* Shadows: Subtle elevation + soft top highlight */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.6);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.3), 0 -1px 0 hsl(0 0% 100% / 0.03);
   }
 }
 
@@ -194,9 +195,27 @@
     @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
   }
 
-  /* Document row hover in dark mode */
+  /* Document row hover in dark mode - subtle muted */
   .dark .document-row-hover:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: hsl(0 0% 15% / 0.6);
+  }
+
+  /* Dark mode card elevation - subtle border + soft shadow */
+  .dark .card,
+  .dark .panel,
+  .dark [data-slot="card"] {
+    border: 1px solid hsl(0 0% 22%);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Dark mode table improvements */
+  .dark table tbody tr:hover {
+    background-color: hsl(0 0% 15% / 0.6);
+  }
+
+  /* Subtle zebra striping for dark mode tables */
+  .dark table tbody tr:nth-child(even) {
+    background-color: hsl(0 0% 15% / 0.25);
   }
 
   /* Modern scrollbar */
@@ -219,11 +238,11 @@
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: hsl(0 0% 25%);
+    background: hsl(0 0% 28%);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: hsl(0 0% 35%);
+    background: hsl(0 0% 38%);
   }
 }
 
