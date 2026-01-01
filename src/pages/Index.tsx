@@ -51,7 +51,7 @@ const Index = () => {
         onToggle={() => toggleSection('summary')}
         className="mb-6"
       >
-        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Ukupno dokumenata"
             value={isLoading ? '...' : stats.totalDocuments}
@@ -83,13 +83,15 @@ const Index = () => {
       </CollapsibleSection>
 
       {/* Recent Documents & Activities - Side by Side */}
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] mb-6">
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
         <CollapsibleSection
           title="Nedavni dokumenti"
           isOpen={sections.recentDocuments}
           onToggle={() => toggleSection('recentDocuments')}
         >
-          <RecentDocuments documents={documents} maxHeight="205px" />
+          <div className="h-[280px]">
+            <RecentDocuments documents={documents} />
+          </div>
         </CollapsibleSection>
         
         <CollapsibleSection
@@ -97,7 +99,9 @@ const Index = () => {
           isOpen={sections.activities}
           onToggle={() => toggleSection('activities')}
         >
-          <ActivityLogList limit={12} maxHeight="205px" />
+          <div className="h-[280px]">
+            <ActivityLogList limit={12} />
+          </div>
         </CollapsibleSection>
       </div>
 
@@ -108,7 +112,9 @@ const Index = () => {
           isOpen={sections.deadlines}
           onToggle={() => toggleSection('deadlines')}
         >
-          <DeadlinesSection />
+          <div className="h-[280px]">
+            <DeadlinesSection />
+          </div>
         </CollapsibleSection>
         
         <CollapsibleSection
@@ -116,7 +122,9 @@ const Index = () => {
           isOpen={sections.analytics}
           onToggle={() => toggleSection('analytics')}
         >
-          <AnalyticsSection />
+          <div className="h-[280px]">
+            <AnalyticsSection />
+          </div>
         </CollapsibleSection>
       </div>
     </MainLayout>
