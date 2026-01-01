@@ -100,25 +100,47 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const { theme } = useTheme();
   const { data: companySettings } = useCompanySettings();
   
-  // Track expanded groups - default all expanded
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    dokumenti: true,
-    sifrarnici: true,
-    pregledi: true,
-  });
-
-  // Auto-expand group containing active route
-  useEffect(() => {
+  const STORAGE_KEY = 'sidebar-expanded-groups';
+  
+  // Initialize state from localStorage or default
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      // Invalid JSON, ignore
+    }
+    
+    // First load: auto-open only the group containing current route
+    const initialState: Record<string, boolean> = {
+      dokumenti: false,
+      sifrarnici: false,
+      pregledi: false,
+    };
+    
     navGroups.forEach(group => {
       if (group.label && group.items.some(item => 
         item.path === '/' 
           ? location.pathname === '/'
           : location.pathname === item.path || location.pathname.startsWith(item.path + '/')
       )) {
-        setExpandedGroups(prev => ({ ...prev, [group.id]: true }));
+        initialState[group.id] = true;
       }
     });
-  }, [location.pathname]);
+    
+    return initialState;
+  });
+
+  // Persist to localStorage when state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(expandedGroups));
+    } catch (e) {
+      // localStorage unavailable
+    }
+  }, [expandedGroups]);
   
   const defaultLogo = theme === 'dark' ? logoDark : logoLight;
   const logo = companySettings?.logo_url || defaultLogo;
