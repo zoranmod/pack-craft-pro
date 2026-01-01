@@ -24,11 +24,15 @@ import {
   formatActivityMessage,
   type ActivityLog 
 } from '@/hooks/useActivityLogs';
+import { cn } from '@/lib/utils';
+import { documentTypeStyles } from '@/lib/documentTypeStyles';
+import { DocumentType } from '@/types/document';
 
 interface ActivityLogListProps {
   limit?: number;
 }
 
+// Default entity icons (for non-document entities)
 const entityIcons: Record<string, typeof FileText> = {
   document: FileText,
   client: Users,
@@ -58,22 +62,55 @@ const actionColors: Record<string, string> = {
   reject: 'text-destructive bg-destructive/10',
 };
 
+// Map document type from activity log details to DocumentType
+function getDocumentTypeFromDetails(details: Record<string, unknown> | null): DocumentType | null {
+  if (!details) return null;
+  const docType = details.document_type as string | undefined;
+  if (docType && docType in documentTypeStyles) {
+    return docType as DocumentType;
+  }
+  return null;
+}
+
 function ActivityLogItem({ log }: { log: ActivityLog }) {
-  const EntityIcon = entityIcons[log.entity_type] || FileText;
   const ActionIcon = actionIcons[log.action_type] || Plus;
   const actionColor = actionColors[log.action_type] || 'text-muted-foreground bg-muted';
+  
+  // Check if this is a document-related activity and get specific styling
+  const documentType = log.entity_type === 'document' 
+    ? getDocumentTypeFromDetails(log.details as Record<string, unknown> | null) 
+    : null;
+  
+  // Get appropriate entity icon and colors
+  let EntityIcon = entityIcons[log.entity_type] || FileText;
+  let entityIconBg = 'bg-muted';
+  let entityIconFg = 'text-muted-foreground';
+  let borderColor = '';
+  
+  if (documentType) {
+    const typeStyle = documentTypeStyles[documentType];
+    EntityIcon = typeStyle.icon;
+    entityIconBg = typeStyle.iconBg;
+    entityIconFg = typeStyle.iconFg;
+    borderColor = typeStyle.borderColor;
+  }
 
   const message = formatActivityMessage(log);
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
   return (
-    <div className="flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150">
+    <div className={cn(
+      "flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150",
+      borderColor && `border-l-4 ${borderColor}`
+    )}>
       <div className={`p-1.5 rounded-md ${actionColor} shrink-0`}>
         <ActionIcon className="h-3.5 w-3.5" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <EntityIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <div className={cn("p-1 rounded", entityIconBg)}>
+            <EntityIcon className={cn("h-3 w-3", entityIconFg)} />
+          </div>
           <p className="text-sm font-medium truncate text-foreground">{message}</p>
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">
