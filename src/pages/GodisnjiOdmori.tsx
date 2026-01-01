@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend, isSameDay, isWithinInterval, parseISO, getDay } from 'date-fns';
+import { useState, useMemo, useEffect } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend, isSameDay, isWithinInterval, parseISO, getDay, isSaturday } from 'date-fns';
 import { hr } from 'date-fns/locale';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,9 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
@@ -54,8 +56,10 @@ import {
   useWeekAbsences,
   useMonthPlanned,
   LeaveRequestWithEmployee,
+  useExcludedDates,
+  useSaveExcludedDates,
 } from '@/hooks/useLeaveOverview';
-import { calculateWorkingDays } from '@/lib/workingDays';
+import { calculateWorkingDays, getSaturdaysInRange, getWeekdaysInRange, ExcludedDate } from '@/lib/workingDays';
 import type { Employee } from '@/types/employee';
 
 const LEAVE_TYPES = [
@@ -114,6 +118,10 @@ const GodisnjiOdmori = () => {
     status: 'pending',
   });
 
+  // Excluded dates state: Map<dateString, { excluded: boolean, reason: 'neradna_subota' | 'neradni_dan' }>
+  const [saturdayExclusions, setSaturdayExclusions] = useState<Map<string, boolean>>(new Map());
+  const [weekdayExclusions, setWeekdayExclusions] = useState<Set<string>>(new Set());
+
   // Data hooks
   const { employees } = useEmployees();
   const { hasFullAccess } = useCurrentEmployee();
@@ -126,6 +134,8 @@ const GodisnjiOdmori = () => {
   const createLeave = useCreateLeaveRequest();
   const updateLeave = useUpdateLeaveRequest();
   const deleteLeave = useDeleteLeaveRequest();
+  const saveExcludedDates = useSaveExcludedDates();
+  const { data: existingExcludedDates = [] } = useExcludedDates(editingItem?.id);
   const { data: todayAbsent = 0 } = useTodayAbsences();
   const { data: weekAbsent = 0 } = useWeekAbsences();
   const { data: monthPlanned = 0 } = useMonthPlanned();
@@ -143,11 +153,84 @@ const GodisnjiOdmori = () => {
   const selectedEmployee = form.employee_id ? employeeMap.get(form.employee_id) : null;
   const worksSaturday = selectedEmployee?.works_saturday ?? false;
 
-  // Calculate working days based on selected employee
+  // Get Saturdays and weekdays in the selected date range
+  const saturdaysInRange = useMemo(() => {
+    if (!form.start_date || !form.end_date) return [];
+    return getSaturdaysInRange(form.start_date, form.end_date);
+  }, [form.start_date, form.end_date]);
+
+  const weekdaysInRange = useMemo(() => {
+    if (!form.start_date || !form.end_date) return [];
+    return getWeekdaysInRange(form.start_date, form.end_date);
+  }, [form.start_date, form.end_date]);
+
+  // Build excluded dates array from current selections
+  const currentExcludedDates = useMemo((): ExcludedDate[] => {
+    const excluded: ExcludedDate[] = [];
+    
+    // Add non-working Saturdays
+    saturdayExclusions.forEach((isNonWorking, dateStr) => {
+      if (isNonWorking) {
+        excluded.push({ date: dateStr, reason: 'neradna_subota' });
+      }
+    });
+    
+    // Add excluded weekdays (neradni dan)
+    weekdayExclusions.forEach(dateStr => {
+      excluded.push({ date: dateStr, reason: 'neradni_dan' });
+    });
+    
+    return excluded;
+  }, [saturdayExclusions, weekdayExclusions]);
+
+  // Check if any neradni_dan is selected
+  const hasNeradniDan = weekdayExclusions.size > 0;
+
+  // Validation: napomena required if neradni_dan selected
+  const napomenaError = hasNeradniDan && form.reason.trim().length < 10
+    ? 'Molimo unesite razlog za označene neradne dane (min. 10 znakova).'
+    : '';
+
+  // Calculate working days based on selected employee and excluded dates
   const calculatedDays = useMemo(() => {
     if (!form.start_date || !form.end_date) return 0;
-    return calculateWorkingDays(form.start_date, form.end_date, worksSaturday);
-  }, [form.start_date, form.end_date, worksSaturday]);
+    return calculateWorkingDays(form.start_date, form.end_date, worksSaturday, currentExcludedDates);
+  }, [form.start_date, form.end_date, worksSaturday, currentExcludedDates]);
+
+  // Initialize Saturday exclusions when dates change or employee changes
+  useEffect(() => {
+    if (!form.start_date || !form.end_date) {
+      setSaturdayExclusions(new Map());
+      return;
+    }
+    
+    const saturdays = getSaturdaysInRange(form.start_date, form.end_date);
+    const newExclusions = new Map<string, boolean>();
+    
+    // Default based on employee's works_saturday setting
+    saturdays.forEach(dateStr => {
+      // If editing, check existing excluded dates
+      const existingExclusion = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'neradna_subota');
+      // If employee doesn't work Saturdays, default to excluded (true = non-working)
+      // If employee works Saturdays, default to working (false)
+      newExclusions.set(dateStr, existingExclusion ? true : !worksSaturday);
+    });
+    
+    setSaturdayExclusions(newExclusions);
+  }, [form.start_date, form.end_date, worksSaturday, existingExcludedDates]);
+
+  // Initialize weekday exclusions when editing
+  useEffect(() => {
+    if (editingItem && existingExcludedDates.length > 0) {
+      const weekdayExcl = new Set<string>();
+      existingExcludedDates.forEach(ed => {
+        if (ed.reason === 'neradni_dan') {
+          weekdayExcl.add(ed.date);
+        }
+      });
+      setWeekdayExclusions(weekdayExcl);
+    }
+  }, [editingItem, existingExcludedDates]);
 
   const resetForm = () => {
     setForm({
@@ -158,6 +241,8 @@ const GodisnjiOdmori = () => {
       reason: '',
       status: 'pending',
     });
+    setSaturdayExclusions(new Map());
+    setWeekdayExclusions(new Set());
   };
 
   const handleOpenAdd = () => {
@@ -175,17 +260,27 @@ const GodisnjiOdmori = () => {
       reason: item.reason || '',
       status: item.status,
     });
+    // Reset exclusions - they will be populated by useEffect when existingExcludedDates loads
+    setSaturdayExclusions(new Map());
+    setWeekdayExclusions(new Set());
     setEditingItem(item);
     setIsAddOpen(true);
   };
 
   const handleSubmit = async () => {
     if (!form.employee_id || !form.start_date || !form.end_date) return;
+    
+    // Validate napomena if neradni_dan is selected
+    if (hasNeradniDan && form.reason.trim().length < 10) {
+      return; // Don't submit - validation error shown in UI
+    }
 
     // Get works_saturday for the employee being edited
     const emp = employeeMap.get(form.employee_id);
     const empWorksSaturday = emp?.works_saturday ?? false;
-    const days = calculateWorkingDays(form.start_date, form.end_date, empWorksSaturday);
+    const days = calculateWorkingDays(form.start_date, form.end_date, empWorksSaturday, currentExcludedDates);
+
+    let leaveRequestId: string;
 
     if (editingItem) {
       await updateLeave.mutateAsync({
@@ -197,8 +292,9 @@ const GodisnjiOdmori = () => {
         reason: form.reason || undefined,
         status: form.status,
       });
+      leaveRequestId = editingItem.id;
     } else {
-      await createLeave.mutateAsync({
+      const result = await createLeave.mutateAsync({
         employee_id: form.employee_id,
         start_date: form.start_date,
         end_date: form.end_date,
@@ -206,10 +302,40 @@ const GodisnjiOdmori = () => {
         leave_type: form.leave_type,
         reason: form.reason || undefined,
       });
+      leaveRequestId = result.id;
     }
+
+    // Save excluded dates
+    if (currentExcludedDates.length > 0 || editingItem) {
+      await saveExcludedDates.mutateAsync({
+        leaveRequestId,
+        excludedDates: currentExcludedDates,
+      });
+    }
+
     setIsAddOpen(false);
     resetForm();
     setEditingItem(null);
+  };
+
+  const toggleSaturdayExclusion = (dateStr: string) => {
+    setSaturdayExclusions(prev => {
+      const next = new Map(prev);
+      next.set(dateStr, !prev.get(dateStr));
+      return next;
+    });
+  };
+
+  const toggleWeekdayExclusion = (dateStr: string) => {
+    setWeekdayExclusions(prev => {
+      const next = new Set(prev);
+      if (next.has(dateStr)) {
+        next.delete(dateStr);
+      } else {
+        next.add(dateStr);
+      }
+      return next;
+    });
   };
 
   const handleDelete = async () => {
@@ -501,7 +627,7 @@ const GodisnjiOdmori = () => {
 
       {/* Add/Edit Modal */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Uredi godišnji' : 'Dodaj godišnji'}</DialogTitle>
           </DialogHeader>
@@ -542,14 +668,82 @@ const GodisnjiOdmori = () => {
                 />
               </div>
             </div>
+            
+            {/* Working days calculation */}
             {form.start_date && form.end_date && (
               <div className="bg-muted/50 rounded-lg p-3">
                 <p className="text-sm">
                   Radnih dana: <strong className="text-primary">{calculatedDays}</strong>
-                  {worksSaturday && <span className="text-muted-foreground ml-2">(uključuje subote)</span>}
+                  {saturdayExclusions.size > 0 && (
+                    <span className="text-muted-foreground ml-2">
+                      ({Array.from(saturdayExclusions.values()).filter(v => !v).length} radnih subota)
+                    </span>
+                  )}
+                  {weekdayExclusions.size > 0 && (
+                    <span className="text-muted-foreground ml-2">
+                      (izuzeto {weekdayExclusions.size} neradnih dana)
+                    </span>
+                  )}
                 </p>
               </div>
             )}
+
+            {/* Saturday toggles - only for godišnji type */}
+            {form.leave_type === 'godišnji' && saturdaysInRange.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Subote u periodu</Label>
+                <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+                  {saturdaysInRange.map((dateStr) => {
+                    const isNonWorking = saturdayExclusions.get(dateStr) ?? !worksSaturday;
+                    return (
+                      <div key={dateStr} className="flex items-center justify-between py-1">
+                        <span className="text-sm">
+                          {format(parseISO(dateStr), 'EEEE, dd.MM.yyyy', { locale: hr })}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs ${isNonWorking ? 'text-muted-foreground' : 'text-primary font-medium'}`}>
+                            {isNonWorking ? 'Neradna' : 'Radna'}
+                          </span>
+                          <Switch
+                            checked={!isNonWorking}
+                            onCheckedChange={() => toggleSaturdayExclusion(dateStr)}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Weekday exclusions (neradni dan) - only for godišnji type */}
+            {form.leave_type === 'godišnji' && weekdaysInRange.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Izuzmi datume (neradni dani)</Label>
+                <p className="text-xs text-muted-foreground">Označite dane koji neće biti odbijeni od godišnjeg odmora</p>
+                <div className="bg-muted/30 rounded-lg p-3 max-h-40 overflow-y-auto space-y-1">
+                  {weekdaysInRange.map((dateStr) => {
+                    const isExcluded = weekdayExclusions.has(dateStr);
+                    return (
+                      <div key={dateStr} className="flex items-center gap-2 py-1">
+                        <Checkbox
+                          id={`weekday-${dateStr}`}
+                          checked={isExcluded}
+                          onCheckedChange={() => toggleWeekdayExclusion(dateStr)}
+                        />
+                        <label
+                          htmlFor={`weekday-${dateStr}`}
+                          className={`text-sm cursor-pointer ${isExcluded ? 'text-primary font-medium' : ''}`}
+                        >
+                          {format(parseISO(dateStr), 'EEEE, dd.MM.yyyy', { locale: hr })}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label>Tip</Label>
               <Select value={form.leave_type} onValueChange={(v) => setForm(prev => ({ ...prev, leave_type: v }))}>
@@ -579,19 +773,37 @@ const GodisnjiOdmori = () => {
               </div>
             )}
             <div className="space-y-2">
-              <Label>Napomena</Label>
+              <Label>
+                Napomena
+                {hasNeradniDan && <span className="text-destructive ml-1">*</span>}
+              </Label>
               <Textarea
                 value={form.reason}
                 onChange={(e) => setForm(prev => ({ ...prev, reason: e.target.value }))}
-                placeholder="Opcijska napomena..."
+                placeholder={hasNeradniDan ? "Unesite razlog za označene neradne dane..." : "Opcijska napomena..."}
+                className={napomenaError ? 'border-destructive' : ''}
               />
+              {napomenaError && (
+                <div className="flex items-center gap-2 text-destructive text-sm">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{napomenaError}</span>
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddOpen(false)}>Odustani</Button>
             <Button
               onClick={handleSubmit}
-              disabled={!form.start_date || !form.end_date || (!editingItem && !form.employee_id) || createLeave.isPending || updateLeave.isPending}
+              disabled={
+                !form.start_date || 
+                !form.end_date || 
+                (!editingItem && !form.employee_id) || 
+                !!napomenaError ||
+                createLeave.isPending || 
+                updateLeave.isPending ||
+                saveExcludedDates.isPending
+              }
             >
               {editingItem ? 'Spremi' : 'Dodaj'}
             </Button>
