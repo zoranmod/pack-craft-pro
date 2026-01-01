@@ -18,6 +18,7 @@ export interface Employee {
   employment_type: string;
   notes?: string;
   status: string;
+  works_saturday?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -29,6 +30,7 @@ export interface EmployeeLeaveEntitlement {
   total_days: number;
   used_days: number;
   carried_over_days: number;
+  manual_adjustment_days: number;
   created_at: string;
   updated_at: string;
 }

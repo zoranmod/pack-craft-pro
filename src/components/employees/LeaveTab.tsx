@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Check, X, Clock, CalendarIcon, ArrowRight } from 'lucide-react';
+import { Plus, Check, X, Clock, CalendarIcon, ArrowRight, Edit2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,8 +35,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { useLeaveEntitlements, useLeaveRequests } from '@/hooks/useEmployees';
+import { useLeaveEntitlements, useLeaveRequests, useEmployee } from '@/hooks/useEmployees';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
 import { formatDateHR, cn } from '@/lib/utils';
+import { calculateWorkingDays, calculateLeaveBalance } from '@/lib/workingDays';
 import { format } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -46,30 +49,53 @@ interface LeaveTabProps {
 export function LeaveTab({ employeeId }: LeaveTabProps) {
   const { entitlements, create: createEntitlement, update: updateEntitlement } = useLeaveEntitlements(employeeId);
   const { requests, create: createRequest, update: updateRequest, remove: removeRequest } = useLeaveRequests(employeeId);
+  const { data: employee } = useEmployee(employeeId);
+  const { isAdmin, hasFullAccess } = useCurrentEmployee();
   
   const [isEntitlementOpen, setIsEntitlementOpen] = useState(false);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
+  const [isEditBalanceOpen, setIsEditBalanceOpen] = useState(false);
   const [entitlementForm, setEntitlementForm] = useState({ 
     year: new Date().getFullYear(), 
     total_days: 20,
     carried_over_days: 0,
+    manual_adjustment_days: 0,
   });
+  const [balanceForm, setBalanceForm] = useState({
+    carried_over_days: 0,
+    manual_adjustment_days: 0,
+  });
+  const [editingEntitlementId, setEditingEntitlementId] = useState<string | null>(null);
   const [requestForm, setRequestForm] = useState({
     start_date: '',
     end_date: '',
-    days_requested: 1,
+    days_requested: 0,
     leave_type: 'godišnji',
     reason: '',
   });
 
   const currentYear = new Date().getFullYear();
   const currentEntitlement = entitlements.find((e) => e.year === currentYear);
-  const totalAvailable = currentEntitlement 
-    ? currentEntitlement.total_days + (currentEntitlement.carried_over_days || 0) 
-    : 0;
-  const remainingDays = currentEntitlement 
-    ? totalAvailable - currentEntitlement.used_days 
-    : 0;
+  
+  const balance = currentEntitlement 
+    ? calculateLeaveBalance(
+        currentEntitlement.total_days,
+        currentEntitlement.carried_over_days || 0,
+        currentEntitlement.manual_adjustment_days || 0,
+        currentEntitlement.used_days
+      )
+    : { fund: 0, carriedOver: 0, adjustment: 0, used: 0, remaining: 0 };
+
+  const worksSaturday = employee?.works_saturday ?? false;
+
+  // Auto-calculate days when dates change
+  const handleDateChange = (field: 'start_date' | 'end_date', value: string) => {
+    const newForm = { ...requestForm, [field]: value };
+    if (newForm.start_date && newForm.end_date) {
+      newForm.days_requested = calculateWorkingDays(newForm.start_date, newForm.end_date, worksSaturday);
+    }
+    setRequestForm(newForm);
+  };
 
   const handleCreateEntitlement = async () => {
     await createEntitlement.mutateAsync({
@@ -78,13 +104,41 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
       total_days: entitlementForm.total_days,
       used_days: 0,
       carried_over_days: entitlementForm.carried_over_days,
+      manual_adjustment_days: entitlementForm.manual_adjustment_days,
     });
     setIsEntitlementOpen(false);
-    setEntitlementForm({ year: currentYear, total_days: 20, carried_over_days: 0 });
+    setEntitlementForm({ year: currentYear, total_days: 20, carried_over_days: 0, manual_adjustment_days: 0 });
+  };
+
+  const handleOpenEditBalance = (entitlement: typeof entitlements[0]) => {
+    if (!hasFullAccess) {
+      toast.error('Samo administratori mogu uređivati prenesene dane i korekcije.');
+      return;
+    }
+    setEditingEntitlementId(entitlement.id);
+    setBalanceForm({
+      carried_over_days: entitlement.carried_over_days || 0,
+      manual_adjustment_days: entitlement.manual_adjustment_days || 0,
+    });
+    setIsEditBalanceOpen(true);
+  };
+
+  const handleSaveBalance = async () => {
+    if (!editingEntitlementId) return;
+    await updateEntitlement.mutateAsync({
+      id: editingEntitlementId,
+      carried_over_days: balanceForm.carried_over_days,
+      manual_adjustment_days: balanceForm.manual_adjustment_days,
+    });
+    setIsEditBalanceOpen(false);
+    setEditingEntitlementId(null);
   };
 
   const handleCarryOver = async () => {
-    // Find previous year's entitlement
+    if (!hasFullAccess) {
+      toast.error('Samo administratori mogu prenositi dane.');
+      return;
+    }
     const previousYear = currentYear - 1;
     const previousEntitlement = entitlements.find((e) => e.year === previousYear);
     
@@ -93,7 +147,10 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
       return;
     }
 
-    const remainingFromPrevious = previousEntitlement.total_days + (previousEntitlement.carried_over_days || 0) - previousEntitlement.used_days;
+    const remainingFromPrevious = previousEntitlement.total_days + 
+      (previousEntitlement.carried_over_days || 0) + 
+      (previousEntitlement.manual_adjustment_days || 0) - 
+      previousEntitlement.used_days;
     
     if (remainingFromPrevious <= 0) {
       toast.error('Nema preostalih dana za prijenos');
@@ -101,19 +158,18 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
     }
 
     if (currentEntitlement) {
-      // Update current year
       await updateEntitlement.mutateAsync({
         id: currentEntitlement.id,
         carried_over_days: (currentEntitlement.carried_over_days || 0) + remainingFromPrevious,
       });
     } else {
-      // Create current year with carried over days
       await createEntitlement.mutateAsync({
         employee_id: employeeId,
         year: currentYear,
         total_days: 20,
         used_days: 0,
         carried_over_days: remainingFromPrevious,
+        manual_adjustment_days: 0,
       });
     }
     
@@ -121,13 +177,15 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
   };
 
   const handleCreateRequest = async () => {
+    const days = calculateWorkingDays(requestForm.start_date, requestForm.end_date, worksSaturday);
     await createRequest.mutateAsync({
       employee_id: employeeId,
       ...requestForm,
+      days_requested: days,
       status: 'pending',
     });
     setIsRequestOpen(false);
-    setRequestForm({ start_date: '', end_date: '', days_requested: 1, leave_type: 'godišnji', reason: '' });
+    setRequestForm({ start_date: '', end_date: '', days_requested: 0, leave_type: 'godišnji', reason: '' });
   };
 
   const handleApprove = async (id: string, daysRequested: number) => {
@@ -158,20 +216,30 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Osnovni dani ({currentYear})</p>
-              <p className="text-3xl font-bold">{currentEntitlement?.total_days ?? 0}</p>
+              <p className="text-sm text-muted-foreground">Fond ({currentYear})</p>
+              <p className="text-3xl font-bold">{balance.fund}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Preneseni dani</p>
-              <p className="text-3xl font-bold text-orange-500">{currentEntitlement?.carried_over_days ?? 0}</p>
+              <p className="text-sm text-muted-foreground">Preneseni</p>
+              <p className="text-3xl font-bold text-orange-500">+{balance.carriedOver}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Korekcija</p>
+              <p className={cn("text-3xl font-bold", balance.adjustment >= 0 ? "text-blue-500" : "text-red-500")}>
+                {balance.adjustment >= 0 ? '+' : ''}{balance.adjustment}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -179,22 +247,22 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Iskorišteno</p>
-              <p className="text-3xl font-bold">{currentEntitlement?.used_days ?? 0}</p>
+              <p className="text-3xl font-bold">-{balance.used}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-primary/5 border-primary/20">
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Preostalo ukupno</p>
-              <p className="text-3xl font-bold text-primary">{remainingDays}</p>
+              <p className="text-sm text-muted-foreground">Preostalo</p>
+              <p className="text-3xl font-bold text-primary">{balance.remaining}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Carry Over Button */}
-      {entitlements.some(e => e.year === currentYear - 1) && (
+      {/* Admin Controls */}
+      {hasFullAccess && entitlements.some(e => e.year === currentYear - 1) && (
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -227,31 +295,53 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Godina</TableHead>
-                <TableHead>Osnovni</TableHead>
+                <TableHead>Fond</TableHead>
                 <TableHead>Preneseni</TableHead>
+                <TableHead>Korekcija</TableHead>
                 <TableHead>Iskorišteno</TableHead>
                 <TableHead>Preostalo</TableHead>
+                {hasFullAccess && <TableHead>Akcije</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {entitlements.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={hasFullAccess ? 7 : 6} className="text-center text-muted-foreground">
                     Nema unesenih prava na godišnji
                   </TableCell>
                 </TableRow>
               ) : (
-                entitlements.map((ent) => (
-                  <TableRow key={ent.id}>
-                    <TableCell className="font-medium">{ent.year}</TableCell>
-                    <TableCell>{ent.total_days}</TableCell>
-                    <TableCell className="text-orange-500">{ent.carried_over_days || 0}</TableCell>
-                    <TableCell>{ent.used_days}</TableCell>
-                    <TableCell className="font-medium text-primary">
-                      {ent.total_days + (ent.carried_over_days || 0) - ent.used_days}
-                    </TableCell>
-                  </TableRow>
-                ))
+                entitlements.map((ent) => {
+                  const entBalance = calculateLeaveBalance(
+                    ent.total_days,
+                    ent.carried_over_days || 0,
+                    ent.manual_adjustment_days || 0,
+                    ent.used_days
+                  );
+                  return (
+                    <TableRow key={ent.id}>
+                      <TableCell className="font-medium">{ent.year}</TableCell>
+                      <TableCell>{ent.total_days}</TableCell>
+                      <TableCell className="text-orange-500">+{ent.carried_over_days || 0}</TableCell>
+                      <TableCell className={cn(entBalance.adjustment >= 0 ? "text-blue-500" : "text-red-500")}>
+                        {entBalance.adjustment >= 0 ? '+' : ''}{entBalance.adjustment}
+                      </TableCell>
+                      <TableCell>{ent.used_days}</TableCell>
+                      <TableCell className="font-medium text-primary">{entBalance.remaining}</TableCell>
+                      {hasFullAccess && (
+                        <TableCell>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => handleOpenEditBalance(ent)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -261,7 +351,14 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
       {/* Leave Requests */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Zahtjevi za godišnji odmor</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Zahtjevi za godišnji odmor</CardTitle>
+            {worksSaturday && (
+              <Badge variant="outline" className="text-xs">
+                Radna subota
+              </Badge>
+            )}
+          </div>
           <Button size="sm" onClick={() => setIsRequestOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Novi zahtjev
@@ -272,7 +369,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Period</TableHead>
-                <TableHead>Dana</TableHead>
+                <TableHead>Radnih dana</TableHead>
                 <TableHead>Vrsta</TableHead>
                 <TableHead>Razlog</TableHead>
                 <TableHead>Status</TableHead>
@@ -297,7 +394,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                     <TableCell className="max-w-[200px] truncate">{req.reason || '-'}</TableCell>
                     <TableCell>{getStatusBadge(req.status)}</TableCell>
                     <TableCell>
-                      {req.status === 'pending' && (
+                      {req.status === 'pending' && hasFullAccess && (
                         <div className="flex gap-1">
                           <Button
                             size="sm"
@@ -333,27 +430,85 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
             <DialogTitle>Dodaj pravo na godišnji</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Godina</Label>
+                <Input
+                  type="number"
+                  value={entitlementForm.year}
+                  onChange={(e) => setEntitlementForm({ ...entitlementForm, year: parseInt(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Fond dana</Label>
+                <Input
+                  type="number"
+                  value={entitlementForm.total_days}
+                  onChange={(e) => setEntitlementForm({ ...entitlementForm, total_days: parseInt(e.target.value) })}
+                />
+              </div>
+            </div>
+            {hasFullAccess && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Preneseni dani</Label>
+                  <Input
+                    type="number"
+                    value={entitlementForm.carried_over_days}
+                    onChange={(e) => setEntitlementForm({ ...entitlementForm, carried_over_days: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>Korekcija +/-</Label>
+                  <Input
+                    type="number"
+                    value={entitlementForm.manual_adjustment_days}
+                    onChange={(e) => setEntitlementForm({ ...entitlementForm, manual_adjustment_days: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEntitlementOpen(false)}>Odustani</Button>
+            <Button onClick={handleCreateEntitlement}>Dodaj</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Balance Dialog (Admin Only) */}
+      <Dialog open={isEditBalanceOpen} onOpenChange={setIsEditBalanceOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Uredi saldo (Admin)
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
             <div>
-              <Label>Godina</Label>
+              <Label>Preneseni dani</Label>
               <Input
                 type="number"
-                value={entitlementForm.year}
-                onChange={(e) => setEntitlementForm({ ...entitlementForm, year: parseInt(e.target.value) })}
+                value={balanceForm.carried_over_days}
+                onChange={(e) => setBalanceForm({ ...balanceForm, carried_over_days: parseInt(e.target.value) || 0 })}
               />
+              <p className="text-xs text-muted-foreground mt-1">Dani preneseni iz prethodne godine</p>
             </div>
             <div>
-              <Label>Ukupno dana</Label>
+              <Label>Korekcija +/-</Label>
               <Input
                 type="number"
-                value={entitlementForm.total_days}
-                onChange={(e) => setEntitlementForm({ ...entitlementForm, total_days: parseInt(e.target.value) })}
+                value={balanceForm.manual_adjustment_days}
+                onChange={(e) => setBalanceForm({ ...balanceForm, manual_adjustment_days: parseInt(e.target.value) || 0 })}
               />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsEntitlementOpen(false)}>Odustani</Button>
-              <Button onClick={handleCreateEntitlement}>Dodaj</Button>
+              <p className="text-xs text-muted-foreground mt-1">Ručna prilagodba (npr. raniji povratak +2, ili odbitak -1)</p>
             </div>
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditBalanceOpen(false)}>Odustani</Button>
+            <Button onClick={handleSaveBalance}>Spremi</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -384,10 +539,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                     <Calendar
                       mode="single"
                       selected={requestForm.start_date ? new Date(requestForm.start_date) : undefined}
-                      onSelect={(date) => setRequestForm({ 
-                        ...requestForm, 
-                        start_date: date ? format(date, 'yyyy-MM-dd') : '' 
-                      })}
+                      onSelect={(date) => handleDateChange('start_date', date ? format(date, 'yyyy-MM-dd') : '')}
                       locale={hr}
                       className="pointer-events-auto"
                     />
@@ -413,10 +565,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                     <Calendar
                       mode="single"
                       selected={requestForm.end_date ? new Date(requestForm.end_date) : undefined}
-                      onSelect={(date) => setRequestForm({ 
-                        ...requestForm, 
-                        end_date: date ? format(date, 'yyyy-MM-dd') : '' 
-                      })}
+                      onSelect={(date) => handleDateChange('end_date', date ? format(date, 'yyyy-MM-dd') : '')}
                       locale={hr}
                       className="pointer-events-auto"
                     />
@@ -424,31 +573,29 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                 </Popover>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Broj dana</Label>
-                <Input
-                  type="number"
-                  value={requestForm.days_requested}
-                  onChange={(e) => setRequestForm({ ...requestForm, days_requested: parseInt(e.target.value) })}
-                />
+            {requestForm.start_date && requestForm.end_date && (
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-sm">
+                  Radnih dana: <strong className="text-primary">{requestForm.days_requested}</strong>
+                  {worksSaturday && <span className="text-muted-foreground ml-2">(uključuje subote)</span>}
+                </p>
               </div>
-              <div>
-                <Label>Vrsta</Label>
-                <Select
-                  value={requestForm.leave_type}
-                  onValueChange={(v) => setRequestForm({ ...requestForm, leave_type: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="godišnji">Godišnji odmor</SelectItem>
-                    <SelectItem value="slobodan_dan">Slobodan dan</SelectItem>
-                    <SelectItem value="plaćeni_dopust">Plaćeni dopust</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            )}
+            <div>
+              <Label>Vrsta</Label>
+              <Select
+                value={requestForm.leave_type}
+                onValueChange={(v) => setRequestForm({ ...requestForm, leave_type: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="godišnji">Godišnji odmor</SelectItem>
+                  <SelectItem value="slobodan_dan">Slobodan dan</SelectItem>
+                  <SelectItem value="plaćeni_dopust">Plaćeni dopust</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Razlog</Label>
@@ -457,11 +604,13 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                 onChange={(e) => setRequestForm({ ...requestForm, reason: e.target.value })}
               />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsRequestOpen(false)}>Odustani</Button>
-              <Button onClick={handleCreateRequest}>Kreiraj zahtjev</Button>
-            </div>
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRequestOpen(false)}>Odustani</Button>
+            <Button onClick={handleCreateRequest} disabled={!requestForm.start_date || !requestForm.end_date}>
+              Kreiraj zahtjev
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
