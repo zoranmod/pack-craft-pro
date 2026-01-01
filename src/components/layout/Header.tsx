@@ -45,15 +45,15 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between h-16 pl-4 pr-3 md:pr-6 backdrop-blur-xl bg-white/70 dark:bg-[#0d0d0d]/60 supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-black/40 border-b border-white/20 dark:border-white/10 shadow-sm transition-all duration-300">
+    <header className="sticky top-0 z-50 flex items-center justify-between h-14 px-4 md:px-6 bg-card border-b border-border">
         <div className="flex items-center gap-3">
           {showMenuButton && (
-            <Button variant="ghost" size="icon" onClick={onMenuClick}>
+            <Button variant="ghost" size="icon" onClick={onMenuClick} className="h-8 w-8">
               <Menu className="h-5 w-5" />
             </Button>
           )}
           <div>
-            <h1 className="text-base md:text-lg font-semibold text-foreground">{title}</h1>
+            <h1 className="text-base font-semibold text-foreground">{title}</h1>
             {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
@@ -101,9 +101,9 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
           {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 hover:bg-accent dark:hover:bg-zinc-800">
-                <div className="h-7 w-7 rounded-full bg-primary dark:bg-zinc-700 flex items-center justify-center">
-                  <User className="h-3.5 w-3.5 text-primary-foreground dark:text-white" />
+              <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-muted">
+                <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center border border-border">
+                  <User className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
               </Button>
             </DropdownMenuTrigger>

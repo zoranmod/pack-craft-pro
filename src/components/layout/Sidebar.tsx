@@ -148,11 +148,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       className={cn(
         "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
         isActive(item.path)
-          ? "bg-primary text-primary-foreground shadow-sm dark:bg-zinc-800/70 dark:text-zinc-100 dark:border-l-2 dark:border-yellow-500/60"
-          : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-zinc-800/40 dark:hover:text-zinc-100"
+          ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px] dark:bg-secondary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >
-      <item.icon className="h-4 w-4 flex-shrink-0" />
+      <item.icon className={cn(
+        "h-4 w-4 flex-shrink-0",
+        isActive(item.path) && "text-primary"
+      )} />
       <span className="truncate">{item.label}</span>
     </Link>
   );
@@ -160,7 +163,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       {/* Compact Logo Header */}
-      <div className="flex items-center justify-between h-12 px-3 border-b border-border/50">
+      <div className="flex items-center justify-between h-12 px-3 border-b border-border">
         <div className="flex items-center gap-2">
           <img src={logo} alt="Company logo" className="h-6 w-6 object-contain" />
           <span className="font-semibold text-sm text-foreground truncate">{companyName}</span>
@@ -222,18 +225,18 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       </div>
 
       {/* Compact Settings Footer */}
-      <div className="border-t border-border/50 px-2 py-2">
+      <div className="border-t border-border px-2 py-2">
         <Link
           to="/settings"
           onClick={handleLinkClick}
           className={cn(
             "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors",
             isActive('/settings')
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px]"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
-          <Settings className="h-4 w-4 flex-shrink-0" />
+          <Settings className={cn("h-4 w-4 flex-shrink-0", isActive('/settings') && "text-primary")} />
           <span>Postavke</span>
         </Link>
       </div>
@@ -253,7 +256,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
   // Desktop: fixed sidebar
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-48 bg-card border-r border-border shadow-card">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-48 bg-card border-r border-border">
       {sidebarContent}
     </aside>
   );
