@@ -15,7 +15,7 @@ import { MemorandumHeader } from './MemorandumHeader';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generatePdfFromElement, downloadPdf, PdfQuality } from '@/lib/pdfGenerator';
+import { openPrintDialog } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +54,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
@@ -142,59 +141,29 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     return `${prefix}-${numberPart}.pdf`;
   };
 
-  // Generate PDF from HTML preview using html2canvas + jsPDF
-  const handleDownloadPdf = async (quality: PdfQuality = 'normal') => {
-    if (!document || !printRef.current) return;
-    
-    setIsGeneratingPdf(true);
-    const qualityLabel = quality === 'high' ? 'visoke kvalitete' : 'optimiziran';
-    toast.info(`Generiram ${qualityLabel} PDF...`);
-    
-    try {
-      const pdfBlob = await generatePdfFromElement(printRef.current, { quality });
-      const filename = getPdfFilename(document);
-      downloadPdf(pdfBlob, filename);
-      toast.success('PDF spremljen.');
-    } catch (err) {
-      console.error('PDF generation error:', err);
-      toast.error('Greška pri spremanju PDF-a. Pokušajte ponovno.');
-    } finally {
-      setIsGeneratingPdf(false);
-    }
+  // Open print dialog for vector PDF with selectable text
+  const handleDownloadPdf = () => {
+    if (!document) return;
+    openPrintDialog(document.id);
+    toast.info('Odaberite "Spremi kao PDF" u dijalogu za ispis.');
   };
 
-  // Auto-trigger PDF download if action=pdf is in URL
+  // Auto-trigger PDF if action=pdf is in URL
   useEffect(() => {
     const action = searchParams.get('action');
-    const shouldReturn = searchParams.get('return') === 'true';
     
-    if (action === 'pdf' && document && printRef.current && !pdfTriggered && !isGeneratingPdf) {
+    if (action === 'pdf' && document && !pdfTriggered) {
       setPdfTriggered(true);
       // Remove the action params from URL
       searchParams.delete('action');
       searchParams.delete('return');
       setSearchParams(searchParams, { replace: true });
-      // Delay slightly to ensure DOM is ready
-      setTimeout(async () => {
-        setIsGeneratingPdf(true);
-        try {
-          const pdfBlob = await generatePdfFromElement(printRef.current!);
-          const filename = getPdfFilename(document);
-          downloadPdf(pdfBlob, filename);
-          toast.success('PDF spremljen.');
-          // If return flag is set, go back after download
-          if (shouldReturn) {
-            setTimeout(() => navigate(-1), 300);
-          }
-        } catch (err) {
-          console.error('PDF generation error:', err);
-          toast.error('Greška pri spremanju PDF-a. Pokušajte ponovno.');
-        } finally {
-          setIsGeneratingPdf(false);
-        }
-      }, 500);
+      // Open print dialog
+      setTimeout(() => {
+        openPrintDialog(document.id);
+      }, 300);
     }
-  }, [document, searchParams, pdfTriggered, isGeneratingPdf, navigate]);
+  }, [document, searchParams, pdfTriggered]);
 
 
   if (error) {
@@ -285,31 +254,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="rounded-lg" disabled={isGeneratingPdf}>
-                <Download className="mr-2 h-4 w-4" />
-                {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
-                <ChevronDown className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg z-50 rounded-lg">
-              <DropdownMenuItem 
-                onClick={() => handleDownloadPdf('normal')}
-                className="cursor-pointer rounded-md"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Normal (~1-3 MB)
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleDownloadPdf('high')}
-                className="cursor-pointer rounded-md"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Visoka kvaliteta (print)
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-lg" 
+            onClick={handleDownloadPdf}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Spremi PDF
+          </Button>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
@@ -437,31 +390,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <Copy className="mr-3 h-4 w-4" />
                 {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj dokument'}
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start rounded-lg" disabled={isGeneratingPdf}>
-                    <Download className="mr-3 h-4 w-4" />
-                    {isGeneratingPdf ? 'Generiram PDF...' : 'Spremi PDF'}
-                    <ChevronDown className="ml-auto h-3.5 w-3.5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-popover border border-border shadow-lg z-50 rounded-lg">
-                  <DropdownMenuItem 
-                    onClick={() => handleDownloadPdf('normal')}
-                    className="cursor-pointer rounded-md"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Normal (~1-3 MB)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleDownloadPdf('high')}
-                    className="cursor-pointer rounded-md"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Visoka kvaliteta (print)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start rounded-lg" 
+                onClick={handleDownloadPdf}
+              >
+                <Download className="mr-3 h-4 w-4" />
+                Spremi PDF
+              </Button>
               <Separator className="my-3" />
               <Button 
                 variant="outline" 
