@@ -278,9 +278,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     );
   }
 
-  // Desktop: fixed sidebar
+  // Desktop: fixed sidebar - pointer-events-auto ensures clicks always work
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-48 bg-card border-r border-border">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-48 bg-card border-r border-border pointer-events-auto">
       {sidebarContent}
     </aside>
   );
