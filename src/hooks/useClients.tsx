@@ -73,11 +73,32 @@ export function useCreateClient() {
     mutationFn: async (clientData: CreateClientData) => {
       if (!user) throw new Error('User not authenticated');
 
+      const normalizedName = normalizeClientName(clientData.name);
+      
+      // Check for existing client with same normalized name
+      const { data: existingClients, error: searchError } = await supabase
+        .from('clients')
+        .select('*')
+        .is('deleted_at', null);
+      
+      if (searchError) throw searchError;
+      
+      // Find client with matching normalized name
+      const existingClient = existingClients?.find(
+        c => normalizeClientName(c.name) === normalizedName
+      );
+      
+      if (existingClient) {
+        // Return existing client instead of creating a new one
+        return { client: existingClient as Client, isExisting: true };
+      }
+
+      // Create new client
       const { data, error } = await supabase
         .from('clients')
         .insert({
           user_id: user.id,
-          name: clientData.name,
+          name: clientData.name.trim().replace(/\s+/g, ' '), // Normalize spaces but keep original case
           oib: clientData.oib || null,
           address: clientData.address || null,
           city: clientData.city || null,
@@ -92,18 +113,23 @@ export function useCreateClient() {
         .single();
 
       if (error) throw error;
-      return data as Client;
+      return { client: data as Client, isExisting: false };
     },
-    onSuccess: (client) => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
-      toast.success('Klijent uspješno kreiran');
       
-      logActivity.mutate({
-        action_type: 'create',
-        entity_type: 'client',
-        entity_id: client.id,
-        entity_name: client.name,
-      });
+      if (result.isExisting) {
+        toast.success('Odabran postojeći klijent.');
+      } else {
+        toast.success('Klijent dodan u bazu.');
+        
+        logActivity.mutate({
+          action_type: 'create',
+          entity_type: 'client',
+          entity_id: result.client.id,
+          entity_name: result.client.name,
+        });
+      }
     },
     onError: (error) => {
       toast.error('Greška pri kreiranju klijenta: ' + error.message);

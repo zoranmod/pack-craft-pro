@@ -301,7 +301,7 @@ export function DocumentForm() {
   const handleSaveNewClient = async (data: NewClientData) => {
     setIsCreatingClient(true);
     try {
-      const client = await createClient.mutateAsync({
+      const result = await createClient.mutateAsync({
         name: data.name,
         client_type: data.client_type,
         oib: data.oib,
@@ -311,8 +311,9 @@ export function DocumentForm() {
         notes: data.contact_person ? `Kontakt: ${data.contact_person}` : undefined,
       });
       
-      if (client) {
-        // Auto-fill form with new client data
+      if (result?.client) {
+        const client = result.client;
+        // Auto-fill form with client data (new or existing)
         setFormData(prev => ({
           ...prev,
           clientName: client.name,
