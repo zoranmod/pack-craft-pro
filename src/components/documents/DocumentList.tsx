@@ -119,7 +119,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
             {filteredDocs.map((doc, index) => (
               <tr 
                 key={doc.id} 
-                className="hover:bg-muted/50 dark:hover:bg-zinc-800/40 transition-colors animate-fade-in cursor-pointer group/row"
+                className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors animate-fade-in cursor-pointer group/row"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <td className="px-6 py-4">
