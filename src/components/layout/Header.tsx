@@ -45,26 +45,26 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center h-14 px-4 md:px-6 bg-card border-b border-border gap-4">
+    <header className="sticky top-0 z-50 grid grid-cols-[auto_1fr_auto] items-center h-14 px-4 md:px-6 bg-card border-b border-border gap-4">
       {/* Left section: Menu + Title */}
-      <div className="flex items-center gap-3 min-w-0 shrink-0">
+      <div className="flex items-center gap-3 min-w-0">
         {showMenuButton && (
           <Button variant="ghost" size="icon" onClick={onMenuClick} className="h-10 w-10 shrink-0">
             <Menu className="h-5 w-5" />
           </Button>
         )}
         
-        {/* Page title only - no breadcrumb */}
+        {/* Page title only */}
         <div className="flex flex-col justify-center min-w-0">
           <h1 className="text-sm font-semibold text-foreground truncate leading-tight">{title}</h1>
           {subtitle && <p className="text-xs text-muted-foreground truncate leading-tight">{subtitle}</p>}
         </div>
       </div>
 
-      {/* Center section: Global Search - grows to fill space */}
-      {showGlobalSearch && (
-        <div className="hidden md:flex items-center flex-1 max-w-md">
-          <div className="relative w-full">
+      {/* Center section: Global Search - centered */}
+      <div className="hidden md:flex justify-center">
+        {showGlobalSearch && (
+          <div className="relative w-full max-w-[520px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               type="search"
@@ -85,14 +85,11 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               </Button>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Spacer when no search */}
-      {!showGlobalSearch && <div className="flex-1" />}
-
-      {/* Right section: Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      {/* Right section: Actions - flush right */}
+      <div className="flex items-center gap-1 justify-end">
         {/* Theme Toggle */}
         <Button 
           variant="ghost" 
