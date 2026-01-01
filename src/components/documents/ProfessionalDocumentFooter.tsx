@@ -34,17 +34,20 @@ export const ProfessionalDocumentFooter = ({
     <div className="mt-8 pt-4 border-t border-gray-300">
       {/* Signature Section */}
       {showPreparedBy && (
-        <div className="flex justify-between items-end mb-6">
-          <div>
-            <p className="text-sm text-gray-600 mb-1">{preparedByLabel}</p>
-            {preparedByName && (
-              <p className="text-sm font-medium text-gray-900 mb-2">{preparedByName}</p>
-            )}
+        <div className="flex justify-between items-start mb-6">
+          {/* Left side - prepared by signature block */}
+          <div className="text-center" style={{ width: '75mm' }}>
+            <p className="text-sm text-gray-600 mb-2">{preparedByLabel}</p>
             {showSignatureLine && (
-              <div className="w-40 border-b border-gray-400 mt-4" />
+              <div className="border-b border-gray-400 w-full" style={{ margin: '10mm 0 3mm' }} />
             )}
+            {preparedByName && (
+              <p className="text-sm font-semibold text-gray-900 mt-1">{preparedByName}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">(Potpis)</p>
           </div>
           
+          {/* Right side - stamp and director signature */}
           <div className="flex items-end gap-8">
             {showStampPlaceholder && (
               <div className="w-20 h-20 border-2 border-dashed border-gray-400 rounded-full flex items-center justify-center">
@@ -53,9 +56,9 @@ export const ProfessionalDocumentFooter = ({
             )}
             
             {showDirectorSignature && (
-              <div className="text-right">
-                <div className="w-40 border-b border-gray-400 mb-2" />
-                <p className="text-sm text-gray-600">(potpis)</p>
+              <div className="text-center" style={{ width: '75mm' }}>
+                <div className="border-b border-gray-400 w-full" style={{ margin: '10mm 0 3mm' }} />
+                <p className="text-xs text-gray-500 mt-1">(potpis)</p>
               </div>
             )}
           </div>
