@@ -3,6 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
+export interface ExcludedDate {
+  id: string;
+  leave_request_id: string;
+  date: string;
+  reason: 'neradna_subota' | 'neradni_dan';
+  created_by?: string;
+  created_at: string;
+  deleted_at?: string;
+}
+
 export interface LeaveRequestWithEmployee {
   id: string;
   employee_id: string;
@@ -21,6 +31,7 @@ export interface LeaveRequestWithEmployee {
   employee_name: string;
   employee_first_name: string;
   employee_last_name: string;
+  excluded_dates?: ExcludedDate[];
 }
 
 export function useAllLeaveRequests(filters?: {
@@ -274,5 +285,69 @@ export function useMonthPlanned() {
       return count || 0;
     },
     enabled: !!user,
+  });
+}
+
+// Get excluded dates for a leave request
+export function useExcludedDates(leaveRequestId?: string) {
+  return useQuery({
+    queryKey: ['excluded-dates', leaveRequestId],
+    queryFn: async (): Promise<ExcludedDate[]> => {
+      if (!leaveRequestId) return [];
+      
+      const { data, error } = await supabase
+        .from('leave_request_excluded_dates')
+        .select('*')
+        .eq('leave_request_id', leaveRequestId)
+        .is('deleted_at', null);
+      
+      if (error) throw error;
+      return (data || []) as ExcludedDate[];
+    },
+    enabled: !!leaveRequestId,
+  });
+}
+
+// Save excluded dates for a leave request
+export function useSaveExcludedDates() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ leaveRequestId, excludedDates }: {
+      leaveRequestId: string;
+      excludedDates: { date: string; reason: 'neradna_subota' | 'neradni_dan' }[];
+    }) => {
+      if (!user) throw new Error('User not authenticated');
+
+      // First delete existing excluded dates for this request
+      await supabase
+        .from('leave_request_excluded_dates')
+        .delete()
+        .eq('leave_request_id', leaveRequestId);
+
+      // Then insert new ones
+      if (excludedDates.length > 0) {
+        const { error } = await supabase
+          .from('leave_request_excluded_dates')
+          .insert(excludedDates.map(ed => ({
+            leave_request_id: leaveRequestId,
+            date: ed.date,
+            reason: ed.reason,
+            created_by: user.id,
+          })));
+
+        if (error) throw error;
+      }
+
+      return leaveRequestId;
+    },
+    onSuccess: (leaveRequestId) => {
+      queryClient.invalidateQueries({ queryKey: ['excluded-dates', leaveRequestId] });
+      queryClient.invalidateQueries({ queryKey: ['all-leave-requests'] });
+    },
+    onError: (error) => {
+      toast.error('Greška pri spremanju izuzetih datuma: ' + error.message);
+    },
   });
 }
