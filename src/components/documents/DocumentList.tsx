@@ -11,8 +11,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn, formatDateHR } from '@/lib/utils';
-import { useConvertDocument, useCopyDocument } from '@/hooks/useDocuments';
+import { useConvertDocument, useCopyDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { toast } from 'sonner';
 
 interface DocumentListProps {
@@ -32,10 +42,31 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const navigate = useNavigate();
   const convertDocument = useConvertDocument();
   const copyDocument = useCopyDocument();
+  const deleteDocument = useDeleteDocument();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
   
   const filteredDocs = filter === 'all' 
     ? documents 
     : documents.filter(doc => doc.type === filter);
+
+  const handleDeleteClick = (doc: Document) => {
+    setDocumentToDelete(doc);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!documentToDelete) return;
+    try {
+      await deleteDocument.mutateAsync({ id: documentToDelete.id, number: documentToDelete.number });
+      toast.success(`Dokument ${documentToDelete.number} je obrisan.`);
+    } catch (error) {
+      // Error toast is handled in hook
+    } finally {
+      setDeleteDialogOpen(false);
+      setDocumentToDelete(null);
+    }
+  };
 
   const handleConvert = async (doc: Document) => {
     const nextType = getNextDocumentType(doc.type);
@@ -167,7 +198,10 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                         </>
                       )}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
+                      <DropdownMenuItem 
+                        className="text-destructive"
+                        onClick={() => handleDeleteClick(doc)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" /> Obriši
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -186,6 +220,28 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
           <p className="text-sm text-muted-foreground">Kreirajte prvi dokument klikom na jednu od brzih akcija</p>
         </div>
       )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati dokument?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Jeste li sigurni da želite obrisati dokument {documentToDelete?.number}? 
+              Ova radnja se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Odustani</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
