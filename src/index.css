@@ -184,6 +184,19 @@
   .shadow-elevated {
     box-shadow: var(--shadow-lg);
   }
+
+  /* Global hover surface utility - consistent across all interactive elements */
+  .hover-surface {
+    @apply transition-colors duration-150;
+  }
+  .hover-surface:hover,
+  .hover-surface:focus {
+    @apply bg-muted/60 text-foreground;
+  }
+  .dark .hover-surface:hover,
+  .dark .hover-surface:focus {
+    @apply bg-muted/50 text-foreground;
+  }
 }
 
 @layer components {
