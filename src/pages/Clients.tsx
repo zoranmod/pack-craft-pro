@@ -89,6 +89,7 @@ const Clients = () => {
     if (editingClient) {
       await updateClient.mutateAsync({ id: editingClient.id, ...formData });
     } else {
+      // createClient now handles duplicate detection internally
       await createClient.mutateAsync(formData);
     }
     setIsDialogOpen(false);
