@@ -180,15 +180,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       to={item.path}
       onClick={handleLinkClick}
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
+        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
         isActive(item.path)
           ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px] dark:bg-secondary"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-muted/60"
       )}
     >
       <item.icon className={cn(
-        "h-4 w-4 flex-shrink-0",
-        isActive(item.path) && "text-primary"
+        "h-4 w-4 flex-shrink-0 transition-colors duration-150",
+        isActive(item.path) ? "text-primary" : "group-hover:text-foreground"
       )} />
       <span className="truncate">{item.label}</span>
     </Link>
@@ -205,7 +205,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         {isMobile && (
           <button
             onClick={() => onOpenChange?.(false)}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            className="p-1.5 rounded-md hover:bg-muted/70 dark:hover:bg-muted/60 transition-colors duration-150 text-muted-foreground hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -219,14 +219,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           to="/"
           onClick={handleLinkClick}
           className={cn(
-            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-all duration-150",
+            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
             isActive('/')
               ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px] dark:bg-secondary"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-muted/60"
           )}
         >
           <LayoutDashboard className={cn(
-            "h-4 w-4 flex-shrink-0",
+            "h-4 w-4 flex-shrink-0 transition-colors duration-150",
             isActive('/') && "text-primary"
           )} />
           <span className="truncate">Početna</span>
@@ -283,7 +283,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             open={expandedGroups[group.id]}
             onOpenChange={() => toggleGroup(group.id)}
           >
-            <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 mt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 mt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors duration-150">
               <span>{group.label}</span>
               {expandedGroups[group.id] ? (
                 <ChevronDown className="h-3 w-3" />
@@ -313,13 +313,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           to="/settings"
           onClick={handleLinkClick}
           className={cn(
-            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors",
+            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150",
             isActive('/settings')
               ? "bg-secondary text-foreground border-l-2 border-primary ml-[-1px]"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-muted/60"
           )}
         >
-          <Settings className={cn("h-4 w-4 flex-shrink-0", isActive('/settings') && "text-primary")} />
+          <Settings className={cn("h-4 w-4 flex-shrink-0 transition-colors duration-150", isActive('/settings') && "text-primary")} />
           <span>Postavke</span>
         </Link>
       </div>
