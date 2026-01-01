@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { SearchInput } from '@/components/ui/search-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -135,25 +136,12 @@ const Articles = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Pretraži artikle..."
-              className="pl-9 pr-9"
-            />
-            {search && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                onClick={() => handleSearchChange('')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <SearchInput
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Pretraži artikle..."
+            className="flex-1 max-w-md"
+          />
           <div className="flex gap-2">
             <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2">
               <Upload className="h-4 w-4" />
