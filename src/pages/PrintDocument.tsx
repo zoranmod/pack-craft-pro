@@ -1,11 +1,12 @@
+import React, { useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useMemo } from 'react';
 import { useDocument } from '@/hooks/useDocuments';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { useArticles } from '@/hooks/useArticles';
 import { Document, documentTypeLabels } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
+import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
 import { ContractDocumentView } from '@/components/documents/ContractDocumentView';
 import { SignatureBlock } from '@/components/documents/SignatureBlock';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
@@ -334,7 +335,13 @@ export function DocumentContent({
           hasPrices={hasPrices}
         />
       </div>
-
+      
+      <div className="doc-footer">
+        <p className="legal-note">
+          Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
+        </p>
+        <MemorandumFooter />
+      </div>
     </div>
   );
 }
