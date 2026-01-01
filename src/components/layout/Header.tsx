@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { useCompanySettings } from '@/hooks/useSettings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +26,8 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isInstallable, installApp } = usePWAInstall();
-  const { data: companySettings } = useCompanySettings();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-
-  const companyName = companySettings?.company_name || 'Akord d.o.o.';
 
   const handleSignOut = async () => {
     await signOut();
@@ -49,33 +45,25 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center h-14 px-4 md:px-6 bg-card border-b border-border">
-      {/* Left section: Menu + Brand + Title */}
-      <div className="flex items-center gap-4 min-w-0 flex-1">
+    <header className="sticky top-0 z-50 flex items-center h-14 px-4 md:px-6 bg-card border-b border-border gap-4">
+      {/* Left section: Menu + Title */}
+      <div className="flex items-center gap-3 min-w-0 shrink-0">
         {showMenuButton && (
-          <Button variant="ghost" size="icon" onClick={onMenuClick} className="h-9 w-9 shrink-0">
+          <Button variant="ghost" size="icon" onClick={onMenuClick} className="h-10 w-10 shrink-0">
             <Menu className="h-5 w-5" />
           </Button>
         )}
         
-        {/* Brand name - hidden on mobile, visible on desktop */}
-        <span className="hidden lg:inline-block text-sm font-medium text-muted-foreground shrink-0">
-          {companyName}
-        </span>
-        
-        {/* Separator - hidden on mobile */}
-        <span className="hidden lg:inline-block text-border select-none">/</span>
-        
-        {/* Page title */}
-        <div className="min-w-0">
-          <h1 className="text-sm font-semibold text-foreground truncate leading-9">{title}</h1>
-          {subtitle && <p className="text-xs text-muted-foreground truncate -mt-1">{subtitle}</p>}
+        {/* Page title only - no breadcrumb */}
+        <div className="flex flex-col justify-center min-w-0">
+          <h1 className="text-sm font-semibold text-foreground truncate leading-tight">{title}</h1>
+          {subtitle && <p className="text-xs text-muted-foreground truncate leading-tight">{subtitle}</p>}
         </div>
       </div>
 
-      {/* Center section: Global Search */}
+      {/* Center section: Global Search - grows to fill space */}
       {showGlobalSearch && (
-        <div className="hidden md:flex items-center justify-center flex-1 max-w-md mx-4">
+        <div className="hidden md:flex items-center flex-1 max-w-md">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
@@ -84,13 +72,13 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="w-full pl-9 pr-9 h-9 bg-background border-border text-sm"
+              className="w-full pl-9 pr-9 h-10 bg-background border-border text-sm"
             />
             {searchQuery && (
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
                 onClick={clearSearch}
               >
                 <X className="h-4 w-4" />
@@ -100,6 +88,9 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
         </div>
       )}
 
+      {/* Spacer when no search */}
+      {!showGlobalSearch && <div className="flex-1" />}
+
       {/* Right section: Actions */}
       <div className="flex items-center gap-1 shrink-0">
         {/* Theme Toggle */}
@@ -107,7 +98,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
           variant="ghost" 
           size="icon" 
           onClick={toggleTheme}
-          className="h-9 w-9"
+          className="h-10 w-10"
         >
           {theme === 'light' ? (
             <Moon className="h-4 w-4" />
@@ -119,9 +110,9 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
         {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 hover:bg-muted">
-              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center border border-border">
-                <User className="h-3.5 w-3.5 text-muted-foreground" />
+            <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
+                <User className="h-4 w-4 text-muted-foreground" />
               </div>
             </Button>
           </DropdownMenuTrigger>
