@@ -60,15 +60,11 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
     docFooter.style.cssText += 'flex-shrink: 0 !important; margin-top: auto !important;';
   }
   
-  // Optimize images in clone to reduce size
+  // Ensure images maintain their original display size (no resizing)
   const images = clone.querySelectorAll('img');
   images.forEach((img) => {
-    const maxDim = 400;
-    if (img.naturalWidth > maxDim || img.naturalHeight > maxDim) {
-      const imgScale = Math.min(maxDim / img.naturalWidth, maxDim / img.naturalHeight);
-      img.style.width = `${img.naturalWidth * imgScale}px`;
-      img.style.height = `${img.naturalHeight * imgScale}px`;
-    }
+    // Keep images at their CSS-defined size, just ensure they load properly
+    img.style.setProperty('max-width', '100%', 'important');
   });
   
   // Enhance text sharpness
