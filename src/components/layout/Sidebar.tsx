@@ -80,13 +80,11 @@ const navGroups: NavGroup[] = [
       { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
     ],
   },
-  {
-    id: 'system',
-    label: '',
-    items: [
-      { icon: Trash2, label: 'Kanta za smeće', path: '/trash' },
-    ],
-  },
+];
+
+// Bottom items (above settings)
+const bottomItems: NavItem[] = [
+  { icon: Trash2, label: 'Kanta za smeće', path: '/trash' },
 ];
 
 interface SidebarProps {
@@ -215,6 +213,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           );
         })}
       </nav>
+
+      {/* Bottom Items (Trash) */}
+      <div className="px-2 py-1.5 space-y-0.5">
+        {bottomItems.map((item) => (
+          <NavItem key={item.path} item={item} />
+        ))}
+      </div>
 
       {/* Compact Settings Footer */}
       <div className="border-t border-border/50 px-2 py-2">
