@@ -1,21 +1,35 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+export type PdfQuality = 'normal' | 'high';
+
+interface PdfOptions {
+  quality?: PdfQuality;
+}
+
 /**
- * Generates a high-quality PDF from an HTML element.
- * Uses high DPI rendering for crisp text and lines.
+ * Generates an optimized PDF from an HTML element.
+ * 'normal' = smaller file size (~0.5-3MB), good for sharing
+ * 'high' = larger file size, best for printing
  */
-export async function generatePdfFromElement(element: HTMLElement): Promise<Blob> {
+export async function generatePdfFromElement(
+  element: HTMLElement, 
+  options: PdfOptions = {}
+): Promise<Blob> {
+  const { quality = 'normal' } = options;
+  
   // Clone the element to avoid modifying the original
   const clone = element.cloneNode(true) as HTMLElement;
   
   // A4 dimensions at 96 DPI (screen pixels)
-  // A4: 210mm x 297mm = 794px x 1123px at 96 DPI
   const a4Width = 794;
   const a4Height = 1123;
   
-  // High resolution scale for print quality (3x = ~288 DPI)
-  const scale = 3;
+  // Quality settings
+  const isHighQuality = quality === 'high';
+  const scale = isHighQuality ? 3 : 2; // 2x for normal, 3x for high
+  const imageFormat = isHighQuality ? 'PNG' : 'JPEG';
+  const imageQuality = isHighQuality ? 1.0 : 0.82; // JPEG quality
   
   // Create a container for rendering
   const container = document.createElement('div');
@@ -60,6 +74,18 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
     docFooter.style.cssText += 'flex-shrink: 0 !important; margin-top: auto !important;';
   }
   
+  // Optimize images in clone to reduce size
+  const images = clone.querySelectorAll('img');
+  images.forEach((img) => {
+    // Limit image dimensions to reduce memory usage
+    const maxDim = isHighQuality ? 800 : 400;
+    if (img.naturalWidth > maxDim || img.naturalHeight > maxDim) {
+      const scale = Math.min(maxDim / img.naturalWidth, maxDim / img.naturalHeight);
+      img.style.width = `${img.naturalWidth * scale}px`;
+      img.style.height = `${img.naturalHeight * scale}px`;
+    }
+  });
+  
   // Enhance text sharpness in all elements
   const allElements = clone.querySelectorAll('*');
   allElements.forEach((el) => {
@@ -76,9 +102,9 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
   await new Promise(resolve => setTimeout(resolve, 100));
   
   try {
-    // Render to canvas with high resolution for print quality
+    // Render to canvas
     const canvas = await html2canvas(clone, {
-      scale: scale, // 3x scale for ~288 DPI print quality
+      scale: scale,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
@@ -87,9 +113,7 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
       windowWidth: a4Width,
       windowHeight: a4Height,
       imageTimeout: 15000,
-      // Ensure sharp rendering
       onclone: (clonedDoc) => {
-        // Apply print-quality styles to cloned document
         const style = clonedDoc.createElement('style');
         style.textContent = `
           * {
@@ -110,20 +134,23 @@ export async function generatePdfFromElement(element: HTMLElement): Promise<Blob
       }
     });
     
-    // Create PDF with A4 dimensions
+    // Create PDF with compression enabled
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
-      compress: false, // Disable compression for maximum quality
+      compress: true, // Enable compression for smaller file size
     });
     
-    // Use PNG format for crisp text (lossless)
-    // Higher quality than JPEG for text and line art
-    const imgData = canvas.toDataURL('image/png');
+    // Convert canvas to image data
+    const imgData = canvas.toDataURL(
+      imageFormat === 'PNG' ? 'image/png' : 'image/jpeg',
+      imageQuality
+    );
     
-    // Add the canvas as image - exactly A4 size (210x297mm)
-    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, undefined, 'NONE');
+    // Add the image - use FAST compression for JPEG, NONE for PNG
+    const compression = imageFormat === 'PNG' ? 'NONE' : 'FAST';
+    pdf.addImage(imgData, imageFormat, 0, 0, 210, 297, undefined, compression);
     
     return pdf.output('blob');
   } finally {

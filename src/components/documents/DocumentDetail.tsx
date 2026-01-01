@@ -15,7 +15,7 @@ import { MemorandumHeader } from './MemorandumHeader';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generatePdfFromElement, downloadPdf } from '@/lib/pdfGenerator';
+import { generatePdfFromElement, downloadPdf, PdfQuality } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -143,14 +143,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   };
 
   // Generate PDF from HTML preview using html2canvas + jsPDF
-  const handleDownloadPdf = async () => {
+  const handleDownloadPdf = async (quality: PdfQuality = 'normal') => {
     if (!document || !printRef.current) return;
     
     setIsGeneratingPdf(true);
-    toast.info('Generiram PDF...');
+    const qualityLabel = quality === 'high' ? 'visoke kvalitete' : 'optimiziran';
+    toast.info(`Generiram ${qualityLabel} PDF...`);
     
     try {
-      const pdfBlob = await generatePdfFromElement(printRef.current);
+      const pdfBlob = await generatePdfFromElement(printRef.current, { quality });
       const filename = getPdfFilename(document);
       downloadPdf(pdfBlob, filename);
       toast.success('PDF spremljen.');
@@ -284,10 +285,31 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-            <Download className="mr-2 h-4 w-4" />
-            {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="rounded-lg" disabled={isGeneratingPdf}>
+                <Download className="mr-2 h-4 w-4" />
+                {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
+                <ChevronDown className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg z-50 rounded-lg">
+              <DropdownMenuItem 
+                onClick={() => handleDownloadPdf('normal')}
+                className="cursor-pointer rounded-md"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Normal (~1-3 MB)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleDownloadPdf('high')}
+                className="cursor-pointer rounded-md"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Visoka kvaliteta (print)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
@@ -415,10 +437,31 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <Copy className="mr-3 h-4 w-4" />
                 {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj dokument'}
               </Button>
-              <Button variant="outline" className="w-full justify-start rounded-lg" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-                <Download className="mr-3 h-4 w-4" />
-                {isGeneratingPdf ? 'Generiram PDF...' : 'Spremi PDF'}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start rounded-lg" disabled={isGeneratingPdf}>
+                    <Download className="mr-3 h-4 w-4" />
+                    {isGeneratingPdf ? 'Generiram PDF...' : 'Spremi PDF'}
+                    <ChevronDown className="ml-auto h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 bg-popover border border-border shadow-lg z-50 rounded-lg">
+                  <DropdownMenuItem 
+                    onClick={() => handleDownloadPdf('normal')}
+                    className="cursor-pointer rounded-md"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Normal (~1-3 MB)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => handleDownloadPdf('high')}
+                    className="cursor-pointer rounded-md"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Visoka kvaliteta (print)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Separator className="my-3" />
               <Button 
                 variant="outline" 
