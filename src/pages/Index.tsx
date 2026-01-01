@@ -83,15 +83,10 @@ const Index = () => {
         </div>
       </CollapsibleSection>
 
-      {/* Collapsible Quick Actions */}
-      <CollapsibleSection
-        title="Brze akcije"
-        isOpen={sections.quickActions}
-        onToggle={() => toggleSection('quickActions')}
-        className="mb-6"
-      >
+      {/* Quick Action - Always visible */}
+      <div className="mb-6">
         <QuickActionsRefactored />
-      </CollapsibleSection>
+      </div>
 
       {/* Recent Documents & Activities - Side by Side */}
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] mb-6">
