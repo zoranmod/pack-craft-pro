@@ -1,17 +1,115 @@
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
 /**
- * Opens the print route for a document and triggers the browser's native print dialog.
- * This creates a vector PDF with selectable text and small file size.
- * 
- * @param documentId - The ID of the document to print
+ * Generates an optimized PDF from an HTML element.
+ * Uses aggressive compression for smaller file sizes (~1-3MB).
  */
-export function openPrintDialog(documentId: string): void {
-  // Open the print route in a new window
-  const printUrl = `/print/${documentId}`;
-  const printWindow = window.open(printUrl, '_blank');
+export async function generatePdfFromElement(element: HTMLElement): Promise<Blob> {
+  // Clone the element to avoid modifying the original
+  const clone = element.cloneNode(true) as HTMLElement;
   
-  if (!printWindow) {
-    // If popup was blocked, navigate directly
-    window.location.href = printUrl;
+  // A4 dimensions at 96 DPI (screen pixels)
+  const a4Width = 794;
+  const a4Height = 1123;
+  
+  // Optimized settings for smaller file size
+  const scale = 1.5; // Lower scale = smaller file
+  
+  // Create a container for rendering
+  const container = document.createElement('div');
+  container.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: ${a4Width}px;
+    height: ${a4Height}px;
+    overflow: hidden;
+    background: #ffffff;
+    z-index: -9999;
+    pointer-events: none;
+  `;
+  
+  // Style the clone for precise A4 rendering
+  clone.style.cssText = `
+    width: ${a4Width}px !important;
+    height: ${a4Height}px !important;
+    min-height: ${a4Height}px !important;
+    max-height: ${a4Height}px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+  `;
+  
+  // Ensure doc-body and doc-footer have correct flex styles
+  const docBody = clone.querySelector('.doc-body') as HTMLElement;
+  const docFooter = clone.querySelector('.doc-footer') as HTMLElement;
+  
+  if (docBody) {
+    docBody.style.cssText += 'flex: 1 1 auto !important; overflow: hidden !important; min-height: 0 !important;';
+  }
+  
+  if (docFooter) {
+    docFooter.style.cssText += 'flex-shrink: 0 !important; margin-top: auto !important;';
+  }
+  
+  // Optimize images in clone to reduce size
+  const images = clone.querySelectorAll('img');
+  images.forEach((img) => {
+    // Limit image dimensions to reduce memory usage
+    const maxDim = 300;
+    if (img.naturalWidth > maxDim || img.naturalHeight > maxDim) {
+      const imgScale = Math.min(maxDim / img.naturalWidth, maxDim / img.naturalHeight);
+      img.style.width = `${img.naturalWidth * imgScale}px`;
+      img.style.height = `${img.naturalHeight * imgScale}px`;
+    }
+  });
+  
+  container.appendChild(clone);
+  document.body.appendChild(container);
+  
+  // Wait for fonts and images to load
+  await document.fonts.ready;
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  try {
+    // Render to canvas with optimized settings
+    const canvas = await html2canvas(clone, {
+      scale: scale,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: a4Width,
+      height: a4Height,
+      windowWidth: a4Width,
+      windowHeight: a4Height,
+      imageTimeout: 10000,
+    });
+    
+    // Create PDF with compression enabled
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true,
+    });
+    
+    // Convert canvas to JPEG with quality compression
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
+    
+    // Add the image with FAST compression
+    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+    
+    return pdf.output('blob');
+  } finally {
+    // Clean up
+    document.body.removeChild(container);
   }
 }
 
