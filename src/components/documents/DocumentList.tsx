@@ -119,16 +119,16 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
             {filteredDocs.map((doc, index) => (
               <tr 
                 key={doc.id} 
-                className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors animate-fade-in cursor-pointer group/row"
+                className="hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150 animate-fade-in cursor-pointer group/row"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <td className="px-6 py-4">
                   <Link to={`/documents/${doc.id}`} className="flex items-center gap-3 group">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-lg">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/60 dark:bg-muted/40 text-lg">
                       {typeIcons[doc.type]}
                     </div>
                     <div>
-                      <p className="font-medium text-foreground group-hover:text-primary transition-colors">
+                      <p className="font-medium text-foreground group-hover:text-primary transition-colors duration-150">
                         {doc.number}
                       </p>
                       <p className="text-sm text-muted-foreground">

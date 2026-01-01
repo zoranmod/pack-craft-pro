@@ -52,8 +52,8 @@ export default function Employees() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Users className="h-6 w-6 text-primary" />
+                <div className="p-3 bg-muted/60 dark:bg-muted/40 rounded-lg">
+                  <Users className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Ukupno zaposlenika</p>

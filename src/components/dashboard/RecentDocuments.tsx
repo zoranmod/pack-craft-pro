@@ -23,12 +23,12 @@ export function RecentDocuments({ documents }: RecentDocumentsProps) {
             key={doc.id}
             to={`/documents/${doc.id}`}
             className={cn(
-              "flex items-center justify-between px-5 py-3 hover:bg-muted/50 transition-colors group",
+              "flex items-center justify-between px-5 py-3 hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150 group",
               index < recentDocs.length - 1 && "border-b border-border"
             )}
           >
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+              <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-150">
                 {doc.number}
               </p>
               <p className="text-xs text-muted-foreground truncate mt-0.5">

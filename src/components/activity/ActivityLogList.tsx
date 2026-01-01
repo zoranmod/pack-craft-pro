@@ -67,7 +67,7 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
   return (
-    <div className="flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors">
+    <div className="flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150">
       <div className={`p-1.5 rounded-md ${actionColor} shrink-0`}>
         <ActionIcon className="h-3.5 w-3.5" />
       </div>

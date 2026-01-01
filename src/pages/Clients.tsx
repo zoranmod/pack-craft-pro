@@ -160,11 +160,11 @@ const Clients = () => {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-muted/60 dark:bg-muted/40 flex items-center justify-center">
                       {client.client_type === 'company' ? (
-                        <Building2 className="h-5 w-5 text-primary" />
+                        <Building2 className="h-5 w-5 text-muted-foreground" />
                       ) : (
-                        <User className="h-5 w-5 text-primary" />
+                        <User className="h-5 w-5 text-muted-foreground" />
                       )}
                     </div>
                     <div>
