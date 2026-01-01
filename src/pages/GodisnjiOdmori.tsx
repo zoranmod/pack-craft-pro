@@ -1,0 +1,593 @@
+import { useState } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isWeekend, isSameDay, isWithinInterval, parseISO } from 'date-fns';
+import { hr } from 'date-fns/locale';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useEmployees } from '@/hooks/useEmployees';
+import {
+  useAllLeaveRequests,
+  useCreateLeaveRequest,
+  useUpdateLeaveRequest,
+  useDeleteLeaveRequest,
+  useTodayAbsences,
+  useWeekAbsences,
+  useMonthPlanned,
+  LeaveRequestWithEmployee,
+} from '@/hooks/useLeaveOverview';
+import { differenceInBusinessDays, addDays } from 'date-fns';
+
+const LEAVE_TYPES = [
+  { value: 'godišnji', label: 'Godišnji odmor' },
+  { value: 'bolovanje', label: 'Bolovanje' },
+  { value: 'neplaćeno', label: 'Neplaćeni dopust' },
+  { value: 'ostalo', label: 'Ostalo' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'pending', label: 'Na čekanju' },
+  { value: 'approved', label: 'Odobren' },
+  { value: 'rejected', label: 'Odbijen' },
+];
+
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'approved':
+      return <Badge className="bg-green-500/20 text-green-700 dark:text-green-400">Odobren</Badge>;
+    case 'rejected':
+      return <Badge variant="destructive">Odbijen</Badge>;
+    case 'pending':
+    default:
+      return <Badge variant="secondary">Na čekanju</Badge>;
+  }
+};
+
+const getLeaveTypeLabel = (type: string) => {
+  return LEAVE_TYPES.find(t => t.value === type)?.label || type;
+};
+
+const GodisnjiOdmori = () => {
+  const currentYear = new Date().getFullYear();
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
+  const [yearFilter, setYearFilter] = useState<string>(currentYear.toString());
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'list' | 'calendar'>('list');
+  
+  // Modal states
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<LeaveRequestWithEmployee | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  
+  // Calendar state
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+
+  // Form state
+  const [form, setForm] = useState({
+    employee_id: '',
+    start_date: '',
+    end_date: '',
+    leave_type: 'godišnji',
+    reason: '',
+    status: 'pending',
+  });
+
+  // Data hooks
+  const { employees } = useEmployees();
+  const { data: leaveRequests = [], isLoading } = useAllLeaveRequests({
+    year: yearFilter !== 'all' ? parseInt(yearFilter) : undefined,
+    status: statusFilter,
+    leaveType: typeFilter,
+    search: debouncedSearch,
+  });
+  const createLeave = useCreateLeaveRequest();
+  const updateLeave = useUpdateLeaveRequest();
+  const deleteLeave = useDeleteLeaveRequest();
+  const { data: todayAbsent = 0 } = useTodayAbsences();
+  const { data: weekAbsent = 0 } = useWeekAbsences();
+  const { data: monthPlanned = 0 } = useMonthPlanned();
+
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
+  const resetForm = () => {
+    setForm({
+      employee_id: '',
+      start_date: '',
+      end_date: '',
+      leave_type: 'godišnji',
+      reason: '',
+      status: 'pending',
+    });
+  };
+
+  const handleOpenAdd = () => {
+    resetForm();
+    setEditingItem(null);
+    setIsAddOpen(true);
+  };
+
+  const handleOpenEdit = (item: LeaveRequestWithEmployee) => {
+    setForm({
+      employee_id: item.employee_id,
+      start_date: item.start_date,
+      end_date: item.end_date,
+      leave_type: item.leave_type,
+      reason: item.reason || '',
+      status: item.status,
+    });
+    setEditingItem(item);
+    setIsAddOpen(true);
+  };
+
+  const calculateBusinessDays = (start: string, end: string) => {
+    if (!start || !end) return 0;
+    return differenceInBusinessDays(parseISO(end), parseISO(start)) + 1;
+  };
+
+  const handleSubmit = async () => {
+    if (!form.employee_id || !form.start_date || !form.end_date) return;
+
+    const days = calculateBusinessDays(form.start_date, form.end_date);
+
+    if (editingItem) {
+      await updateLeave.mutateAsync({
+        id: editingItem.id,
+        start_date: form.start_date,
+        end_date: form.end_date,
+        days_requested: days,
+        leave_type: form.leave_type,
+        reason: form.reason || undefined,
+        status: form.status,
+      });
+    } else {
+      await createLeave.mutateAsync({
+        employee_id: form.employee_id,
+        start_date: form.start_date,
+        end_date: form.end_date,
+        days_requested: days,
+        leave_type: form.leave_type,
+        reason: form.reason || undefined,
+      });
+    }
+    setIsAddOpen(false);
+    resetForm();
+    setEditingItem(null);
+  };
+
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteLeave.mutateAsync(deleteId);
+      setDeleteId(null);
+    }
+  };
+
+  // Calendar helpers
+  const monthStart = startOfMonth(calendarMonth);
+  const monthEnd = endOfMonth(calendarMonth);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  const getLeaveForDay = (day: Date) => {
+    return leaveRequests.filter(leave => {
+      const start = parseISO(leave.start_date);
+      const end = parseISO(leave.end_date);
+      return isWithinInterval(day, { start, end });
+    });
+  };
+
+  return (
+    <MainLayout
+      title="Godišnji odmori"
+      subtitle="Pregled svih godišnjih odmora i odsustava"
+    >
+      <div className="space-y-6">
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Danas odsutni</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold">{todayAbsent}</span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Odsutni ovaj tjedan</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold">{weekAbsent}</span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Planirano ovaj mjesec</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold">{monthPlanned}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Pretraži po imenu..."
+                className="pl-9 pr-9 w-64"
+              />
+              {search && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={() => setSearch('')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <Select value={yearFilter} onValueChange={setYearFilter}>
+              <SelectTrigger className="w-28">
+                <SelectValue placeholder="Godina" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Sve</SelectItem>
+                {years.map((y) => (
+                  <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Svi statusi</SelectItem>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Tip" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Svi tipovi</SelectItem>
+                {LEAVE_TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={handleOpenAdd} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Dodaj godišnji
+          </Button>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'list' | 'calendar')}>
+          <TabsList>
+            <TabsTrigger value="list" className="gap-2">
+              <List className="h-4 w-4" />
+              Lista
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              Kalendar
+            </TabsTrigger>
+          </TabsList>
+
+          {/* List View */}
+          <TabsContent value="list" className="mt-6">
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">Učitavanje...</div>
+            ) : leaveRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Nema zapisa</h3>
+                <p className="text-muted-foreground">Nema godišnjih odmora za odabrane filtere</p>
+              </div>
+            ) : (
+              <div className="bg-card rounded-xl border border-border/50 shadow-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Zaposlenik</TableHead>
+                        <TableHead>Od – Do</TableHead>
+                        <TableHead>Broj dana</TableHead>
+                        <TableHead>Tip</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Napomena</TableHead>
+                        <TableHead>Datum unosa</TableHead>
+                        <TableHead className="text-right">Akcije</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {leaveRequests.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.employee_name}</TableCell>
+                          <TableCell>
+                            {format(parseISO(item.start_date), 'dd.MM.yyyy', { locale: hr })} – {format(parseISO(item.end_date), 'dd.MM.yyyy', { locale: hr })}
+                          </TableCell>
+                          <TableCell>{item.days_requested}</TableCell>
+                          <TableCell>{getLeaveTypeLabel(item.leave_type)}</TableCell>
+                          <TableCell>{getStatusBadge(item.status)}</TableCell>
+                          <TableCell className="max-w-[200px] truncate text-muted-foreground">
+                            {item.reason || '-'}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {format(parseISO(item.created_at), 'dd.MM.yyyy', { locale: hr })}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleOpenEdit(item)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setDeleteId(item.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Calendar View */}
+          <TabsContent value="calendar" className="mt-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <Button variant="ghost" size="icon" onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1))}>
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <CardTitle className="text-lg">
+                  {format(calendarMonth, 'LLLL yyyy', { locale: hr })}
+                </CardTitle>
+                <Button variant="ghost" size="icon" onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1))}>
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-7 gap-1">
+                  {['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'].map((day) => (
+                    <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+                      {day}
+                    </div>
+                  ))}
+                  {/* Empty cells for days before month starts */}
+                  {Array.from({ length: (monthStart.getDay() + 6) % 7 }).map((_, i) => (
+                    <div key={`empty-${i}`} className="h-20 bg-muted/20 rounded" />
+                  ))}
+                  {daysInMonth.map((day) => {
+                    const leaves = getLeaveForDay(day);
+                    const isToday = isSameDay(day, new Date());
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className={`h-20 p-1 rounded border ${
+                          isWeekend(day)
+                            ? 'bg-muted/30'
+                            : 'bg-card'
+                        } ${isToday ? 'border-primary' : 'border-border/50'}`}
+                      >
+                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
+                          {format(day, 'd')}
+                        </div>
+                        <div className="space-y-0.5 overflow-hidden">
+                          {leaves.slice(0, 2).map((leave) => (
+                            <div
+                              key={leave.id}
+                              className={`text-[10px] px-1 py-0.5 rounded truncate ${
+                                leave.status === 'approved'
+                                  ? 'bg-green-500/20 text-green-700 dark:text-green-400'
+                                  : leave.status === 'pending'
+                                  ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400'
+                                  : 'bg-red-500/20 text-red-700 dark:text-red-400'
+                              }`}
+                              title={`${leave.employee_name} - ${getLeaveTypeLabel(leave.leave_type)}`}
+                            >
+                              {leave.employee_first_name} {leave.employee_last_name.charAt(0)}.
+                            </div>
+                          ))}
+                          {leaves.length > 2 && (
+                            <div className="text-[10px] text-muted-foreground px-1">
+                              +{leaves.length - 2} više
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Add/Edit Modal */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingItem ? 'Uredi godišnji' : 'Dodaj godišnji'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {!editingItem && (
+              <div className="space-y-2">
+                <Label>Zaposlenik *</Label>
+                <Select value={form.employee_id} onValueChange={(v) => setForm(prev => ({ ...prev, employee_id: v }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Odaberi zaposlenika" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((emp) => (
+                      <SelectItem key={emp.id} value={emp.id}>
+                        {emp.first_name} {emp.last_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Od *</Label>
+                <Input
+                  type="date"
+                  value={form.start_date}
+                  onChange={(e) => setForm(prev => ({ ...prev, start_date: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Do *</Label>
+                <Input
+                  type="date"
+                  value={form.end_date}
+                  onChange={(e) => setForm(prev => ({ ...prev, end_date: e.target.value }))}
+                />
+              </div>
+            </div>
+            {form.start_date && form.end_date && (
+              <div className="text-sm text-muted-foreground">
+                Broj radnih dana: <strong>{calculateBusinessDays(form.start_date, form.end_date)}</strong>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Tip</Label>
+              <Select value={form.leave_type} onValueChange={(v) => setForm(prev => ({ ...prev, leave_type: v }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEAVE_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {editingItem && (
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={form.status} onValueChange={(v) => setForm(prev => ({ ...prev, status: v }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Napomena</Label>
+              <Textarea
+                value={form.reason}
+                onChange={(e) => setForm(prev => ({ ...prev, reason: e.target.value }))}
+                placeholder="Opcijska napomena..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddOpen(false)}>Odustani</Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!form.start_date || !form.end_date || (!editingItem && !form.employee_id) || createLeave.isPending || updateLeave.isPending}
+            >
+              {editingItem ? 'Spremi' : 'Dodaj'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obriši godišnji odmor?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Zapis će biti premješten u kantu za smeće. Možete ga vratiti iz kante ako se predomislite.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Odustani</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </MainLayout>
+  );
+};
+
+export default GodisnjiOdmori;

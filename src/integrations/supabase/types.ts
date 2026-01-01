@@ -747,6 +747,8 @@ export type Database = {
           approved_by: string | null
           created_at: string
           days_requested: number
+          deleted_at: string | null
+          deleted_by: string | null
           employee_id: string
           end_date: string
           id: string
@@ -761,6 +763,8 @@ export type Database = {
           approved_by?: string | null
           created_at?: string
           days_requested: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           employee_id: string
           end_date: string
           id?: string
@@ -775,6 +779,8 @@ export type Database = {
           approved_by?: string | null
           created_at?: string
           days_requested?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           employee_id?: string
           end_date?: string
           id?: string
@@ -917,6 +923,8 @@ export type Database = {
           assigned_date: string
           condition: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           employee_id: string
           id: string
           item_name: string
@@ -930,6 +938,8 @@ export type Database = {
           assigned_date?: string
           condition?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           employee_id: string
           id?: string
           item_name: string
@@ -943,6 +953,8 @@ export type Database = {
           assigned_date?: string
           condition?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           employee_id?: string
           id?: string
           item_name?: string

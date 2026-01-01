@@ -10,10 +10,11 @@ import {
   Receipt,
   X,
   Calendar,
-  ClipboardList,
   Package,
   UsersRound,
-  Trash2
+  Trash2,
+  Palmtree,
+  Shirt
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -36,6 +37,8 @@ const menuItems = [
   { icon: Users, label: 'Klijenti', path: '/clients' },
   { icon: Truck, label: 'Dobavljači', path: '/dobavljaci' },
   { icon: UsersRound, label: 'Zaposlenici', path: '/employees' },
+  { icon: Palmtree, label: 'Godišnji odmori', path: '/godisnji-odmori' },
+  { icon: Shirt, label: 'Radna odjeća', path: '/radna-odjeca' },
   { icon: Calendar, label: 'Kalendar', path: '/kalendar' },
   { icon: Trash2, label: 'Kanta za smeće', path: '/trash' },
 ];
