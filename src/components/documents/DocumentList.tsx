@@ -24,19 +24,12 @@ import {
 import { cn, formatDateHR } from '@/lib/utils';
 import { useConvertDocument, useCopyDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { toast } from 'sonner';
+import { getDocumentTypeStyle } from '@/lib/documentTypeStyles';
 
 interface DocumentListProps {
   documents: Document[];
   filter?: DocumentType | 'all';
 }
-
-const typeIcons: Record<DocumentType, string> = {
-  'otpremnica': '📦',
-  'ponuda': '📄',
-  'nalog-dostava-montaza': '🚚',
-  'racun': '🧾',
-  'ugovor': '📝',
-};
 
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const navigate = useNavigate();
@@ -116,27 +109,36 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredDocs.map((doc, index) => (
-              <tr 
-                key={doc.id} 
-                className="hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150 animate-fade-in cursor-pointer group/row"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <td className="px-6 py-4">
-                  <Link to={`/documents/${doc.id}`} className="flex items-center gap-3 group">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/60 dark:bg-muted/40 text-lg">
-                      {typeIcons[doc.type]}
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground group-hover:text-primary transition-colors duration-150">
-                        {doc.number}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {documentTypeLabels[doc.type]}
-                      </p>
-                    </div>
-                  </Link>
-                </td>
+            {filteredDocs.map((doc, index) => {
+              const typeStyle = getDocumentTypeStyle(doc.type);
+              const TypeIcon = typeStyle.icon;
+              return (
+                <tr 
+                  key={doc.id} 
+                  className={cn(
+                    "hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150 animate-fade-in cursor-pointer group/row border-l-4",
+                    typeStyle.borderColor
+                  )}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <td className="px-6 py-4">
+                    <Link to={`/documents/${doc.id}`} className="flex items-center gap-3 group">
+                      <div className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-lg",
+                        typeStyle.iconBg
+                      )}>
+                        <TypeIcon className={cn("h-5 w-5", typeStyle.iconFg)} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground group-hover:text-primary transition-colors duration-150">
+                          {doc.number}
+                        </p>
+                        <p className={cn("text-sm font-medium", typeStyle.badgeFg)}>
+                          {documentTypeLabels[doc.type]}
+                        </p>
+                      </div>
+                    </Link>
+                  </td>
                 <td className="px-6 py-4">
                   <p className="font-medium text-foreground">{doc.clientName}</p>
                   <p className="text-sm text-muted-foreground truncate max-w-[200px]">
@@ -208,7 +210,8 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                   </DropdownMenu>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
