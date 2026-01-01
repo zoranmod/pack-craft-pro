@@ -81,36 +81,37 @@
 
   .dark {
     /* =============================================
-       DARK MODE TOKENS - Warm Charcoal (not blue)
+       DARK MODE TOKENS - True Neutral Charcoal
+       Zero saturation for clean enterprise look
        ============================================= */
 
-    /* Core backgrounds: Warm charcoal */
-    --background: 24 10% 7%;
-    --foreground: 30 10% 96%;
+    /* Core backgrounds: Neutral charcoal */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 96%;
 
-    /* Card surfaces: Slightly elevated warm charcoal */
-    --card: 24 10% 9%;
-    --card-foreground: 30 10% 96%;
+    /* Card surfaces: Slightly elevated neutral */
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
 
     /* Popover/dropdown surfaces */
-    --popover: 24 10% 9%;
-    --popover-foreground: 30 10% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%;
 
-    /* Primary: Akord Amber (slightly brighter in dark) */
+    /* Primary: Akord Amber (only warm accent) */
     --primary: 38 92% 60%;
-    --primary-foreground: 24 10% 10%;
+    --primary-foreground: 0 0% 10%;
 
-    /* Secondary: Warm dark neutral */
-    --secondary: 24 8% 14%;
-    --secondary-foreground: 30 10% 96%;
+    /* Secondary: Neutral dark */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 96%;
 
-    /* Muted: Warm dark subtle backgrounds */
-    --muted: 24 8% 14%;
-    --muted-foreground: 30 8% 70%;
+    /* Muted: Neutral subtle backgrounds */
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
 
     /* Accent: Akord Amber for dark mode */
     --accent: 38 92% 60%;
-    --accent-foreground: 24 10% 10%;
+    --accent-foreground: 0 0% 10%;
 
     /* Destructive: Softer red for dark */
     --destructive: 0 62% 55%;
@@ -122,27 +123,27 @@
 
     /* Warning */
     --warning: 38 92% 60%;
-    --warning-foreground: 24 10% 10%;
+    --warning-foreground: 0 0% 10%;
 
-    /* Borders and inputs: Warm charcoal borders */
-    --border: 24 6% 18%;
-    --input: 24 6% 18%;
+    /* Borders and inputs: Neutral charcoal borders */
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
     --ring: 38 92% 60%;
 
     /* Badge neutral */
-    --badge-neutral: 24 8% 22%;
+    --badge-neutral: 0 0% 22%;
 
-    /* Sidebar tokens: Warm charcoal */
-    --sidebar-background: 24 10% 8%;
-    --sidebar-foreground: 30 10% 96%;
+    /* Sidebar tokens: Neutral charcoal */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 96%;
     --sidebar-primary: 38 92% 60%;
-    --sidebar-primary-foreground: 24 10% 10%;
-    --sidebar-accent: 24 8% 14%;
-    --sidebar-accent-foreground: 30 10% 96%;
-    --sidebar-border: 24 6% 18%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 18%;
     --sidebar-ring: 38 92% 60%;
 
-    /* Shadows: More visible on dark backgrounds */
+    /* Shadows: Subtle on dark backgrounds */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5);
@@ -218,11 +219,11 @@
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: hsl(24 8% 25%);
+    background: hsl(0 0% 25%);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: hsl(24 8% 35%);
+    background: hsl(0 0% 35%);
   }
 }
 
