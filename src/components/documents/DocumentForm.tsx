@@ -691,26 +691,31 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
                   className="mt-1.5"
                 />
               </div>
-              <div>
-                <Label htmlFor="contactPerson">Kontakt osoba</Label>
-                <Input
-                  id="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                  placeholder="Ime, prezime, broj telefona kontakt osobe"
-                  className="mt-1.5"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="deliveryAddress">Adresa isporuke</Label>
-                <Input
-                  id="deliveryAddress"
-                  value={formData.deliveryAddress}
-                  onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
-                  placeholder="Adresa za isporuku (ako je različita od adrese klijenta)"
-                  className="mt-1.5"
-                />
-              </div>
+              {/* Kontakt osoba i Adresa isporuke - samo za otpremnice i naloge */}
+              {(formData.type === 'otpremnica' || formData.type === 'nalog-dostava-montaza') && (
+                <>
+                  <div>
+                    <Label htmlFor="contactPerson">Kontakt osoba</Label>
+                    <Input
+                      id="contactPerson"
+                      value={formData.contactPerson}
+                      onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                      placeholder="Ime, prezime, broj telefona kontakt osobe"
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="deliveryAddress">Adresa isporuke</Label>
+                    <Input
+                      id="deliveryAddress"
+                      value={formData.deliveryAddress}
+                      onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
+                      placeholder="Adresa za isporuku (ako je različita od adrese klijenta)"
+                      className="mt-1.5"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
