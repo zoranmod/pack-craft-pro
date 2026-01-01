@@ -697,7 +697,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
                   id="contactPerson"
                   value={formData.contactPerson}
                   onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                  placeholder="Ime i prezime kontakt osobe"
+                  placeholder="Ime, prezime, broj telefona kontakt osobe"
                   className="mt-1.5"
                 />
               </div>
