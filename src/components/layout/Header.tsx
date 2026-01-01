@@ -72,8 +72,8 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
       {/* Center section: Global Search - centered */}
       <div className="hidden md:flex justify-center">
         {showGlobalSearch && (
-          <div className="relative w-full max-w-[520px]">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <div className="relative flex items-center w-full max-w-[520px]">
+            <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               type="text"
               placeholder="Pretraži dokumente"
@@ -86,7 +86,7 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
               <button
                 type="button"
                 aria-label="Očisti pretragu"
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm hover:bg-muted transition-colors"
+                className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-sm hover:bg-muted/50"
                 onClick={clearSearch}
               >
                 <X className="h-4 w-4 text-muted-foreground" />
