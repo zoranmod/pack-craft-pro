@@ -572,6 +572,8 @@ export type Database = {
           delivery_address: string | null
           delivery_days: number | null
           id: string
+          monter1: string | null
+          monter2: string | null
           notes: string | null
           number: string
           payment_method: string | null
@@ -599,6 +601,8 @@ export type Database = {
           delivery_address?: string | null
           delivery_days?: number | null
           id?: string
+          monter1?: string | null
+          monter2?: string | null
           notes?: string | null
           number: string
           payment_method?: string | null
@@ -626,6 +630,8 @@ export type Database = {
           delivery_address?: string | null
           delivery_days?: number | null
           id?: string
+          monter1?: string | null
+          monter2?: string | null
           notes?: string | null
           number?: string
           payment_method?: string | null

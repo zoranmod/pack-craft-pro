@@ -21,6 +21,8 @@ export interface CreateDocumentData {
   preparedBy?: string;
   contactPerson?: string;
   deliveryAddress?: string;
+  monter1?: string;
+  monter2?: string;
 }
 
 // Convert database row to Document type
@@ -42,6 +44,8 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   preparedBy: row.prepared_by,
   contactPerson: row.contact_person,
   deliveryAddress: row.delivery_address,
+  monter1: row.monter1,
+  monter2: row.monter2,
   items: items.map(item => ({
     id: item.id,
     name: item.name,
@@ -220,6 +224,8 @@ export function useCreateDocument() {
           prepared_by: data.preparedBy,
           contact_person: data.contactPerson,
           delivery_address: data.deliveryAddress,
+          monter1: data.monter1,
+          monter2: data.monter2,
         })
         .select()
         .single();
@@ -295,6 +301,8 @@ export function useUpdateDocument() {
           prepared_by: data.preparedBy,
           contact_person: data.contactPerson,
           delivery_address: data.deliveryAddress,
+          monter1: data.monter1,
+          monter2: data.monter2,
         })
         .eq('id', id)
         .select()

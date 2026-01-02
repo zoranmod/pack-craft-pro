@@ -47,6 +47,8 @@ export interface Document {
   preparedBy?: string;
   contactPerson?: string;
   deliveryAddress?: string;
+  monter1?: string;
+  monter2?: string;
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {
