@@ -12,6 +12,7 @@ import { useClients } from '@/hooks/useClients';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useSettings';
 import { useDashboardPreferences } from '@/hooks/useDashboardPreferences';
+import { useYearFilter } from '@/hooks/useYearFilter';
 
 const Index = () => {
   const { data: documents = [], isLoading } = useDocuments();
@@ -19,6 +20,7 @@ const Index = () => {
   const { user } = useAuth();
   const { data: profile } = useUserProfile();
   const { sections, toggleSection } = useDashboardPreferences();
+  const { filterByYear, yearLabel, selectedYear } = useYearFilter();
   
   const getDisplayName = () => {
     if (profile?.first_name || profile?.last_name) {
@@ -29,12 +31,17 @@ const Index = () => {
   
   const userName = getDisplayName();
 
+  // Filter documents by selected year
+  const filteredDocuments = documents.filter(doc => filterByYear(doc.date));
+
   const stats = {
-    totalDocuments: documents.length,
-    draftDocuments: documents.filter(d => d.status === 'draft').length,
-    completedThisMonth: documents.filter(d => ['accepted', 'completed'].includes(d.status)).length,
+    totalDocuments: filteredDocuments.length,
+    draftDocuments: filteredDocuments.filter(d => d.status === 'draft').length,
+    completedThisMonth: filteredDocuments.filter(d => ['accepted', 'completed'].includes(d.status)).length,
     totalClients: clients.length,
   };
+
+  const yearSuffix = selectedYear !== 'all' ? ` (${selectedYear})` : '';
 
   return (
     <MainLayout title="Početna" showGlobalSearch>
@@ -46,7 +53,7 @@ const Index = () => {
 
       {/* Collapsible Summary Section */}
       <CollapsibleSection
-        title="Sažetak"
+        title={`Sažetak${yearSuffix}`}
         isOpen={sections.summary}
         onToggle={() => toggleSection('summary')}
         className="mb-6"
@@ -57,20 +64,20 @@ const Index = () => {
             value={isLoading ? '...' : stats.totalDocuments}
             icon={FileText}
             trend={{ value: 12, isPositive: true }}
-            href="/documents"
+            href={`/documents?year=${selectedYear}`}
           />
           <StatCard
             title="U pripremi"
             value={isLoading ? '...' : stats.draftDocuments}
             icon={FileEdit}
-            href="/documents?status=draft"
+            href={`/documents?status=draft&year=${selectedYear}`}
           />
           <StatCard
             title="Završeno"
             value={isLoading ? '...' : stats.completedThisMonth}
             icon={Truck}
             trend={{ value: 8, isPositive: true }}
-            href="/documents?status=completed"
+            href={`/documents?status=completed&year=${selectedYear}`}
           />
           <StatCard
             title="Klijenti"
@@ -85,12 +92,12 @@ const Index = () => {
       {/* Recent Documents & Activities - Side by Side */}
       <div className="grid gap-6 lg:grid-cols-2 mb-6">
         <CollapsibleSection
-          title="Nedavni dokumenti"
+          title={`Nedavni dokumenti${yearSuffix}`}
           isOpen={sections.recentDocuments}
           onToggle={() => toggleSection('recentDocuments')}
         >
           <div className="h-[280px]">
-            <RecentDocuments documents={documents} />
+            <RecentDocuments documents={filteredDocuments} />
           </div>
         </CollapsibleSection>
         
@@ -108,22 +115,22 @@ const Index = () => {
       {/* Bottom Sections - Deadlines & Analytics */}
       <div className="grid gap-6 lg:grid-cols-2">
         <CollapsibleSection
-          title="Rokovi i isporuke"
+          title={`Rokovi i isporuke${yearSuffix}`}
           isOpen={sections.deadlines}
           onToggle={() => toggleSection('deadlines')}
         >
           <div className="h-[280px]">
-            <DeadlinesSection />
+            <DeadlinesSection documents={filteredDocuments} />
           </div>
         </CollapsibleSection>
         
         <CollapsibleSection
-          title="Analitika"
+          title={`Analitika${yearSuffix}`}
           isOpen={sections.analytics}
           onToggle={() => toggleSection('analytics')}
         >
           <div className="h-[280px]">
-            <AnalyticsSection />
+            <AnalyticsSection documents={filteredDocuments} />
           </div>
         </CollapsibleSection>
       </div>

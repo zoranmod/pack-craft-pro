@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { YearSelector } from './YearSelector';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,30 +70,33 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
         </div>
       </div>
 
-      {/* Center section: Global Search - centered */}
-      <div className="hidden md:flex justify-center">
+      {/* Center section: Global Search + Year Filter - centered */}
+      <div className="hidden md:flex justify-center items-center gap-3">
         {showGlobalSearch && (
-          <div className="relative flex items-center w-full max-w-[520px]">
-            <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="text"
-              placeholder="Pretraži dokumente"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-              className="w-full pl-9 pr-10 h-10 bg-background border-border text-sm"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                aria-label="Očisti pretragu"
-                className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-sm hover:bg-muted/50"
-                onClick={clearSearch}
-              >
-                <X className="h-4 w-4 text-muted-foreground" />
-              </button>
-            )}
-          </div>
+          <>
+            <div className="relative flex items-center w-full max-w-[400px]">
+              <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Pretraži dokumente"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                className="w-full pl-9 pr-10 h-10 bg-background border-border text-sm"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  aria-label="Očisti pretragu"
+                  className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-sm hover:bg-muted/50"
+                  onClick={clearSearch}
+                >
+                  <X className="h-4 w-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+            <YearSelector />
+          </>
         )}
       </div>
 
