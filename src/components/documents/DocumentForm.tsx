@@ -183,25 +183,32 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
     }
   }, [isEditMode, existingDocument]);
   
-  // Auto-fill preparedBy with current user's name when creating new document
+  // Auto-fill preparedBy with current user's full name when creating new document
   useEffect(() => {
-    if (!isEditMode && !formData.preparedBy) {
-      const displayName = getCurrentUserDisplayName();
-      if (displayName) {
-        setFormData(prev => ({ ...prev, preparedBy: displayName }));
+    if (!isEditMode) {
+      // Only auto-fill if we have the full name from user profile
+      const fullName = userProfile?.first_name || userProfile?.last_name
+        ? [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ')
+        : null;
+      
+      if (fullName && !formData.preparedBy) {
+        setFormData(prev => ({ ...prev, preparedBy: fullName }));
       }
     }
-  }, [isEditMode, userProfile, user]);
+  }, [isEditMode, userProfile]);
 
-  // Auto-fill monter1 with current user's name when creating new NDM document
+  // Auto-fill monter1 with current user's full name when creating new NDM document
   useEffect(() => {
-    if (!isEditMode && formData.type === 'nalog-dostava-montaza' && !formData.monter1) {
-      const displayName = getCurrentUserDisplayName();
-      if (displayName) {
-        setFormData(prev => ({ ...prev, monter1: displayName }));
+    if (!isEditMode && formData.type === 'nalog-dostava-montaza') {
+      const fullName = userProfile?.first_name || userProfile?.last_name
+        ? [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ')
+        : null;
+      
+      if (fullName && !formData.monter1) {
+        setFormData(prev => ({ ...prev, monter1: fullName }));
       }
     }
-  }, [isEditMode, formData.type, userProfile, user]);
+  }, [isEditMode, formData.type, userProfile]);
 
   // Contract articles state
   const { data: articleTemplates = [] } = useContractArticleTemplates();
