@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import {
@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { documentStatusLabels } from '@/types/document';
+import { Badge } from '@/components/ui/badge';
 
 interface TableToolbarProps {
   // Status filter
@@ -28,6 +29,9 @@ interface TableToolbarProps {
   primaryActionHref?: string;
   primaryActionOnClick?: () => void;
   
+  // Year filter indicator
+  yearLabel?: string;
+  
   // Custom filters (additional content)
   children?: ReactNode;
 }
@@ -42,6 +46,7 @@ export function TableToolbar({
   primaryActionLabel,
   primaryActionHref,
   primaryActionOnClick,
+  yearLabel,
   children,
 }: TableToolbarProps) {
   return (
@@ -79,6 +84,15 @@ export function TableToolbar({
               </Select>
             </>
           )}
+          
+          {/* Year filter indicator */}
+          {yearLabel && (
+            <Badge variant="secondary" className="gap-1.5 h-8 px-3">
+              <Calendar className="h-3.5 w-3.5" />
+              Godina: {yearLabel}
+            </Badge>
+          )}
+          
           {children}
         </div>
         

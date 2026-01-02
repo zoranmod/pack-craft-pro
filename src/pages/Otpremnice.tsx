@@ -7,6 +7,7 @@ import { TableToolbar } from '@/components/ui/table-toolbar';
 import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useYearFilter } from '@/hooks/useYearFilter';
 import { DocumentStatus } from '@/types/document';
 
 type StatusFilter = DocumentStatus | 'all';
@@ -23,6 +24,7 @@ const Otpremnice = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
   const { data: documents = [], isLoading } = useDocuments();
+  const { filterByYear, yearLabel } = useYearFilter();
 
   useEffect(() => {
     const status = searchParams.get('status') as StatusFilter;
@@ -35,9 +37,10 @@ const Otpremnice = () => {
     }
   }, []);
 
-  // Filter only otpremnice
+  // Filter only otpremnice with year filter
   const filteredDocuments = documents.filter(doc => {
     if (doc.type !== 'otpremnica') return false;
+    if (!filterByYear(doc.date)) return false;
     const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
     const searchLower = debouncedSearch.toLowerCase();
     const matchesSearch = !debouncedSearch || 
@@ -71,6 +74,7 @@ const Otpremnice = () => {
         searchPlaceholder="Pretraži otpremnice..."
         primaryActionLabel="Nova otpremnica"
         primaryActionHref="/documents/new?type=otpremnica"
+        yearLabel={yearLabel}
       />
 
       {isLoading ? (

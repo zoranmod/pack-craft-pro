@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useYearFilter } from '@/hooks/useYearFilter';
 import { DocumentType, DocumentStatus, documentTypeLabels } from '@/types/document';
 
 type StatusFilter = DocumentStatus | 'all';
@@ -37,6 +38,7 @@ const Documents = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
   const { data: documents = [], isLoading } = useDocuments();
+  const { filterByYear, yearLabel } = useYearFilter();
 
   // Read URL parameters on mount and redirect deprecated statuses
   useEffect(() => {
@@ -58,10 +60,11 @@ const Documents = () => {
     }
   }, [searchParams, setSearchParams]);
 
-  // Filter documents by type, status and search query
+  // Filter documents by type, status, year and search query
   const filteredDocuments = documents.filter(doc => {
     const matchesType = typeFilter === 'all' || doc.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+    const matchesYear = filterByYear(doc.date);
     
     const searchLower = debouncedSearch.toLowerCase();
     const matchesSearch = !debouncedSearch || 
@@ -70,7 +73,7 @@ const Documents = () => {
       doc.clientAddress?.toLowerCase().includes(searchLower) ||
       doc.notes?.toLowerCase().includes(searchLower);
     
-    return matchesType && matchesStatus && matchesSearch;
+    return matchesType && matchesStatus && matchesYear && matchesSearch;
   });
 
   const handleStatusFilterChange = (value: string) => {
@@ -96,6 +99,7 @@ const Documents = () => {
         searchPlaceholder="Pretraži sve dokumente..."
         primaryActionLabel="Novi dokument"
         primaryActionHref="/documents/new"
+        yearLabel={yearLabel}
       >
         {/* Type filter as additional child */}
         <div className="flex items-center gap-2">
