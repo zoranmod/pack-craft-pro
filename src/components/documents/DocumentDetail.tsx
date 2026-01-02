@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2 } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { MemorandumHeader } from './MemorandumHeader';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
+import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,6 +61,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const convertDocument = useConvertDocument();
   const deleteDocument = useDeleteDocument();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   
   const handleConvertDocument = async (targetType: DocumentType) => {
     if (!document) return;
@@ -123,25 +125,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  // Generate PDF filename with type prefix
-  const getPdfFilename = (doc: Document): string => {
-    const typePrefix: Record<string, string> = {
-      'ponuda': 'PON',
-      'ugovor': 'UGO',
-      'otpremnica': 'OTP',
-      'nalog-dostava-montaza': 'NAL',
-      'racun': 'RAC',
-    };
-    const prefix = typePrefix[doc.type] || 'DOC';
-    // Extract number part, removing existing prefix if any
-    const numberPart = doc.number.replace(/^[A-Z]+-/, '');
-    return `${prefix}-${numberPart}.pdf`;
-  };
-
-  // Open print route for vector PDF generation (uses browser print-to-PDF)
-  const handleSavePdf = () => {
-    if (!document) return;
-    window.open(`/print/${document.id}?noPrint=true`, '_blank');
+  // Handle PDF generation and download
+  const handleSavePdf = async () => {
+    if (!document || isPdfGenerating) return;
+    
+    setIsPdfGenerating(true);
+    try {
+      await generateAndDownloadPdf(document, template, companySettings, enrichedItems);
+      toast.success('PDF uspješno spremljen');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Greška pri generiranju PDF-a');
+    } finally {
+      setIsPdfGenerating(false);
+    }
   };
 
 
@@ -238,9 +235,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             size="sm" 
             className="rounded-lg"
             onClick={handleSavePdf}
+            disabled={isPdfGenerating}
           >
-            <Download className="mr-2 h-4 w-4" />
-            Spremi PDF
+            {isPdfGenerating ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
           </Button>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
@@ -373,9 +375,14 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 variant="outline" 
                 className="w-full justify-start rounded-lg" 
                 onClick={handleSavePdf}
+                disabled={isPdfGenerating}
               >
-                <Download className="mr-3 h-4 w-4" />
-                Spremi PDF
+                {isPdfGenerating ? (
+                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-3 h-4 w-4" />
+                )}
+                {isPdfGenerating ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
               <Separator className="my-3" />
               <Button 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, Suspense, lazy } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocument } from '@/hooks/useDocuments';
 import { useCompanySettings } from '@/hooks/useSettings';
@@ -11,7 +11,9 @@ import { ContractDocumentView } from '@/components/documents/ContractDocumentVie
 import { SignatureBlock } from '@/components/documents/SignatureBlock';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download, Loader2 } from 'lucide-react';
+import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
+import { toast } from 'sonner';
 
 // Shared document body content (table, totals, signatures) - no header/footer
 export function DocumentBodyContent({
@@ -713,6 +715,7 @@ const PrintDocument = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasPrinted = useRef(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
   // Check if we should skip auto-print (for manual PDF save)
   const noPrint = searchParams.get('noPrint') === 'true';
@@ -751,6 +754,22 @@ const PrintDocument = () => {
       code: item.code || articleCodeMap.get(item.name.toLowerCase()) || ''
     }));
   }, [document?.items, articlesData?.articles]);
+
+  // Handle PDF download
+  const handleSavePdf = async () => {
+    if (!document || isPdfGenerating) return;
+    
+    setIsPdfGenerating(true);
+    try {
+      await generateAndDownloadPdf(document, template, companySettings, enrichedItems);
+      toast.success('PDF uspješno spremljen');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Greška pri generiranju PDF-a');
+    } finally {
+      setIsPdfGenerating(false);
+    }
+  };
 
   // Auto-print after content loads (unless noPrint is set)
   useEffect(() => {
@@ -792,19 +811,14 @@ const PrintDocument = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Natrag
         </Button>
-        <Button onClick={() => window.print()} className="shadow-lg">
-          Spremi PDF
+        <Button onClick={handleSavePdf} className="shadow-lg" disabled={isPdfGenerating}>
+          {isPdfGenerating ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
         </Button>
-      </div>
-      
-      {/* Instructions for PDF save */}
-      <div className="print-controls fixed top-4 right-4 z-50 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-xs shadow-lg">
-        <p className="text-sm text-blue-800 font-medium mb-1">Kako spremiti PDF:</p>
-        <ol className="text-xs text-blue-700 list-decimal list-inside space-y-1">
-          <li>Kliknite "Spremi PDF" ili Ctrl+P</li>
-          <li>Odaberite "Spremi kao PDF"</li>
-          <li>Kliknite "Spremi"</li>
-        </ol>
       </div>
 
       {/* Document content - clean A4 page */}
