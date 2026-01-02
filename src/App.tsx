@@ -35,6 +35,7 @@ import Trash from "./pages/Trash";
 import GodisnjiOdmori from "./pages/GodisnjiOdmori";
 import RadnaOdjeca from "./pages/RadnaOdjeca";
 import Bolovanja from "./pages/Bolovanja";
+import AdminQA from "./pages/AdminQA";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
                 <Route path="/settings/templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
                 <Route path="/settings/templates/new" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
                 <Route path="/settings/templates/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
+                <Route path="/admin/qa" element={<ProtectedRoute><AdminQA /></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

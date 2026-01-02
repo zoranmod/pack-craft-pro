@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocument } from '@/hooks/useDocuments';
 import { useCompanySettings } from '@/hooks/useSettings';
-import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
+import { useActiveTemplate } from '@/hooks/useActiveTemplate';
 import { useArticles } from '@/hooks/useArticles';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import { Document, documentTypeLabels } from '@/types/document';
@@ -12,6 +12,7 @@ import { GlobalDocumentHeader } from '@/components/documents/GlobalDocumentHeade
 import { GlobalDocumentFooter } from '@/components/documents/GlobalDocumentFooter';
 import { ContractDocumentView } from '@/components/documents/ContractDocumentView';
 import { SignatureBlock } from '@/components/documents/SignatureBlock';
+import { TemplateDebugIndicator } from '@/components/documents/TemplateDebugIndicator';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Download, Loader2 } from 'lucide-react';
@@ -736,9 +737,13 @@ const PrintDocument = () => {
   const {
     data: companySettings
   } = useCompanySettings();
-  const {
-    data: template
-  } = useDocumentTemplate(document?.templateId);
+  
+  // Use active template hook - resolves document template, default template, or fallback
+  const { template, templateSource, isLoading: isLoadingTemplate } = useActiveTemplate(
+    document?.templateId,
+    document?.type || 'ponuda'
+  );
+  
   const {
     data: articlesData
   } = useArticles({
