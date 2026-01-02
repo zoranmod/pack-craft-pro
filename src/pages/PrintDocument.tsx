@@ -792,25 +792,25 @@ const PrintDocument = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Natrag
         </Button>
-        {noPrint && <Button onClick={() => window.print()} className="shadow-lg">
-            Spremi PDF
-          </Button>}
+        <Button onClick={() => window.print()} className="shadow-lg">
+          Spremi PDF
+        </Button>
       </div>
       
-      {/* Instructions for PDF save - only when noPrint mode */}
-      {noPrint && <div className="print-controls fixed top-4 right-4 z-50 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-xs shadow-lg">
-          <p className="text-sm text-blue-800 font-medium mb-1">Kako spremiti PDF:</p>
-          <ol className="text-xs text-blue-700 list-decimal list-inside space-y-1">
-            <li>Kliknite "Spremi PDF" ili Ctrl+P</li>
-            <li>Odaberite "Spremi kao PDF"</li>
-            <li>Kliknite "Spremi"</li>
-          </ol>
-        </div>}
+      {/* Instructions for PDF save */}
+      <div className="print-controls fixed top-4 right-4 z-50 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-xs shadow-lg">
+        <p className="text-sm text-blue-800 font-medium mb-1">Kako spremiti PDF:</p>
+        <ol className="text-xs text-blue-700 list-decimal list-inside space-y-1">
+          <li>Kliknite "Spremi PDF" ili Ctrl+P</li>
+          <li>Odaberite "Spremi kao PDF"</li>
+          <li>Kliknite "Spremi"</li>
+        </ol>
+      </div>
 
-      {/* Document content - clean A4 page, no wrapper that could cause 2nd page */}
+      {/* Document content - clean A4 page */}
       <div className="py-8 print:py-0 print:bg-white flex justify-center" style={{
-      minHeight: 'auto'
-    }}>
+        minHeight: 'auto'
+      }}>
         <DocumentContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} forPrint={true} />
       </div>
     </>;
