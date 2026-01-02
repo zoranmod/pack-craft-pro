@@ -167,6 +167,15 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
       if (existingDocument.templateId) {
         setSelectedTemplateId(existingDocument.templateId);
       }
+      // Load contract articles from existing document
+      if (existingDocument.type === 'ugovor' && existingDocument.contractArticles?.length) {
+        setContractArticles(existingDocument.contractArticles.map(article => ({
+          article_number: article.articleNumber,
+          title: article.title,
+          content: article.content,
+          is_selected: true,
+        })));
+      }
     }
   }, [isEditMode, existingDocument]);
   
@@ -201,7 +210,9 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
   }, [formData.type, articleTemplates.length]);
 
   useEffect(() => {
-    if (formData.type === 'ugovor' && articleTemplates.length > 0 && contractArticles.length === 0) {
+    // Only load from templates for NEW contracts (not edit mode)
+    // and only if no articles have been loaded yet
+    if (!isEditMode && formData.type === 'ugovor' && articleTemplates.length > 0 && contractArticles.length === 0) {
       setContractArticles(
         articleTemplates
           .filter(t => t.is_active)
@@ -213,7 +224,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
           }))
       );
     }
-  }, [formData.type, articleTemplates]);
+  }, [formData.type, articleTemplates, isEditMode]);
 
   // Document type specific rules - ponuda, račun and ugovor have prices
   const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(formData.type);
