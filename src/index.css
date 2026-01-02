@@ -300,6 +300,24 @@
     break-after: auto !important;
   }
 
+  /* Multi-page documents (contracts) */
+  .a4-page-multipage {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .a4-page-multipage .contract-article {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
   /* Prevent any element from forcing a page break */
   .print-controls,
   .print-controls * {
@@ -320,14 +338,28 @@
   height: 297mm;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+/* Multi-page A4 layout for long documents like contracts */
+.a4-page-multipage {
+  width: 210mm;
+  min-height: 297mm;
+  height: auto;
+  box-sizing: border-box;
+  overflow: visible;
   position: relative;
   margin: 0;
-  padding: 8mm 12mm 10mm;
   background: hsl(0 0% 100%);
   color: hsl(0 0% 0%);
-  /* Flexbox layout for proper footer positioning */
-  display: flex;
-  flex-direction: column;
+}
+
+.a4-page-multipage .doc-body {
+  overflow: visible;
+}
+
+.a4-page-multipage .doc-footer {
+  position: relative;
+  margin-top: 20mm;
 }
 
 .doc-body {

@@ -70,7 +70,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
     } as React.CSSProperties;
 
     return (
-      <div ref={ref} className="a4-page font-serif" style={printStyles}>
+      <div ref={ref} className="a4-page-multipage font-serif bg-white p-[20mm]" style={printStyles}>
         <div className="doc-body">
           {/* Memorandum Header - identical for all documents */}
           <MemorandumHeader />
@@ -134,7 +134,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
           {/* Contract Articles */}
           <div className="space-y-4">
             {sortedArticles.map((article) => (
-              <div key={article.id} className="text-sm">
+              <div key={article.id} className="text-sm contract-article">
                 <p className="font-bold mb-1">
                   Članak {article.articleNumber}.
                 </p>
