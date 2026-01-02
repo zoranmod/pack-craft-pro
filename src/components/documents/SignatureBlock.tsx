@@ -59,7 +59,21 @@ export function SignatureBlock({
         }}
       />
 
-      {/* Name - below the signature line */}
+      {/* Caption - below the signature line */}
+      {caption && (
+        <p
+          className="signature-caption"
+          style={{
+            color: '#000',
+            fontSize: '10px',
+            marginTop: '2mm',
+          }}
+        >
+          {caption}
+        </p>
+      )}
+
+      {/* Name - below the caption */}
       {name && (
         <p
           className="signature-name"
@@ -71,20 +85,6 @@ export function SignatureBlock({
           }}
         >
           {name}
-        </p>
-      )}
-
-      {/* Caption */}
-      {caption && (
-        <p
-          className="signature-caption"
-          style={{
-            color: '#000',
-            fontSize: '10px',
-            marginTop: '2mm',
-          }}
-        >
-          {caption}
         </p>
       )}
     </div>
