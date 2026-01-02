@@ -91,6 +91,8 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
     preparedBy: '',
     contactPerson: '',
     deliveryAddress: '',
+    monter1: '',
+    monter2: '',
   }));
 
   // Validation errors state
@@ -153,6 +155,8 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
         preparedBy: existingDocument.preparedBy || '',
         contactPerson: existingDocument.contactPerson || '',
         deliveryAddress: existingDocument.deliveryAddress || '',
+        monter1: existingDocument.monter1 || '',
+        monter2: existingDocument.monter2 || '',
       });
       setItems(existingDocument.items.map(item => ({
         name: item.name,
@@ -422,6 +426,8 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
       preparedBy: formData.preparedBy || undefined,
       contactPerson: formData.contactPerson || undefined,
       deliveryAddress: formData.deliveryAddress || undefined,
+      monter1: formData.monter1 || undefined,
+      monter2: formData.monter2 || undefined,
     };
 
     // Update or create the document
@@ -722,6 +728,31 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
                       value={formData.deliveryAddress}
                       onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
                       placeholder="Adresa za isporuku (ako je različita od adrese klijenta)"
+                      className="mt-1.5"
+                    />
+                  </div>
+                </>
+              )}
+              {/* Monteri - samo za naloge dostave i montaže */}
+              {formData.type === 'nalog-dostava-montaza' && (
+                <>
+                  <div>
+                    <Label htmlFor="monter1">Monter 1</Label>
+                    <Input
+                      id="monter1"
+                      value={formData.monter1}
+                      onChange={(e) => setFormData({ ...formData, monter1: e.target.value })}
+                      placeholder="Ime i prezime montera 1"
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="monter2">Monter 2</Label>
+                    <Input
+                      id="monter2"
+                      value={formData.monter2}
+                      onChange={(e) => setFormData({ ...formData, monter2: e.target.value })}
+                      placeholder="Ime i prezime montera 2"
                       className="mt-1.5"
                     />
                   </div>

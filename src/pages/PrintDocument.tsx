@@ -376,8 +376,8 @@ export function DocumentBodyContent({
           </div>
         </div>}
 
-      {/* Signature Section for Otpremnica/Nalog */}
-      {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && <div className="mt-4 pt-3 border-t border-gray-300" style={{
+      {/* Signature Section for Otpremnica */}
+      {document.type === 'otpremnica' && <div className="mt-4 pt-3 border-t border-gray-300" style={{
       fontSize: '11.5px'
     }}>
           {/* Row 1: Robu preuzeo */}
@@ -488,6 +488,167 @@ export function DocumentBodyContent({
           marginLeft: '2mm',
           maxWidth: '100mm'
         }}></div>
+          </div>
+        </div>}
+
+      {/* Signature Section for Nalog dostave i montaže */}
+      {document.type === 'nalog-dostava-montaza' && <div className="mt-4 pt-3 border-t border-gray-300" style={{
+      fontSize: '11.5px'
+    }}>
+          {/* Row 1: Robu preuzeo */}
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '24mm 1fr 14mm 1fr',
+        alignItems: 'end',
+        paddingTop: '6mm'
+      }}>
+            <span style={{
+          color: '#000',
+          whiteSpace: 'nowrap'
+        }}>Robu preuzeo:</span>
+            <div style={{
+          borderBottom: '1px solid #666',
+          minHeight: '4mm'
+        }}></div>
+            <div style={{
+          textAlign: 'center',
+          color: '#000'
+        }}>MP</div>
+            <div style={{
+          borderBottom: '1px solid #666',
+          minHeight: '4mm'
+        }}></div>
+          </div>
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '24mm 1fr 14mm 1fr'
+      }}>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div style={{
+          textAlign: 'center',
+          fontSize: '9px',
+          color: '#000',
+          marginTop: '1mm'
+        }}>(potpis)</div>
+          </div>
+
+          {/* Row 2: Za tvrtku - auto-filled with preparedBy */}
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '24mm 1fr 14mm 1fr',
+        alignItems: 'end',
+        paddingTop: '8mm'
+      }}>
+            <span style={{
+          color: '#000',
+          whiteSpace: 'nowrap'
+        }}>Za tvrtku:</span>
+            <div style={{
+          borderBottom: '1px solid #666',
+          textAlign: 'center',
+          position: 'relative',
+          minHeight: '4mm'
+        }}>
+              {document.preparedBy && <span style={{
+            color: '#000',
+            fontSize: '11px',
+            position: 'absolute',
+            bottom: '2mm',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            whiteSpace: 'nowrap'
+          }} className="text-sm">
+                  {document.preparedBy}
+                </span>}
+            </div>
+            <div style={{
+          textAlign: 'center',
+          color: '#000'
+        }}>MP</div>
+            <div style={{
+          borderBottom: '1px solid #666',
+          minHeight: '4mm'
+        }}></div>
+          </div>
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '24mm 1fr 14mm 1fr'
+      }}>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div style={{
+          textAlign: 'center',
+          fontSize: '9px',
+          color: '#000',
+          marginTop: '1mm'
+        }}>(potpis)</div>
+          </div>
+
+          {/* Row 3: Monter 1 */}
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '20mm 1fr',
+        alignItems: 'end',
+        marginTop: '10mm'
+      }}>
+            <span style={{
+          color: '#000',
+          whiteSpace: 'nowrap'
+        }}>Monter 1:</span>
+            <div style={{
+          borderBottom: '1px solid #666',
+          textAlign: 'center',
+          position: 'relative',
+          minHeight: '4mm',
+          maxWidth: '80mm'
+        }}>
+              {document.monter1 && <span style={{
+            color: '#000',
+            fontSize: '11px',
+            position: 'absolute',
+            bottom: '2mm',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            whiteSpace: 'nowrap'
+          }}>
+                  {document.monter1}
+                </span>}
+            </div>
+          </div>
+
+          {/* Row 4: Monter 2 */}
+          <div style={{
+        display: 'grid',
+        gridTemplateColumns: '20mm 1fr',
+        alignItems: 'end',
+        marginTop: '6mm'
+      }}>
+            <span style={{
+          color: '#000',
+          whiteSpace: 'nowrap'
+        }}>Monter 2:</span>
+            <div style={{
+          borderBottom: '1px solid #666',
+          textAlign: 'center',
+          position: 'relative',
+          minHeight: '4mm',
+          maxWidth: '80mm'
+        }}>
+              {document.monter2 && <span style={{
+            color: '#000',
+            fontSize: '11px',
+            position: 'absolute',
+            bottom: '2mm',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            whiteSpace: 'nowrap'
+          }}>
+                  {document.monter2}
+                </span>}
+            </div>
           </div>
         </div>}
     </>;
