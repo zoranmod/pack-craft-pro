@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Printer } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -162,6 +162,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     }
   };
 
+  // Open print route for 100% identical PDF (uses browser print dialog)
+  const handleOpenPrintForPdf = () => {
+    if (!document) return;
+    window.open(`/print/${document.id}?noPrint=true`, '_blank');
+  };
+
   // Auto-trigger PDF if action=pdf is in URL
   useEffect(() => {
     const action = searchParams.get('action');
@@ -267,16 +273,37 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             <Copy className="mr-2 h-4 w-4" />
             {copyDocument.isPending ? 'Kopiram...' : 'Kopiraj'}
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-lg" 
-            onClick={handleDownloadPdf}
-            disabled={isGeneratingPdf}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {isGeneratingPdf ? 'Generiram...' : 'Spremi PDF'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-lg"
+                disabled={isGeneratingPdf}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {isGeneratingPdf ? 'Generiram...' : 'PDF'}
+                <ChevronDown className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg z-50 rounded-lg">
+              <DropdownMenuItem
+                onClick={handleDownloadPdf}
+                disabled={isGeneratingPdf}
+                className="cursor-pointer rounded-md"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Brzi PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleOpenPrintForPdf}
+                className="cursor-pointer rounded-md"
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                100% identičan PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link to={`/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
@@ -410,7 +437,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 onClick={handleDownloadPdf}
               >
                 <Download className="mr-3 h-4 w-4" />
-                Spremi PDF
+                Brzi PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start rounded-lg" 
+                onClick={handleOpenPrintForPdf}
+              >
+                <Printer className="mr-3 h-4 w-4" />
+                100% identičan PDF
               </Button>
               <Separator className="my-3" />
               <Button 

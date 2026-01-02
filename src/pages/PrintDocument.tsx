@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useMemo, Suspense, lazy } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocument } from '@/hooks/useDocuments';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
@@ -349,7 +349,11 @@ export function DocumentContent({
 const PrintDocument = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const hasPrinted = useRef(false);
+  
+  // Check if we should skip auto-print (for manual PDF save)
+  const noPrint = searchParams.get('noPrint') === 'true';
   
   const { data: document, isLoading, error } = useDocument(id || '');
   const { data: companySettings } = useCompanySettings();
@@ -377,16 +381,16 @@ const PrintDocument = () => {
     }));
   }, [document?.items, articlesData?.articles]);
 
-  // Auto-print after content loads
+  // Auto-print after content loads (unless noPrint is set)
   useEffect(() => {
-    if (document && !isLoading && !hasPrinted.current) {
+    if (document && !isLoading && !hasPrinted.current && !noPrint) {
       const timer = setTimeout(() => {
         hasPrinted.current = true;
         window.print();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [document, isLoading]);
+  }, [document, isLoading, noPrint]);
 
   if (isLoading) {
     return (
@@ -419,13 +423,30 @@ const PrintDocument = () => {
         }
       `}</style>
 
-      {/* Back button - hidden on print */}
-      <div className="print-controls fixed top-4 left-4 z-50">
+      {/* Controls - hidden on print */}
+      <div className="print-controls fixed top-4 left-4 z-50 flex gap-2">
         <Button onClick={() => navigate(-1)} variant="outline" className="shadow-lg bg-white">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Natrag
         </Button>
+        {noPrint && (
+          <Button onClick={() => window.print()} className="shadow-lg">
+            Spremi PDF
+          </Button>
+        )}
       </div>
+      
+      {/* Instructions for PDF save - only when noPrint mode */}
+      {noPrint && (
+        <div className="print-controls fixed top-4 right-4 z-50 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-xs shadow-lg">
+          <p className="text-sm text-blue-800 font-medium mb-1">Kako spremiti PDF:</p>
+          <ol className="text-xs text-blue-700 list-decimal list-inside space-y-1">
+            <li>Kliknite "Spremi PDF" ili Ctrl+P</li>
+            <li>Odaberite "Spremi kao PDF"</li>
+            <li>Kliknite "Spremi"</li>
+          </ol>
+        </div>
+      )}
 
       {/* Document content - clean A4 page, no wrapper that could cause 2nd page */}
       <div className="py-8 print:py-0 print:bg-white flex justify-center" style={{ minHeight: 'auto' }}>
