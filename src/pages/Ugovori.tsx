@@ -63,14 +63,27 @@ const Ugovori = () => {
       title="Ugovori" 
       subtitle={`Ukupno ${filteredDocuments.length} ugovora`}
     >
+      <div className="flex items-center gap-2 mb-4">
+        <Link to="/contracts/new/furniture">
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Novi ugovor - Namještaj po mjeri
+          </Button>
+        </Link>
+        <Link to="/documents/new?type=ugovor">
+          <Button variant="outline" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Generički ugovor
+          </Button>
+        </Link>
+      </div>
+      
       <TableToolbar
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Pretraži ugovore..."
-        primaryActionLabel="Novi ugovor"
-        primaryActionHref="/documents/new?type=ugovor"
       />
 
       {isLoading ? (
