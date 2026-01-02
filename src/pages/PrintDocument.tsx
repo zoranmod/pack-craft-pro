@@ -559,7 +559,7 @@ export function DocumentBodyContent({
             left: '50%',
             transform: 'translateX(-50%)',
             whiteSpace: 'nowrap'
-          }} className="text-sm">
+          }} className="text-base">
                   {document.preparedBy}
                 </span>}
             </div>
@@ -597,7 +597,8 @@ export function DocumentBodyContent({
             <span style={{
           color: '#000',
           whiteSpace: 'nowrap'
-        }}>Monter 1:</span>
+        }}>
+        </span>
             <div style={{
           borderBottom: '1px solid #666',
           textAlign: 'center',
@@ -613,7 +614,7 @@ export function DocumentBodyContent({
             left: '50%',
             transform: 'translateX(-50%)',
             whiteSpace: 'nowrap'
-          }}>
+          }} className="text-base">
                   {document.monter1}
                 </span>}
             </div>
@@ -629,7 +630,8 @@ export function DocumentBodyContent({
             <span style={{
           color: '#000',
           whiteSpace: 'nowrap'
-        }}>Monter 2:</span>
+        }}>
+        </span>
             <div style={{
           borderBottom: '1px solid #666',
           textAlign: 'center',
@@ -645,7 +647,7 @@ export function DocumentBodyContent({
             left: '50%',
             transform: 'translateX(-50%)',
             whiteSpace: 'nowrap'
-          }}>
+          }} className="text-base">
                   {document.monter2}
                 </span>}
             </div>
