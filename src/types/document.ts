@@ -1,6 +1,6 @@
 export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza' | 'racun' | 'ugovor';
 
-export type DocumentStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'pending' | 'completed' | 'cancelled';
+export type DocumentStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
 
 export interface DocumentItem {
   id: string;
@@ -64,7 +64,6 @@ export const documentStatusLabels: Record<DocumentStatus, string> = {
   'sent': 'Poslano',
   'accepted': 'Prihvaćeno',
   'rejected': 'Odbijeno',
-  'pending': 'Na čekanju',
   'completed': 'Završeno',
   'cancelled': 'Otkazano',
 };
@@ -81,7 +80,7 @@ export const getNextQuoteStatus = (current: DocumentStatus): DocumentStatus | nu
 export const contractStatusFlow: DocumentStatus[] = ['draft', 'sent', 'accepted'];
 
 // Status workflow for delivery notes (otpremnica/nalog)
-export const deliveryStatusFlow: DocumentStatus[] = ['draft', 'pending', 'completed'];
+export const deliveryStatusFlow: DocumentStatus[] = ['draft', 'completed'];
 
 // Status workflow for invoices (racun)
 export const invoiceStatusFlow: DocumentStatus[] = ['draft', 'sent', 'completed'];

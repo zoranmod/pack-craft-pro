@@ -37,12 +37,16 @@ export function DocumentBodyContent({
   const isOtpremnica = document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza';
   const unitLabel = isOtpremnica ? 'Jedinica' : 'Jed.';
   const qtyLabel = isOtpremnica ? 'Količina' : 'Kol.';
+  
+  // Template colors with fallback
+  const primaryColor = template?.primary_color || '#1a365d';
+  
   return <>
       {/* Document Header - 2-column grid: left (client info), right (metadata) */}
       {/* Title centered above the grid */}
       <div className="text-center mb-4">
         <h2 className="font-bold" style={{
-        color: '#000',
+        color: primaryColor,
         fontSize: '19px',
         letterSpacing: '0.5px'
       }}>
@@ -169,7 +173,7 @@ export function DocumentBodyContent({
           </colgroup>
           <thead>
             <tr style={{
-            borderBottom: '2px solid #1a1a1a'
+            borderBottom: `2px solid ${primaryColor}`
           }}>
               <th style={{
               padding: '2mm 1mm',
@@ -344,7 +348,7 @@ export function DocumentBodyContent({
             }, 0))} €
                 </span>
               </div>}
-            <div className="flex justify-between pt-1 border-t-2 border-gray-800">
+            <div className="flex justify-between pt-1" style={{ borderTop: `2px solid ${primaryColor}` }}>
               <span className="font-bold" style={{
             color: '#000'
           }}>UKUPNO:</span>
