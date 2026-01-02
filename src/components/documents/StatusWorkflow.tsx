@@ -26,7 +26,6 @@ const statusIcons: Record<DocumentStatus, React.ReactNode> = {
   sent: <Send className="h-3 w-3" />,
   accepted: <ThumbsUp className="h-3 w-3" />,
   rejected: <ThumbsDown className="h-3 w-3" />,
-  pending: <Clock className="h-3 w-3" />,
   completed: <Check className="h-3 w-3" />,
   cancelled: null,
 };
@@ -36,7 +35,6 @@ const statusColors: Record<DocumentStatus, string> = {
   sent: 'bg-blue-100 text-blue-700 border-blue-200',
   accepted: 'bg-green-100 text-green-700 border-green-200',
   rejected: 'bg-red-100 text-red-700 border-red-200',
-  pending: 'bg-warning/10 text-warning border-warning/20',
   completed: 'bg-success/10 text-success border-success/20',
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
 };
@@ -95,7 +93,6 @@ export function StatusWorkflow({ document }: StatusWorkflowProps) {
       sent: 'Označi kao poslano',
       accepted: 'Označi kao prihvaćeno',
       rejected: 'Označi kao odbijeno',
-      pending: 'Označi kao u pripremi',
       completed: 'Označi kao završeno',
       cancelled: 'Otkaži',
     };
@@ -297,38 +294,13 @@ export function StatusWorkflow({ document }: StatusWorkflowProps) {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="w-full" size="sm">
-                <Clock className="mr-2 h-4 w-4" />
-                U pripremi
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Označiti kao u pripremi?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Ova akcija će promijeniti status u "Na čekanju/U pripremi".
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Odustani</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleStatusChange('pending')}>
-                  Potvrdi
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-
-        {(document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza') && document.status === 'pending' && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button className="w-full" size="sm">
                 <Check className="mr-2 h-4 w-4" />
-                Isporučeno
+                Označi kao završeno
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Označiti kao isporučeno?</AlertDialogTitle>
+                <AlertDialogTitle>Označiti kao završeno?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Ova akcija će promijeniti status u "Završeno/Isporučeno".
                 </AlertDialogDescription>

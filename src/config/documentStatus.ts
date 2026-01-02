@@ -7,28 +7,28 @@
 
 import { DocumentStatus } from '@/types/document';
 
-// All possible statuses in the database (including legacy 'rejected')
+// All possible statuses in the database (including legacy 'rejected' and 'pending')
 export const ALL_DB_STATUSES: DocumentStatus[] = [
-  'draft', 'sent', 'accepted', 'rejected', 'pending', 'completed', 'cancelled'
+  'draft', 'sent', 'accepted', 'rejected', 'completed', 'cancelled'
 ];
 
-// Statuses visible in UI (dropdowns, filters, etc.) - 'rejected' is excluded
+// Statuses visible in UI (dropdowns, filters, etc.) - 'rejected' and 'pending' are excluded
 export const UI_VISIBLE_STATUSES: DocumentStatus[] = [
-  'draft', 'sent', 'accepted', 'pending', 'completed', 'cancelled'
+  'draft', 'sent', 'accepted', 'completed', 'cancelled'
 ];
 
-// Statuses for filters (excludes pending and rejected for cleaner filtering)
+// Statuses for filters (excludes rejected for cleaner filtering)
 export const FILTER_STATUSES: DocumentStatus[] = [
   'draft', 'sent', 'accepted', 'completed', 'cancelled'
 ];
 
-// Labels for display - 'rejected' maps to 'Otkazano' for display purposes
+// Labels for display - 'rejected' and 'pending' map to other statuses for legacy records
 export const STATUS_LABELS: Record<string, string> = {
   'draft': 'U pripremi',
   'sent': 'Poslano',
   'accepted': 'Prihvaćeno',
   'rejected': 'Otkazano', // Display as 'Otkazano' for legacy records
-  'pending': 'Na čekanju',
+  'pending': 'U pripremi', // Display as 'U pripremi' for legacy records
   'completed': 'Završeno',
   'cancelled': 'Otkazano',
 };
@@ -44,7 +44,7 @@ export const STATUS_STYLES: Record<string, string> = {
   sent: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   accepted: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   rejected: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400', // Same as cancelled
-  pending: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  pending: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400', // Maps to draft style for legacy
   completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   cancelled: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
 };
