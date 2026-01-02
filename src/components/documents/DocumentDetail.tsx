@@ -10,10 +10,11 @@ import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
 import { useCompanySettings } from '@/hooks/useSettings';
-import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
+import { useActiveTemplate } from '@/hooks/useActiveTemplate';
 import { MemorandumHeader } from './MemorandumHeader';
 import { GlobalDocumentHeader } from './GlobalDocumentHeader';
 import { GlobalDocumentFooter } from './GlobalDocumentFooter';
+import { TemplateDebugIndicator } from './TemplateDebugIndicator';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
@@ -57,7 +58,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   const { data: companySettings } = useCompanySettings();
-  const { data: template } = useDocumentTemplate(document?.templateId);
+  
+  // Use active template hook - resolves document template, default template, or fallback
+  const { template, isLoading: isLoadingTemplate, templateSource } = useActiveTemplate(
+    document?.templateId,
+    document?.type || 'ponuda'
+  );
+  
   const { data: articlesData } = useArticles({ pageSize: 1000 });
   const { data: headerSettings } = useDocumentHeaderSettings();
   const { data: footerSettings } = useDocumentFooterSettings();
@@ -217,6 +224,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </DropdownMenu>
             </div>
             <p className="text-muted-foreground mt-0.5">{documentTypeLabels[document.type]}</p>
+            {/* Template debug indicator - admin only */}
+            <TemplateDebugIndicator 
+              template={template} 
+              templateSource={templateSource}
+              isLoading={isLoadingTemplate}
+              className="mt-1"
+            />
           </div>
         </div>
         
