@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy } from 'lucide-react';
+import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2 } from 'lucide-react';
 import { Document, DocumentType, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,9 @@ import { cn, formatDateHR } from '@/lib/utils';
 import { useConvertDocument, useCopyDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { toast } from 'sonner';
 import { getDocumentTypeStyle } from '@/lib/documentTypeStyles';
+import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
+import { useCompanySettings } from '@/hooks/useSettings';
+import { useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 
 interface DocumentListProps {
   documents: Document[];
@@ -36,12 +39,32 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const convertDocument = useConvertDocument();
   const copyDocument = useCopyDocument();
   const deleteDocument = useDeleteDocument();
+  const { data: companySettings } = useCompanySettings();
+  const { data: templates } = useDocumentTemplates();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [pdfGeneratingId, setPdfGeneratingId] = useState<string | null>(null);
   
   const filteredDocs = filter === 'all' 
     ? documents 
     : documents.filter(doc => doc.type === filter);
+
+  // Handle PDF generation for a specific document
+  const handleSavePdf = async (doc: Document) => {
+    if (pdfGeneratingId) return;
+    
+    setPdfGeneratingId(doc.id);
+    try {
+      const template = templates?.find(t => t.id === doc.templateId);
+      await generateAndDownloadPdf(doc, template, companySettings);
+      toast.success('PDF uspješno spremljen');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Greška pri generiranju PDF-a');
+    } finally {
+      setPdfGeneratingId(null);
+    }
+  };
 
   const handleDeleteClick = (doc: Document) => {
     setDocumentToDelete(doc);
@@ -173,14 +196,17 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => {
-                          toast.info('Spremam PDF...');
-                          navigate(`/documents/${doc.id}?action=pdf&return=true`);
-                        }}
+                        onClick={() => handleSavePdf(doc)}
+                        disabled={pdfGeneratingId === doc.id}
                       >
-                        <Download className="mr-2 h-4 w-4" /> Spremi PDF
+                        {pdfGeneratingId === doc.id ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
+                        {pdfGeneratingId === doc.id ? 'Generiram...' : 'Spremi PDF'}
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleCopy(doc)}
                         disabled={copyDocument.isPending}
                       >
