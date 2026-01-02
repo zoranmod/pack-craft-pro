@@ -4,9 +4,12 @@ import { useDocument } from '@/hooks/useDocuments';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { useArticles } from '@/hooks/useArticles';
+import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import { Document, documentTypeLabels } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
 import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
+import { GlobalDocumentHeader } from '@/components/documents/GlobalDocumentHeader';
+import { GlobalDocumentFooter } from '@/components/documents/GlobalDocumentFooter';
 import { ContractDocumentView } from '@/components/documents/ContractDocumentView';
 import { SignatureBlock } from '@/components/documents/SignatureBlock';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
@@ -665,7 +668,9 @@ export function DocumentContent({
   companySettings,
   enrichedItems,
   hasPrices,
-  forPrint = false
+  forPrint = false,
+  headerSettings,
+  footerSettings
 }: {
   document: Document;
   template?: any;
@@ -673,6 +678,8 @@ export function DocumentContent({
   enrichedItems: any[];
   hasPrices: boolean;
   forPrint?: boolean;
+  headerSettings?: any;
+  footerSettings?: any;
 }) {
   const isContract = document.type === 'ugovor';
 
@@ -696,6 +703,7 @@ export function DocumentContent({
     fontSize: '11.5px'
   }}>
       <div className="doc-body">
+        <GlobalDocumentHeader settings={headerSettings} />
         <MemorandumHeader />
         <DocumentBodyContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} />
       </div>
@@ -704,6 +712,7 @@ export function DocumentContent({
         <p className="legal-note">
           Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.
         </p>
+        <GlobalDocumentFooter settings={footerSettings} />
         <MemorandumFooter />
       </div>
     </div>;
@@ -735,6 +744,8 @@ const PrintDocument = () => {
   } = useArticles({
     pageSize: 1000
   });
+  const { data: headerSettings } = useDocumentHeaderSettings();
+  const { data: footerSettings } = useDocumentFooterSettings();
 
   // Document types that should NOT show prices
   const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor'].includes(document.type) : true;
@@ -825,7 +836,7 @@ const PrintDocument = () => {
       <div className="py-8 print:py-0 print:bg-white flex justify-center" style={{
         minHeight: 'auto'
       }}>
-        <DocumentContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} forPrint={true} />
+        <DocumentContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} forPrint={true} headerSettings={headerSettings} footerSettings={footerSettings} />
       </div>
     </>;
 };
