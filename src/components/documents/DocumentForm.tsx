@@ -197,18 +197,6 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
     }
   }, [isEditMode, userProfile]);
 
-  // Auto-fill monter1 with current user's full name when creating new NDM document
-  useEffect(() => {
-    if (!isEditMode && formData.type === 'nalog-dostava-montaza') {
-      const fullName = userProfile?.first_name || userProfile?.last_name
-        ? [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ')
-        : null;
-      
-      if (fullName && !formData.monter1) {
-        setFormData(prev => ({ ...prev, monter1: fullName }));
-      }
-    }
-  }, [isEditMode, formData.type, userProfile]);
 
   // Contract articles state
   const { data: articleTemplates = [] } = useContractArticleTemplates();
