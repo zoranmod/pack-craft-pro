@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale, Download, Clock, Archive, Printer, Plus, Minus } from 'lucide-react';
+import { Building2, User, Bell, Database, Loader2, Upload, X, FileText, CreditCard, Phone, Scale, Download, Clock, Archive, Printer, Plus, Minus, LayoutTemplate } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,15 @@ import {
   useSaveUserProfile,
   useUploadCompanyLogo,
 } from '@/hooks/useSettings';
+import { DocumentHeaderFooterEditor } from '@/components/settings/DocumentHeaderFooterEditor';
+import {
+  useDocumentHeaderSettings,
+  useDocumentFooterSettings,
+  useSaveDocumentSetting,
+  defaultHeaderSettings,
+  defaultFooterSettings,
+  DocumentHeaderFooterSettings,
+} from '@/hooks/useDocumentSettings';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -274,6 +283,90 @@ const Settings = () => {
             )}
           </div>
         </div>
+      </div>
+    );
+  };
+
+  // Document Header/Footer Settings Section
+  const DocumentHeaderFooterSection = () => {
+    const { data: headerSettings, isLoading: headerLoading } = useDocumentHeaderSettings();
+    const { data: footerSettings, isLoading: footerLoading } = useDocumentFooterSettings();
+    const saveSetting = useSaveDocumentSetting();
+    
+    const [localHeader, setLocalHeader] = useState<DocumentHeaderFooterSettings>(defaultHeaderSettings);
+    const [localFooter, setLocalFooter] = useState<DocumentHeaderFooterSettings>(defaultFooterSettings);
+
+    useEffect(() => {
+      if (headerSettings) setLocalHeader(headerSettings);
+    }, [headerSettings]);
+
+    useEffect(() => {
+      if (footerSettings) setLocalFooter(footerSettings);
+    }, [footerSettings]);
+
+    const handleSaveHeader = () => {
+      saveSetting.mutate({ key: 'global_document_header', value: localHeader });
+    };
+
+    const handleSaveFooter = () => {
+      saveSetting.mutate({ key: 'global_document_footer', value: localFooter });
+    };
+
+    const handleResetHeader = () => {
+      setLocalHeader(defaultHeaderSettings);
+    };
+
+    const handleResetFooter = () => {
+      setLocalFooter(defaultFooterSettings);
+    };
+
+    const isLoading = headerLoading || footerLoading;
+
+    return (
+      <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <LayoutTemplate className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-foreground">Globalni Header i Footer dokumenata</h2>
+            <p className="text-sm text-muted-foreground">Postavite zaglavlje i podnožje za sve dokumente (Ponude, Ugovori, Otpremnice, Računi, Nalozi)</p>
+          </div>
+        </div>
+        
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Header Editor */}
+            <div className="border border-border rounded-lg p-4">
+              <DocumentHeaderFooterEditor
+                type="header"
+                value={localHeader}
+                onChange={setLocalHeader}
+                onSave={handleSaveHeader}
+                onReset={handleResetHeader}
+                isSaving={saveSetting.isPending}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Footer Editor */}
+            <div className="border border-border rounded-lg p-4">
+              <DocumentHeaderFooterEditor
+                type="footer"
+                value={localFooter}
+                onChange={setLocalFooter}
+                onSave={handleSaveFooter}
+                onReset={handleResetFooter}
+                isSaving={saveSetting.isPending}
+              />
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -747,6 +840,9 @@ const Settings = () => {
             </p>
           </div>
         </div>
+
+        {/* Global Document Header/Footer */}
+        <DocumentHeaderFooterSection />
 
         {/* Print/PDF Layout Settings */}
         <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">

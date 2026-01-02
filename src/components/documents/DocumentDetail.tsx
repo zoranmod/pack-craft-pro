@@ -12,10 +12,13 @@ import { ContractDocumentView } from './ContractDocumentView';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplate } from '@/hooks/useDocumentTemplates';
 import { MemorandumHeader } from './MemorandumHeader';
+import { GlobalDocumentHeader } from './GlobalDocumentHeader';
+import { GlobalDocumentFooter } from './GlobalDocumentFooter';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
+import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +59,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: companySettings } = useCompanySettings();
   const { data: template } = useDocumentTemplate(document?.templateId);
   const { data: articlesData } = useArticles({ pageSize: 1000 });
+  const { data: headerSettings } = useDocumentHeaderSettings();
+  const { data: footerSettings } = useDocumentFooterSettings();
   const copyDocument = useCopyDocument();
   const updateStatus = useUpdateDocumentStatus();
   const convertDocument = useConvertDocument();
@@ -277,6 +282,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               } as React.CSSProperties}
             >
               <div className="doc-body">
+                <GlobalDocumentHeader settings={headerSettings} />
                 <MemorandumHeader />
                 <DocumentBodyContent
                   document={document}
@@ -285,6 +291,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   enrichedItems={enrichedItems}
                   hasPrices={hasPrices}
                 />
+              </div>
+              <div className="doc-footer">
+                <GlobalDocumentFooter settings={footerSettings} />
               </div>
             </div>
           )}
