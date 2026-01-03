@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { validateOIB, validateDocumentItems } from '@/lib/validation';
-import { Textarea } from '@/components/ui/textarea';
+import { AutoResizeTextarea } from '@/components/ui/auto-resize-textarea';
 import {
   Select,
   SelectContent,
@@ -998,11 +998,10 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
           {/* Notes */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 p-6">
             <h2 className="font-semibold text-foreground mb-4">Napomene</h2>
-            <Textarea
+            <AutoResizeTextarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Dodatne napomene ili upute..."
-              rows={4}
             />
           </div>
         </div>
