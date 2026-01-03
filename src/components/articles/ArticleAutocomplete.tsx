@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Package } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Package } from 'lucide-react';
+import { AutoResizeTextarea } from '@/components/ui/auto-resize-textarea';
 import { useArticles, Article } from '@/hooks/useArticles';
 
 interface ArticleAutocompleteProps {
@@ -50,7 +50,7 @@ export function ArticleAutocomplete({
 
   return (
     <div ref={wrapperRef} className="relative">
-      <Input
+      <AutoResizeTextarea
         value={search}
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => setIsOpen(true)}

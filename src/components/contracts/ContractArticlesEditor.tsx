@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, GripVertical, Plus, Trash2, Edit2, Check, X } f
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { AutoResizeTextarea } from '@/components/ui/auto-resize-textarea';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ContractArticleFormData } from '@/types/contractArticle';
@@ -210,10 +210,9 @@ export function ContractArticlesEditor({
                   <div className="border-t border-border p-3 space-y-3">
                     {editingArticle === index ? (
                       <>
-                        <Textarea
+                        <AutoResizeTextarea
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
-                          rows={6}
                           className="font-mono text-sm"
                         />
                         <div className="flex justify-end gap-2">
