@@ -66,32 +66,32 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         {/* 2-column layout: buyer left, metadata right, aligned at top */}
         <div className="grid grid-cols-2 gap-4 mb-5 items-start">
           {/* Left: Client Info */}
-          <div className="p-3 bg-gray-50 rounded border border-gray-200">
-            <p className="font-semibold text-sm mb-1">Kupac:</p>
-            <p className="font-medium">Naziv kupca d.o.o.</p>
-            <p className="text-gray-600 text-sm">Adresa kupca 123, 10000 Zagreb</p>
-            <p className="text-gray-600 text-sm">OIB: 98765432109</p>
+          <div className="p-3 rounded" style={{ background: '#f9fafb', border: '1px solid #e5e7eb' }}>
+            <p className="font-semibold text-sm mb-1" style={{ color: '#000' }}>Kupac:</p>
+            <p className="font-medium" style={{ color: '#000' }}>Naziv kupca d.o.o.</p>
+            <p className="text-sm" style={{ color: '#4b5563' }}>Adresa kupca 123, 10000 Zagreb</p>
+            <p className="text-sm" style={{ color: '#4b5563' }}>OIB: 98765432109</p>
           </div>
 
           {/* Right: Document metadata */}
-          <div className="text-right text-sm">
+          <div className="text-right text-sm" style={{ color: '#000' }}>
             <p className="font-semibold" style={{ marginBottom: '2px' }}>
               {template.document_type.toUpperCase().slice(0,3)}-2025-0001
             </p>
-            <p className="text-gray-600">Datum: {formatDateHR(new Date())}</p>
+            <p style={{ color: '#4b5563' }}>Datum: {formatDateHR(new Date())}</p>
             {template.show_validity_days && (
-              <p className="text-gray-600">Rok valjanosti: {template.default_validity_days} dana</p>
+              <p style={{ color: '#4b5563' }}>Rok valjanosti: {template.default_validity_days} dana</p>
             )}
             {template.show_delivery_days && (
-              <p className="text-gray-600">Rok isporuke: {template.default_delivery_days} dana</p>
+              <p style={{ color: '#4b5563' }}>Rok isporuke: {template.default_delivery_days} dana</p>
             )}
             {template.show_payment_method && (
-              <p className="text-gray-600">Način plaćanja: {template.default_payment_method}</p>
+              <p style={{ color: '#4b5563' }}>Način plaćanja: {template.default_payment_method}</p>
             )}
           </div>
         </div>
         {/* Table */}
-        <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse' }}>
+        <table className="w-full mb-6 text-xs" style={{ borderCollapse: 'collapse', color: '#000' }}>
           <thead>
             <tr style={{ backgroundColor: template.primary_color, color: 'white' }}>
               {visibleColumns.map((col) => (
@@ -103,7 +103,7 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
           </thead>
           <tbody>
             {mockItems.map((item, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+              <tr key={index} style={{ background: index % 2 === 0 ? '#f9fafb' : '#ffffff' }}>
                 {visibleColumns.map((col) => (
                   <td key={col} className="p-2 border border-gray-300">
                     {col === 'cijena' || col === 'cijena_s_rabatom' || col === 'pdv_iznos' || col === 'ukupno'
@@ -122,14 +122,14 @@ export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         {hasPrices && (
           <div className="flex justify-end mb-6">
             <div className="w-56 text-sm">
-              <div className="flex justify-between py-1.5 border-b border-gray-300">
-                <span className="text-gray-600">Osnovica:</span>
-                <span>{formatCurrency(380)}</span>
+              <div className="flex justify-between py-1.5" style={{ borderBottom: '1px solid #d1d5db' }}>
+                <span style={{ color: '#4b5563' }}>Osnovica:</span>
+                <span style={{ color: '#000' }}>{formatCurrency(380)}</span>
               </div>
               {template.show_pdv_breakdown && (
-                <div className="flex justify-between py-1.5 border-b border-gray-300">
-                  <span className="text-gray-600">PDV (25%):</span>
-                  <span>{formatCurrency(95)}</span>
+                <div className="flex justify-between py-1.5" style={{ borderBottom: '1px solid #d1d5db' }}>
+                  <span style={{ color: '#4b5563' }}>PDV (25%):</span>
+                  <span style={{ color: '#000' }}>{formatCurrency(95)}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 font-bold text-base" style={{ color: template.primary_color }}>

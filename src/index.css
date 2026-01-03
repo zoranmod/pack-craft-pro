@@ -338,6 +338,15 @@
   height: 297mm;
   box-sizing: border-box;
   overflow: hidden;
+  background: hsl(0 0% 100%);
+  color: hsl(0 0% 0%);
+}
+
+/* Force light mode for document previews in dark mode */
+.dark .a4-page,
+.dark .a4-page-multipage {
+  background: hsl(0 0% 100%) !important;
+  color: hsl(0 0% 0%) !important;
 }
 
 /* Multi-page A4 layout for long documents like contracts */

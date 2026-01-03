@@ -362,8 +362,10 @@ export function DocumentBodyContent({
         </div>}
 
       {/* Notes */}
-      {document.notes && <div className="mb-4 p-2 bg-gray-50 border border-gray-200 rounded" style={{
-      fontSize: '11.5px'
+      {document.notes && <div className="mb-4 p-2 rounded" style={{
+      fontSize: '11.5px',
+      background: '#f9fafb',
+      border: '1px solid #e5e7eb'
     }}>
           <p className="font-medium mb-1" style={{
         color: '#000'
