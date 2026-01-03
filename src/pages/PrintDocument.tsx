@@ -377,11 +377,12 @@ export function DocumentBodyContent({
 
       {/* Stamp & Signature Section for Ponuda */}
       {document.type === 'ponuda' && <div className="mt-3 pt-3 border-t border-gray-300">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            {/* M.P. aligned with signature line */}
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+            {/* M.P. centered horizontally, aligned with signature line vertically */}
             <div style={{ 
+              flex: 1, 
               display: 'flex', 
-              alignItems: 'flex-end',
+              justifyContent: 'center',
               paddingBottom: '3mm'
             }}>
               <p style={{
