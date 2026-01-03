@@ -69,7 +69,7 @@ export function FurnitureContractPreview({ template, values }: FurnitureContract
   const sections = processedContent.split('\n\n');
 
   return (
-    <div className="a4-page bg-white shadow-lg" style={{ fontSize: '11px', lineHeight: '1.5' }}>
+    <div className="a4-page-multipage bg-white shadow-lg" style={{ fontSize: '11px', lineHeight: '1.5' }}>
       <div className="doc-body">
         <MemorandumHeader />
         
