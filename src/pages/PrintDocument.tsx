@@ -25,13 +25,15 @@ export function DocumentBodyContent({
   template,
   companySettings,
   enrichedItems,
-  hasPrices
+  hasPrices,
+  mpYMm = 0,
 }: {
   document: Document;
   template?: any;
   companySettings?: any;
   enrichedItems: any[];
   hasPrices: boolean;
+  mpYMm?: number;
 }) {
   // For otpremnica, use full column names
   const isOtpremnica = document.type === 'otpremnica' || document.type === 'nalog-dostava-montaza';
@@ -377,13 +379,16 @@ export function DocumentBodyContent({
 
       {/* Stamp & Signature Section for Ponuda */}
       {document.type === 'ponuda' && <div className="mt-3 pt-3 border-t border-gray-300">
-          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-            {/* M.P. centered horizontally, aligned with signature line vertically */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', position: 'relative' }}>
+            {/* M.P. absolutely centered horizontally, with configurable vertical offset */}
             <div style={{ 
-              flex: 1, 
-              display: 'flex', 
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: `calc(3mm + ${mpYMm ?? 0}mm)`,
+              display: 'flex',
               justifyContent: 'center',
-              paddingBottom: '3mm'
+              pointerEvents: 'none',
             }}>
               <p style={{
                 color: '#000',
@@ -683,7 +688,8 @@ export function DocumentContent({
   hasPrices,
   forPrint = false,
   headerSettings,
-  footerSettings
+  footerSettings,
+  mpYMm = 0,
 }: {
   document: Document;
   template?: any;
@@ -693,6 +699,7 @@ export function DocumentContent({
   forPrint?: boolean;
   headerSettings?: any;
   footerSettings?: any;
+  mpYMm?: number;
 }) {
   const isContract = document.type === 'ugovor';
 
@@ -718,7 +725,7 @@ export function DocumentContent({
       <div className="doc-body">
         <GlobalDocumentHeader settings={headerSettings} />
         <MemorandumHeader />
-        <DocumentBodyContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} />
+        <DocumentBodyContent document={document} template={template} companySettings={companySettings} enrichedItems={enrichedItems} hasPrices={hasPrices} mpYMm={mpYMm} />
       </div>
       
       <div className="doc-footer">

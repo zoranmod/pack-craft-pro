@@ -196,6 +196,7 @@ interface PDFDocumentComponentProps {
   companySettings?: any;
   enrichedItems: (DocumentItem & { code?: string })[];
   hasPrices: boolean;
+  mpYMm?: number;
 }
 
 // Standard Document PDF Component
@@ -205,6 +206,7 @@ const StandardDocumentPDF = ({
   companySettings,
   enrichedItems,
   hasPrices,
+  mpYMm = 0,
 }: PDFDocumentComponentProps) => {
   const isOtpremnica = doc.type === 'otpremnica' || doc.type === 'nalog-dostava-montaza';
   const unitLabel = isOtpremnica ? 'Jedinica' : 'Jed.';
@@ -347,12 +349,19 @@ const StandardDocumentPDF = ({
         {/* Signature Section for Ponuda */}
         {doc.type === 'ponuda' && (
           <View style={styles.signatureSection}>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              {/* M.P. centered horizontally, aligned with signature line vertically */}
-              <View style={{ flex: 1, alignItems: 'center', paddingBottom: 3 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'relative' }}>
+              {/* M.P. centered horizontally with configurable vertical offset */}
+              <View style={{ 
+                position: 'absolute', 
+                left: 0, 
+                right: 0, 
+                bottom: 3 - (mpYMm * 2.83465), // Convert mm to points (1mm = 2.83465pt), negative because bottom offset
+                alignItems: 'center' 
+              }}>
                 <Text style={styles.text}>M.P.</Text>
               </View>
               {/* Signature block */}
+              <View style={{ flex: 1 }} />
               <View style={[styles.signatureBlock, { width: 200 }]}>
                 <Text style={styles.text}>Ponudu izradio/la:</Text>
                 <View style={[styles.signatureLine, { marginTop: 25 }]} />
@@ -640,7 +649,8 @@ export const generateAndDownloadPdf = async (
   document: Document,
   template?: any,
   companySettings?: any,
-  enrichedItems?: (DocumentItem & { code?: string })[]
+  enrichedItems?: (DocumentItem & { code?: string })[],
+  mpYMm?: number
 ): Promise<void> => {
   const isContract = document.type === 'ugovor';
   const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(document.type);
@@ -660,6 +670,7 @@ export const generateAndDownloadPdf = async (
         companySettings={companySettings}
         enrichedItems={items}
         hasPrices={hasPrices}
+        mpYMm={mpYMm}
       />
     ).toBlob();
   }
