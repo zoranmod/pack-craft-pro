@@ -115,6 +115,69 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_events: {
+        Row: {
+          all_day: boolean
+          client_id: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          employee_id: string | null
+          end_at: string | null
+          id: string
+          location: string | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+          start_at: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          all_day?: boolean
+          client_id?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          employee_id?: string | null
+          end_at?: string | null
+          id?: string
+          location?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          start_at: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          all_day?: boolean
+          client_id?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          employee_id?: string | null
+          end_at?: string | null
+          id?: string
+          location?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          start_at?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
@@ -1172,6 +1235,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      public_holidays: {
+        Row: {
+          country_code: string
+          created_at: string
+          date: string
+          id: string
+          is_non_working: boolean
+          name: string
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country_code?: string
+          created_at?: string
+          date: string
+          id?: string
+          is_non_working?: boolean
+          name: string
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          date?: string
+          id?: string
+          is_non_working?: boolean
+          name?: string
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
