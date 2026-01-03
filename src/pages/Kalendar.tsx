@@ -545,7 +545,12 @@ const Kalendar = () => {
             pressed={showRok}
             onPressedChange={setShowRok}
             size="sm"
-            className={cn("gap-1", showRok && "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200")}
+            className={cn(
+              "gap-1 border",
+              showRok 
+                ? "bg-amber-500 text-white border-amber-600 hover:bg-amber-600 data-[state=on]:bg-amber-500 data-[state=on]:text-white" 
+                : "text-muted-foreground border-border hover:bg-muted"
+            )}
           >
             <Flag className="h-3 w-3" />
             Rokovi
@@ -554,7 +559,12 @@ const Kalendar = () => {
             pressed={showIsporuka}
             onPressedChange={setShowIsporuka}
             size="sm"
-            className={cn("gap-1", showIsporuka && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200")}
+            className={cn(
+              "gap-1 border",
+              showIsporuka 
+                ? "bg-blue-500 text-white border-blue-600 hover:bg-blue-600 data-[state=on]:bg-blue-500 data-[state=on]:text-white" 
+                : "text-muted-foreground border-border hover:bg-muted"
+            )}
           >
             <Truck className="h-3 w-3" />
             Isporuke
@@ -563,7 +573,12 @@ const Kalendar = () => {
             pressed={showMontaza}
             onPressedChange={setShowMontaza}
             size="sm"
-            className={cn("gap-1", showMontaza && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200")}
+            className={cn(
+              "gap-1 border",
+              showMontaza 
+                ? "bg-green-500 text-white border-green-600 hover:bg-green-600 data-[state=on]:bg-green-500 data-[state=on]:text-white" 
+                : "text-muted-foreground border-border hover:bg-muted"
+            )}
           >
             <Wrench className="h-3 w-3" />
             Montaže
@@ -572,7 +587,12 @@ const Kalendar = () => {
             pressed={showHolidays}
             onPressedChange={setShowHolidays}
             size="sm"
-            className={cn("gap-1", showHolidays && "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200")}
+            className={cn(
+              "gap-1 border",
+              showHolidays 
+                ? "bg-rose-500 text-white border-rose-600 hover:bg-rose-600 data-[state=on]:bg-rose-500 data-[state=on]:text-white" 
+                : "text-muted-foreground border-border hover:bg-muted"
+            )}
           >
             <Star className="h-3 w-3" />
             Blagdani
