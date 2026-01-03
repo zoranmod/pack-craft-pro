@@ -200,8 +200,17 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                     </SelectTrigger>
                     <SelectContent>
                       {UI_VISIBLE_STATUSES.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          <StatusBadge status={status} />
+                        <SelectItem key={status} value={status} className="py-2">
+                          <span className={cn(
+                            "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium",
+                            status === 'draft' && 'bg-muted text-muted-foreground',
+                            status === 'sent' && 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400',
+                            status === 'accepted' && 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400',
+                            status === 'completed' && 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400',
+                            status === 'cancelled' && 'bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                          )}>
+                            {STATUS_LABELS[status]}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
