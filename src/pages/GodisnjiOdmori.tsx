@@ -169,10 +169,22 @@ const GodisnjiOdmori = () => {
   const currentExcludedDates = useMemo((): ExcludedDate[] => {
     const excluded: ExcludedDate[] = [];
     
-    // Add non-working Saturdays
+    // Handle Saturday exclusions based on employee's works_saturday setting
     saturdayExclusions.forEach((isNonWorking, dateStr) => {
-      if (isNonWorking) {
-        excluded.push({ date: dateStr, reason: 'neradna_subota' });
+      if (worksSaturday) {
+        // Employee normally works Saturdays
+        // If marked as non-working, add neradna_subota exclusion
+        if (isNonWorking) {
+          excluded.push({ date: dateStr, reason: 'neradna_subota' });
+        }
+        // If working (isNonWorking = false), no exclusion needed (default behavior)
+      } else {
+        // Employee normally does NOT work Saturdays
+        // If marked as working (isNonWorking = false), add radna_subota exclusion to override
+        if (!isNonWorking) {
+          excluded.push({ date: dateStr, reason: 'radna_subota' });
+        }
+        // If non-working (isNonWorking = true), no exclusion needed (default behavior)
       }
     });
     
@@ -182,7 +194,7 @@ const GodisnjiOdmori = () => {
     });
     
     return excluded;
-  }, [saturdayExclusions, weekdayExclusions]);
+  }, [saturdayExclusions, weekdayExclusions, worksSaturday]);
 
   // Check if any neradni_dan is selected
   const hasNeradniDan = weekdayExclusions.size > 0;
@@ -210,11 +222,22 @@ const GodisnjiOdmori = () => {
     
     // Default based on employee's works_saturday setting
     saturdays.forEach(dateStr => {
-      // If editing, check existing excluded dates
-      const existingExclusion = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'neradna_subota');
-      // If employee doesn't work Saturdays, default to excluded (true = non-working)
-      // If employee works Saturdays, default to working (false)
-      newExclusions.set(dateStr, existingExclusion ? true : !worksSaturday);
+      // Check if there's an existing exclusion for this Saturday
+      const existingNeradna = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'neradna_subota');
+      const existingRadna = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'radna_subota');
+      
+      if (existingNeradna) {
+        // Explicitly marked as non-working
+        newExclusions.set(dateStr, true);
+      } else if (existingRadna) {
+        // Explicitly marked as working (for employee who doesn't normally work Saturdays)
+        newExclusions.set(dateStr, false);
+      } else {
+        // Default based on employee's works_saturday setting
+        // If employee works Saturdays, default to working (false = not excluded)
+        // If employee doesn't work Saturdays, default to non-working (true = excluded)
+        newExclusions.set(dateStr, !worksSaturday);
+      }
     });
     
     setSaturdayExclusions(newExclusions);

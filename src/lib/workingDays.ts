@@ -2,7 +2,7 @@ import { eachDayOfInterval, parseISO, getDay, format, isSaturday } from 'date-fn
 
 export interface ExcludedDate {
   date: string;
-  reason: 'neradna_subota' | 'neradni_dan';
+  reason: 'neradna_subota' | 'neradni_dan' | 'radna_subota';
 }
 
 /**
@@ -78,7 +78,7 @@ export function calculateWorkingDays(
   const days = eachDayOfInterval({ start, end });
   
   // Create a set of excluded dates for quick lookup
-  const excludedSet = new Map<string, 'neradna_subota' | 'neradni_dan'>();
+  const excludedSet = new Map<string, 'neradna_subota' | 'neradni_dan' | 'radna_subota'>();
   excludedDates.forEach(ed => {
     excludedSet.set(ed.date, ed.reason);
   });
@@ -95,7 +95,9 @@ export function calculateWorkingDays(
     if (dayOfWeek === 6) {
       // If explicitly marked as neradna_subota, don't count
       if (exclusionReason === 'neradna_subota') return false;
-      // Count if worksSaturday is true (and not excluded)
+      // If explicitly marked as radna_subota, count it (override for employees who don't normally work Saturdays)
+      if (exclusionReason === 'radna_subota') return true;
+      // Otherwise, count if worksSaturday is true
       return worksSaturday;
     }
     

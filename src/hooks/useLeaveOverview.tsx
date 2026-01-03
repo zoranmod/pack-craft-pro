@@ -7,7 +7,7 @@ export interface ExcludedDate {
   id: string;
   leave_request_id: string;
   date: string;
-  reason: 'neradna_subota' | 'neradni_dan';
+  reason: 'neradna_subota' | 'neradni_dan' | 'radna_subota';
   created_by?: string;
   created_at: string;
   deleted_at?: string;
@@ -316,7 +316,7 @@ export function useSaveExcludedDates() {
   return useMutation({
     mutationFn: async ({ leaveRequestId, excludedDates }: {
       leaveRequestId: string;
-      excludedDates: { date: string; reason: 'neradna_subota' | 'neradni_dan' }[];
+      excludedDates: { date: string; reason: 'neradna_subota' | 'neradni_dan' | 'radna_subota' }[];
     }) => {
       if (!user) throw new Error('User not authenticated');
 
