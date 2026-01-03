@@ -392,7 +392,7 @@ const StandardDocumentPDF = ({
             </View>
             <View style={{ marginTop: 15, flexDirection: 'row' }}>
               <Text style={styles.text}>Robu izdao skladištar (puno ime i prezime):</Text>
-              <View style={[styles.signatureLine, { width: 100, marginTop: 0, marginLeft: 5 }]} />
+              <View style={[styles.signatureLine, { flex: 1, marginTop: 0, marginLeft: 5 }]} />
             </View>
           </View>
         )}
