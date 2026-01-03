@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Plus, Check, X, Clock, CalendarIcon, ArrowRight, Edit2, Shield } from 'lucide-react';
+import { Plus, Check, X, Clock, CalendarIcon, ArrowRight, Edit2, Shield, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateAndDownloadLeaveRequestPdf } from '@/lib/leaveRequestPdfGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -394,26 +395,45 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                     <TableCell className="max-w-[200px] truncate">{req.reason || '-'}</TableCell>
                     <TableCell>{getStatusBadge(req.status)}</TableCell>
                     <TableCell>
-                      {req.status === 'pending' && hasFullAccess && (
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-green-500 hover:text-green-600"
-                            onClick={() => handleApprove(req.id, req.days_requested)}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => handleReject(req.id)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Preuzmi PDF"
+                          onClick={async () => {
+                            if (employee) {
+                              try {
+                                await generateAndDownloadLeaveRequestPdf(req, employee);
+                                toast.success('PDF zahtjeva je uspješno generiran');
+                              } catch (error) {
+                                toast.error('Greška pri generiranju PDF-a');
+                              }
+                            }
+                          }}
+                        >
+                          <FileDown className="h-4 w-4" />
+                        </Button>
+                        {req.status === 'pending' && hasFullAccess && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-green-500 hover:text-green-600"
+                              onClick={() => handleApprove(req.id, req.days_requested)}
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleReject(req.id)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
