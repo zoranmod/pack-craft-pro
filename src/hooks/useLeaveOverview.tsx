@@ -316,7 +316,7 @@ export function useSaveExcludedDates() {
   return useMutation({
     mutationFn: async ({ leaveRequestId, excludedDates }: {
       leaveRequestId: string;
-      excludedDates: { date: string; reason: 'neradna_subota' | 'neradni_dan' | 'radna_subota' }[];
+      excludedDates: { date: string; reason: 'neradna_subota' | 'neradni_dan' | 'radna_subota' | 'praznik' | 'ostalo' }[];
     }) => {
       if (!user) throw new Error('User not authenticated');
 
