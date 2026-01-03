@@ -355,7 +355,7 @@ const StandardDocumentPDF = ({
                 position: 'absolute', 
                 left: 0, 
                 right: 0, 
-                bottom: 3 - (mpYMm * 2.83465), // Convert mm to points (1mm = 2.83465pt), negative because bottom offset
+                bottom: (3 + mpYMm) * 2.83465, // 3mm base + offset (mm -> pt)
                 alignItems: 'center' 
               }}>
                 <Text style={styles.text}>M.P.</Text>
