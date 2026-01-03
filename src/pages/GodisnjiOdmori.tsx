@@ -45,7 +45,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle, CalendarIcon, FileDown } from 'lucide-react';
-import { generateAndDownloadLeaveRequestPdf } from '@/lib/leaveRequestPdfGenerator';
+import { generateAndDownloadLeaveRequestPdf, ExcludedDateInfo } from '@/lib/leaveRequestPdfGenerator';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -597,7 +598,18 @@ const GodisnjiOdmori = () => {
                                   const emp = employeeMap.get(item.employee_id);
                                   if (emp) {
                                     try {
-                                      await generateAndDownloadLeaveRequestPdf(item, emp);
+                                      // Fetch excluded dates for this leave request
+                                      const { data: excludedDates } = await supabase
+                                        .from('leave_request_excluded_dates')
+                                        .select('date, reason')
+                                        .eq('leave_request_id', item.id)
+                                        .is('deleted_at', null);
+                                      
+                                      const leaveWithExcluded = {
+                                        ...item,
+                                        excluded_dates: (excludedDates || []) as ExcludedDateInfo[],
+                                      };
+                                      await generateAndDownloadLeaveRequestPdf(leaveWithExcluded, emp);
                                       toast.success('PDF zahtjeva je uspješno generiran');
                                     } catch (error) {
                                       toast.error('Greška pri generiranju PDF-a');

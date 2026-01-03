@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Plus, Check, X, Clock, CalendarIcon, ArrowRight, Edit2, Shield, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { generateAndDownloadLeaveRequestPdf } from '@/lib/leaveRequestPdfGenerator';
+import { generateAndDownloadLeaveRequestPdf, ExcludedDateInfo } from '@/lib/leaveRequestPdfGenerator';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -403,7 +404,18 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                           onClick={async () => {
                             if (employee) {
                               try {
-                                await generateAndDownloadLeaveRequestPdf(req, employee);
+                                // Fetch excluded dates for this leave request
+                                const { data: excludedDates } = await supabase
+                                  .from('leave_request_excluded_dates')
+                                  .select('date, reason')
+                                  .eq('leave_request_id', req.id)
+                                  .is('deleted_at', null);
+                                
+                                const reqWithExcluded = {
+                                  ...req,
+                                  excluded_dates: (excludedDates || []) as ExcludedDateInfo[],
+                                };
+                                await generateAndDownloadLeaveRequestPdf(reqWithExcluded, employee);
                                 toast.success('PDF zahtjeva je uspješno generiran');
                               } catch (error) {
                                 toast.error('Greška pri generiranju PDF-a');
