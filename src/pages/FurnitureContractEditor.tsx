@@ -200,7 +200,7 @@ export default function FurnitureContractEditor() {
 
           {/* Preview */}
           <div className="print:w-full">
-            <div className="sticky top-4">
+            <div className="sticky top-4 max-h-[calc(100vh-6rem)] overflow-auto">
               <h3 className="text-sm font-medium text-muted-foreground mb-3 print:hidden">
                 Pregled ugovora (A4)
               </h3>

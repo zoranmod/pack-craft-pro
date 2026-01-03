@@ -64,7 +64,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
     '--print-footer-max-height-mm': `${footerMaxHeightMm}mm`,
     '--print-content-bottom-padding-mm': `${contentBottomPaddingMm}mm`
   } as React.CSSProperties;
-  return <div ref={ref} className="a4-page font-serif" style={printStyles}>
+  return <div ref={ref} className="a4-page-multipage font-serif" style={printStyles}>
         <div className="doc-body">
           {/* Memorandum Header - identical for all documents */}
           <MemorandumHeader />
