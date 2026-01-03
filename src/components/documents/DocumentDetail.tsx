@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
@@ -81,8 +81,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
   const [draftMpYMm, setDraftMpYMm] = useState(0);
   
-  // Sync draft with saved settings
-  const mpYMm = isLayoutEditing ? draftMpYMm : (ponudaLayoutSettings?.mp.yMm ?? 0);
+  // Sync draft with saved settings when they load (only when not editing)
+  useEffect(() => {
+    if (ponudaLayoutSettings && !isLayoutEditing) {
+      setDraftMpYMm(ponudaLayoutSettings.mp.yMm);
+    }
+  }, [ponudaLayoutSettings, isLayoutEditing]);
+  
+  // Use draft for both preview and PDF to ensure consistency
+  const mpYMm = draftMpYMm;
   
   const handleConvertDocument = async (targetType: DocumentType) => {
     if (!document) return;
@@ -152,8 +159,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     
     setIsPdfGenerating(true);
     try {
-      const savedMpYMm = ponudaLayoutSettings?.mp.yMm ?? 0;
-      await generateAndDownloadPdf(document, template, companySettings, enrichedItems, savedMpYMm);
+      // Use draftMpYMm directly - it's always in sync with saved settings or current edits
+      await generateAndDownloadPdf(document, template, companySettings, enrichedItems, draftMpYMm);
       toast.success('PDF uspješno spremljen');
     } catch (error) {
       console.error('PDF generation error:', error);
