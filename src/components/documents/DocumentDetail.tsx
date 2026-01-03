@@ -321,7 +321,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
         {/* Document Preview - constrained width with horizontal scroll if needed */}
         <div className="w-full min-w-0 overflow-x-auto">
           {isContract ? (
-            <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
+            <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-visible">
               <ContractDocumentView 
                 ref={printRef} 
                 document={document} 
