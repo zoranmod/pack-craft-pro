@@ -347,13 +347,15 @@ const StandardDocumentPDF = ({
         {/* Signature Section for Ponuda */}
         {doc.type === 'ponuda' && (
           <View style={styles.signatureSection}>
-            <Text style={[styles.text, { textAlign: 'center', marginBottom: 8 }]}>M.P.</Text>
-            <View style={styles.signatureRow}>
-              <View style={styles.signatureBlock}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              {/* M.P. aligned with signature line */}
+              <Text style={[styles.text, { paddingBottom: 3 }]}>M.P.</Text>
+              {/* Signature block */}
+              <View style={[styles.signatureBlock, { width: 200 }]}>
                 <Text style={styles.text}>Ponudu izradio/la:</Text>
-                {doc.preparedBy && <Text style={[styles.text, { marginTop: 15 }]}>{doc.preparedBy}</Text>}
-                <View style={styles.signatureLine} />
+                <View style={[styles.signatureLine, { marginTop: 25 }]} />
                 <Text style={styles.signatureLabel}>(Potpis)</Text>
+                {doc.preparedBy && <Text style={[styles.text, { fontWeight: 600, marginTop: 3 }]}>{doc.preparedBy}</Text>}
               </View>
             </View>
           </View>
