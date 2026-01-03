@@ -15,11 +15,13 @@ import { MemorandumHeader } from './MemorandumHeader';
 import { GlobalDocumentHeader } from './GlobalDocumentHeader';
 import { GlobalDocumentFooter } from './GlobalDocumentFooter';
 import { TemplateDebugIndicator } from './TemplateDebugIndicator';
+import { LayoutEditor } from './LayoutEditor';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
+import { usePonudaLayoutSettings, useSavePonudaLayoutSettings, defaultPonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,12 +70,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: articlesData } = useArticles({ pageSize: 1000 });
   const { data: headerSettings } = useDocumentHeaderSettings();
   const { data: footerSettings } = useDocumentFooterSettings();
+  const { data: ponudaLayoutSettings } = usePonudaLayoutSettings();
+  const saveLayoutSettings = useSavePonudaLayoutSettings();
   const copyDocument = useCopyDocument();
   const updateStatus = useUpdateDocumentStatus();
   const convertDocument = useConvertDocument();
   const deleteDocument = useDeleteDocument();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const [isLayoutEditing, setIsLayoutEditing] = useState(false);
+  const [draftMpYMm, setDraftMpYMm] = useState(0);
+  
+  // Sync draft with saved settings
+  const mpYMm = isLayoutEditing ? draftMpYMm : (ponudaLayoutSettings?.mp.yMm ?? 0);
   
   const handleConvertDocument = async (targetType: DocumentType) => {
     if (!document) return;
@@ -143,7 +152,8 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     
     setIsPdfGenerating(true);
     try {
-      await generateAndDownloadPdf(document, template, companySettings, enrichedItems);
+      const savedMpYMm = ponudaLayoutSettings?.mp.yMm ?? 0;
+      await generateAndDownloadPdf(document, template, companySettings, enrichedItems, savedMpYMm);
       toast.success('PDF uspješno spremljen');
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -269,6 +279,26 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               Uredi
             </Button>
           </Link>
+          {document.type === 'ponuda' && (
+            <LayoutEditor
+              isEditing={isLayoutEditing}
+              onToggleEdit={() => {
+                if (!isLayoutEditing) {
+                  setDraftMpYMm(ponudaLayoutSettings?.mp.yMm ?? 0);
+                }
+                setIsLayoutEditing(!isLayoutEditing);
+              }}
+              documentType={document.type}
+              draftMpYMm={draftMpYMm}
+              onDraftChange={setDraftMpYMm}
+              onSave={() => {
+                saveLayoutSettings.mutate({ mp: { yMm: draftMpYMm } });
+                setIsLayoutEditing(false);
+              }}
+              onReset={() => setDraftMpYMm(0)}
+              isSaving={saveLayoutSettings.isPending}
+            />
+          )}
         </div>
       </div>
 
@@ -304,6 +334,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                   companySettings={companySettings}
                   enrichedItems={enrichedItems}
                   hasPrices={hasPrices}
+                  mpYMm={mpYMm}
                 />
               </div>
               <div className="doc-footer">
