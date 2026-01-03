@@ -102,7 +102,7 @@ const GodisnjiOdmori = () => {
   const [yearFilter, setYearFilter] = useState<string>(currentYear.toString());
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'list' | 'calendar'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'calendar' | 'rejected'>('list');
   
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -395,11 +395,18 @@ const GodisnjiOdmori = () => {
 
   const getLeaveForDay = (day: Date) => {
     return leaveRequests.filter(leave => {
+      // Only show approved and pending in calendar
+      if (leave.status === 'rejected') return false;
       const start = parseISO(leave.start_date);
       const end = parseISO(leave.end_date);
       return isWithinInterval(day, { start, end });
     });
   };
+
+  // Filter rejected leave requests for the rejected tab
+  const rejectedLeaveRequests = useMemo(() => {
+    return leaveRequests.filter(leave => leave.status === 'rejected');
+  }, [leaveRequests]);
 
   return (
     <MainLayout
@@ -494,7 +501,7 @@ const GodisnjiOdmori = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'list' | 'calendar')}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'list' | 'calendar' | 'rejected')}>
           <TabsList>
             <TabsTrigger value="list" className="gap-2">
               <List className="h-4 w-4" />
@@ -503,6 +510,10 @@ const GodisnjiOdmori = () => {
             <TabsTrigger value="calendar" className="gap-2">
               <Calendar className="h-4 w-4" />
               Kalendar
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="gap-2">
+              <X className="h-4 w-4" />
+              Odbijeni ({rejectedLeaveRequests.length})
             </TabsTrigger>
           </TabsList>
 
@@ -678,6 +689,97 @@ const GodisnjiOdmori = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Rejected View */}
+          <TabsContent value="rejected" className="mt-6">
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">Učitavanje...</div>
+            ) : rejectedLeaveRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <X className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Nema odbijenih</h3>
+                <p className="text-muted-foreground">Nema odbijenih godišnjih odmora</p>
+              </div>
+            ) : (
+              <div className="bg-card rounded-xl border border-border/50 shadow-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Zaposlenik</TableHead>
+                        <TableHead>Od – Do</TableHead>
+                        <TableHead>Radnih dana</TableHead>
+                        <TableHead>Tip</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Napomena</TableHead>
+                        <TableHead>Datum unosa</TableHead>
+                        <TableHead className="text-right">Akcije</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rejectedLeaveRequests.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.employee_name}</TableCell>
+                          <TableCell>
+                            {format(parseISO(item.start_date), 'dd.MM.yyyy', { locale: hr })} – {format(parseISO(item.end_date), 'dd.MM.yyyy', { locale: hr })}
+                          </TableCell>
+                          <TableCell>{item.days_requested}</TableCell>
+                          <TableCell>{getLeaveTypeLabel(item.leave_type)}</TableCell>
+                          <TableCell>
+                            {hasFullAccess ? (
+                              <Select
+                                value={item.status}
+                                onValueChange={(newStatus) => handleQuickStatusChange(item.id, newStatus)}
+                              >
+                                <SelectTrigger className="w-[130px] h-8 text-xs">
+                                  <SelectValue>
+                                    {getStatusBadge(item.status)}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">
+                                    <Badge variant="secondary">Na čekanju</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="approved">
+                                    <Badge className="bg-green-500/20 text-green-700 dark:text-green-400">Odobren</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="rejected">
+                                    <Badge variant="destructive">Odbijen</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              getStatusBadge(item.status)
+                            )}
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate text-muted-foreground">
+                            {item.reason || '-'}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {format(parseISO(item.created_at), 'dd.MM.yyyy', { locale: hr })}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {hasFullAccess && (
+                                <>
+                                  <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(item)}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(item.id)}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
