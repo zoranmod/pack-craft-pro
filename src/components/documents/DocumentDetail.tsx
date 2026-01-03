@@ -80,13 +80,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
   const [draftMpYMm, setDraftMpYMm] = useState(0);
+  const didInitMpYMm = useRef(false);
   
-  // Sync draft with saved settings when they load (only when not editing)
+  // Initialize draft from saved settings once per document load (avoid overwriting user edits)
   useEffect(() => {
-    if (ponudaLayoutSettings && !isLayoutEditing) {
-      setDraftMpYMm(ponudaLayoutSettings.mp.yMm);
-    }
-  }, [ponudaLayoutSettings, isLayoutEditing]);
+    didInitMpYMm.current = false;
+  }, [document?.id]);
+
+  useEffect(() => {
+    if (!ponudaLayoutSettings) return;
+    if (didInitMpYMm.current) return;
+
+    setDraftMpYMm(ponudaLayoutSettings.mp.yMm);
+    didInitMpYMm.current = true;
+  }, [ponudaLayoutSettings]);
   
   // Use draft for both preview and PDF to ensure consistency
   const mpYMm = draftMpYMm;
