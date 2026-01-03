@@ -384,6 +384,58 @@ const StandardDocumentPDF = ({
           </View>
         )}
 
+        {/* Signature Section for Nalog dostava + montaža */}
+        {doc.type === 'nalog-dostava-montaza' && (
+          <View style={styles.signatureSection}>
+            {/* Row 1: Robu preuzeo */}
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <Text style={[styles.text, { width: 80 }]}>Robu preuzeo:</Text>
+              <View style={[styles.signatureLine, { flex: 1, marginTop: 0 }]} />
+              <Text style={[styles.text, { width: 40, textAlign: 'center' }]}>MP</Text>
+              <View style={[styles.signatureLine, { flex: 1, marginTop: 0 }]} />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: 80 }} />
+              <View style={{ flex: 1 }} />
+              <View style={{ width: 40 }} />
+              <View style={{ flex: 1, alignItems: 'center', marginTop: 2 }}>
+                <Text style={[styles.signatureLabel, { fontSize: 7 }] }>(potpis)</Text>
+              </View>
+            </View>
+
+            {/* Row 2: Za tvrtku */}
+            <View style={{ flexDirection: 'row', marginTop: 15 }}>
+              <Text style={[styles.text, { width: 80 }]}>Za tvrtku:</Text>
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                {doc.preparedBy && <Text style={styles.text}>{doc.preparedBy}</Text>}
+                <View style={[styles.signatureLine, { width: '100%', marginTop: 0 }]} />
+              </View>
+              <Text style={[styles.text, { width: 40, textAlign: 'center' }]}>MP</Text>
+              <View style={[styles.signatureLine, { flex: 1, marginTop: 0 }]} />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: 80 }} />
+              <View style={{ flex: 1 }} />
+              <View style={{ width: 40 }} />
+              <View style={{ flex: 1, alignItems: 'center', marginTop: 2 }}>
+                <Text style={[styles.signatureLabel, { fontSize: 7 }] }>(potpis)</Text>
+              </View>
+            </View>
+
+            {/* Monter 1 */}
+            <View style={{ marginTop: 20, alignItems: 'center' }}>
+              {doc.monter1 && <Text style={styles.text}>{doc.monter1}</Text>}
+              <View style={[styles.signatureLine, { width: 200, marginTop: 0 }]} />
+            </View>
+
+            {/* Monter 2 */}
+            <View style={{ marginTop: 12, alignItems: 'center' }}>
+              {doc.monter2 && <Text style={styles.text}>{doc.monter2}</Text>}
+              <View style={[styles.signatureLine, { width: 200, marginTop: 0 }]} />
+            </View>
+          </View>
+        )}
+
         {/* Footer */}
         <View style={styles.footer} fixed>
           <Text style={styles.footerLegal}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</Text>
