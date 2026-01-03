@@ -8,7 +8,7 @@ import {
   Font,
   pdf,
 } from '@react-pdf/renderer';
-import { format, addDays, isWeekend, isSaturday } from 'date-fns';
+import { format, addDays, isWeekend, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
 // Import header image as base64 for PDF embedding
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
     fontSize: 11,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   formValueEmpty: {
     flex: 1,
@@ -82,13 +83,29 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
     minHeight: 14,
   },
+  noteSection: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  noteLabel: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  noteText: {
+    fontSize: 9,
+    color: '#333',
+    lineHeight: 1.4,
+  },
   signatureSection: {
     marginTop: 50,
+    alignItems: 'center',
   },
   signatureRow: {
     flexDirection: 'row',
     marginBottom: 8,
     alignItems: 'flex-end',
+    width: '80%',
   },
   signatureLabel: {
     width: 180,
@@ -105,11 +122,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
     marginTop: 2,
+    width: '80%',
   },
   approvalSection: {
     marginTop: 40,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     gap: 40,
   },
@@ -143,7 +161,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   directorSection: {
-    marginTop: 50,
+    marginTop: 30,
+    alignItems: 'center',
   },
   footer: {
     position: 'absolute',
@@ -164,6 +183,11 @@ const styles = StyleSheet.create({
   },
 });
 
+export interface ExcludedDateInfo {
+  date: string;
+  reason: string;
+}
+
 interface LeaveRequestData {
   id: string;
   start_date: string;
@@ -173,6 +197,7 @@ interface LeaveRequestData {
   reason?: string | null;
   status: string;
   created_at: string;
+  excluded_dates?: ExcludedDateInfo[];
 }
 
 interface EmployeeData {
@@ -199,6 +224,45 @@ const generateDocNumber = (requestId: string, createdAt: string): string => {
   return `ZG${year}${shortId}`;
 };
 
+// Generate automatic note from excluded dates
+const generateAutomaticNote = (
+  excludedDates: ExcludedDateInfo[],
+  existingReason?: string | null
+): string => {
+  const parts: string[] = [];
+
+  // Radne subote (working Saturdays - not excluded from count)
+  const radneSubote = excludedDates
+    .filter(d => d.reason === 'radna_subota')
+    .map(d => format(parseISO(d.date), 'dd.MM.', { locale: hr }));
+  if (radneSubote.length > 0) {
+    parts.push(`Radne subote: ${radneSubote.join(', ')}`);
+  }
+
+  // Neradne subote (non-working Saturdays)
+  const neradneSubote = excludedDates
+    .filter(d => d.reason === 'neradna_subota')
+    .map(d => format(parseISO(d.date), 'dd.MM.', { locale: hr }));
+  if (neradneSubote.length > 0) {
+    parts.push(`Neradne subote: ${neradneSubote.join(', ')}`);
+  }
+
+  // Neradni dani (holidays)
+  const neradniDani = excludedDates
+    .filter(d => ['neradni_dan', 'blagdan', 'praznik'].includes(d.reason))
+    .map(d => format(parseISO(d.date), 'dd.MM.', { locale: hr }));
+  if (neradniDani.length > 0) {
+    parts.push(`Neradni dani: ${neradniDani.join(', ')}`);
+  }
+
+  // Add user's note if present
+  if (existingReason && existingReason.trim()) {
+    parts.push(existingReason.trim());
+  }
+
+  return parts.join(' | ');
+};
+
 // Leave Request PDF Component
 const LeaveRequestPDF = ({
   leaveRequest,
@@ -216,6 +280,12 @@ const LeaveRequestPDF = ({
   const dateTimeStr = format(now, "dd.MM.yyyy 'u' HH:mm", { locale: hr });
   const isApproved = leaveRequest.status === 'approved';
   const isRejected = leaveRequest.status === 'rejected';
+
+  // Generate combined note
+  const combinedNote = generateAutomaticNote(
+    leaveRequest.excluded_dates || [],
+    leaveRequest.reason
+  );
 
   return (
     <PDFDocument>
@@ -260,11 +330,11 @@ const LeaveRequestPDF = ({
           <Text style={styles.formValue}>{returnDate}</Text>
         </View>
 
-        {/* Reason if present */}
-        {leaveRequest.reason && (
-          <View style={styles.formRow}>
-            <Text style={styles.formLabel}>Napomena:</Text>
-            <Text style={styles.formValue}>{leaveRequest.reason}</Text>
+        {/* Note section - always shown if there's content */}
+        {combinedNote && (
+          <View style={styles.noteSection}>
+            <Text style={styles.noteLabel}>Napomena:</Text>
+            <Text style={styles.noteText}>{combinedNote}</Text>
           </View>
         )}
 
@@ -293,7 +363,7 @@ const LeaveRequestPDF = ({
         </View>
 
         {/* Signature - Department Head */}
-        <View style={[styles.signatureSection, { marginTop: 30 }]}>
+        <View style={styles.signatureSection}>
           <View style={styles.signatureRow}>
             <Text style={styles.signatureLabel}>Voditelj odjela:</Text>
             <View style={styles.signatureLine} />
