@@ -27,53 +27,53 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Roboto',
-    fontSize: 11,
+    fontSize: 10,
     paddingTop: 10,
-    paddingBottom: 80,
+    paddingBottom: 65,
     paddingHorizontal: 40,
     color: '#000',
   },
   header: {
-    marginBottom: 15,
+    marginBottom: 10,
   },
   headerImage: {
     width: '100%',
     height: 'auto',
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 15,
+    marginBottom: 20,
     letterSpacing: 1,
   },
   documentNumber: {
-    fontSize: 10,
+    fontSize: 9,
     textAlign: 'right',
-    marginBottom: 15,
+    marginBottom: 10,
     color: '#666',
   },
   dateLocation: {
-    fontSize: 10,
+    fontSize: 9,
     textAlign: 'right',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   formRow: {
     flexDirection: 'row',
-    marginBottom: 18,
+    marginBottom: 14,
     alignItems: 'center',
   },
   formLabel: {
-    width: 200,
-    fontSize: 11,
+    width: 180,
+    fontSize: 10,
   },
   formValue: {
     flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
     paddingBottom: 2,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -81,92 +81,96 @@ const styles = StyleSheet.create({
     flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-    minHeight: 14,
+    minHeight: 12,
   },
   noteSection: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 8,
+    marginBottom: 8,
   },
   noteLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   noteText: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#333',
     lineHeight: 1.4,
   },
   signatureSection: {
-    marginTop: 50,
-    alignItems: 'center',
+    marginTop: 30,
   },
   signatureRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 2,
     alignItems: 'flex-end',
-    width: '80%',
   },
   signatureLabel: {
-    width: 180,
-    fontSize: 11,
+    width: 150,
+    fontSize: 10,
   },
   signatureLine: {
     flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-    minHeight: 20,
+    minHeight: 16,
+  },
+  signatureHintContainer: {
+    flexDirection: 'row',
+    marginBottom: 0,
+  },
+  signatureHintSpacer: {
+    width: 150,
   },
   signatureHint: {
-    fontSize: 8,
+    flex: 1,
+    fontSize: 7,
     textAlign: 'center',
     color: '#666',
     marginTop: 2,
-    width: '80%',
   },
   approvalSection: {
-    marginTop: 40,
+    marginTop: 25,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 40,
+    gap: 30,
   },
   approvalLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   approvalOptions: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 25,
   },
   approvalOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   checkbox: {
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     borderWidth: 1,
     borderColor: '#333',
   },
   checkboxChecked: {
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     borderWidth: 1,
     borderColor: '#333',
     backgroundColor: '#333',
   },
   optionText: {
-    fontSize: 11,
+    fontSize: 10,
   },
   directorSection: {
-    marginTop: 30,
-    alignItems: 'center',
+    marginTop: 25,
   },
   footer: {
     position: 'absolute',
-    bottom: 25,
+    bottom: 20,
     left: 40,
     right: 40,
   },
@@ -344,7 +348,10 @@ const LeaveRequestPDF = ({
             <Text style={styles.signatureLabel}>Podnositelj zahtjeva:</Text>
             <View style={styles.signatureLine} />
           </View>
-          <Text style={styles.signatureHint}>(potpis)</Text>
+          <View style={styles.signatureHintContainer}>
+            <View style={styles.signatureHintSpacer} />
+            <Text style={styles.signatureHint}>(potpis)</Text>
+          </View>
         </View>
 
         {/* Approval Section */}
@@ -368,7 +375,10 @@ const LeaveRequestPDF = ({
             <Text style={styles.signatureLabel}>Voditelj odjela:</Text>
             <View style={styles.signatureLine} />
           </View>
-          <Text style={styles.signatureHint}>(potpis)</Text>
+          <View style={styles.signatureHintContainer}>
+            <View style={styles.signatureHintSpacer} />
+            <Text style={styles.signatureHint}>(potpis)</Text>
+          </View>
         </View>
 
         {/* Signature - Director */}
@@ -377,7 +387,10 @@ const LeaveRequestPDF = ({
             <Text style={styles.signatureLabel}>Direktor:</Text>
             <View style={styles.signatureLine} />
           </View>
-          <Text style={styles.signatureHint}>(potpis)</Text>
+          <View style={styles.signatureHintContainer}>
+            <View style={styles.signatureHintSpacer} />
+            <Text style={styles.signatureHint}>(potpis)</Text>
+          </View>
         </View>
 
         {/* Footer */}
