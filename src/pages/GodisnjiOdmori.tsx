@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend, isSameDay, isWithinInterval, parseISO, getDay, isSaturday } from 'date-fns';
 import { hr } from 'date-fns/locale';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -44,7 +44,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
+import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle, CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
@@ -122,6 +125,9 @@ const GodisnjiOdmori = () => {
   // Excluded dates state: Map<dateString, { excluded: boolean, reason: 'neradna_subota' | 'neradni_dan' }>
   const [saturdayExclusions, setSaturdayExclusions] = useState<Map<string, boolean>>(new Map());
   const [weekdayExclusions, setWeekdayExclusions] = useState<Set<string>>(new Set());
+  
+  // Ref to track if user has manually modified Saturday exclusions
+  const userModifiedSaturdays = useRef(false);
 
   // Data hooks
   const { employees } = useEmployees();
@@ -212,6 +218,9 @@ const GodisnjiOdmori = () => {
 
   // Initialize Saturday exclusions when dates change or employee changes
   useEffect(() => {
+    // Skip re-initialization if user has manually modified Saturday exclusions
+    if (userModifiedSaturdays.current) return;
+    
     if (!form.start_date || !form.end_date) {
       setSaturdayExclusions(new Map());
       return;
@@ -222,9 +231,9 @@ const GodisnjiOdmori = () => {
     
     // Default based on employee's works_saturday setting
     saturdays.forEach(dateStr => {
-      // Check if there's an existing exclusion for this Saturday
-      const existingNeradna = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'neradna_subota');
-      const existingRadna = existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'radna_subota');
+      // Check if there's an existing exclusion for this Saturday (only in edit mode)
+      const existingNeradna = editingItem ? existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'neradna_subota') : null;
+      const existingRadna = editingItem ? existingExcludedDates.find(ed => ed.date === dateStr && ed.reason === 'radna_subota') : null;
       
       if (existingNeradna) {
         // Explicitly marked as non-working
@@ -241,7 +250,7 @@ const GodisnjiOdmori = () => {
     });
     
     setSaturdayExclusions(newExclusions);
-  }, [form.start_date, form.end_date, worksSaturday, existingExcludedDates]);
+  }, [form.start_date, form.end_date, worksSaturday, existingExcludedDates, editingItem]);
 
   // Initialize weekday exclusions when editing
   useEffect(() => {
@@ -257,6 +266,7 @@ const GodisnjiOdmori = () => {
   }, [editingItem, existingExcludedDates]);
 
   const resetForm = () => {
+    userModifiedSaturdays.current = false;
     setForm({
       employee_id: '',
       start_date: '',
@@ -343,6 +353,7 @@ const GodisnjiOdmori = () => {
   };
 
   const toggleSaturdayExclusion = (dateStr: string) => {
+    userModifiedSaturdays.current = true;
     setSaturdayExclusions(prev => {
       const next = new Map(prev);
       next.set(dateStr, !prev.get(dateStr));
@@ -664,19 +675,71 @@ const GodisnjiOdmori = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Od *</Label>
-                <Input
-                  type="date"
-                  value={form.start_date}
-                  onChange={(e) => setForm(prev => ({ ...prev, start_date: e.target.value }))}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.start_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.start_date 
+                        ? format(parseISO(form.start_date), 'dd.MM.yyyy.', { locale: hr })
+                        : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={form.start_date ? parseISO(form.start_date) : undefined}
+                      onSelect={(date) => {
+                        userModifiedSaturdays.current = false;
+                        setForm(prev => ({ 
+                          ...prev, 
+                          start_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                        }));
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
                 <Label>Do *</Label>
-                <Input
-                  type="date"
-                  value={form.end_date}
-                  onChange={(e) => setForm(prev => ({ ...prev, end_date: e.target.value }))}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.end_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.end_date 
+                        ? format(parseISO(form.end_date), 'dd.MM.yyyy.', { locale: hr })
+                        : 'Odaberi datum'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={form.end_date ? parseISO(form.end_date) : undefined}
+                      onSelect={(date) => {
+                        userModifiedSaturdays.current = false;
+                        setForm(prev => ({ 
+                          ...prev, 
+                          end_date: date ? format(date, 'yyyy-MM-dd') : '' 
+                        }));
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             
