@@ -111,6 +111,7 @@ const GodisnjiOdmori = () => {
   
   // Calendar state
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [selectedDayDetail, setSelectedDayDetail] = useState<{ date: Date; leaves: LeaveRequestWithEmployee[] } | null>(null);
 
   // Form state
   const [form, setForm] = useState({
@@ -635,15 +636,16 @@ const GodisnjiOdmori = () => {
                     const isSaturday = dayOfWeek === 6;
                     
                     return (
-                      <div
+                        <div
                         key={day.toISOString()}
-                        className={`h-20 p-1 rounded border ${
+                        className={`h-20 p-1 rounded border cursor-pointer hover:border-primary/50 transition-colors ${
                           isSunday 
                             ? 'bg-muted/40' 
                             : isSaturday 
                               ? 'bg-muted/30' 
                               : 'bg-card'
                         } ${isToday ? 'border-primary' : 'border-border/50'}`}
+                        onClick={() => leaves.length > 0 && setSelectedDayDetail({ date: day, leaves })}
                       >
                         <div className={`text-xs font-medium mb-1 ${isToday ? 'text-primary' : isSunday ? 'text-red-500' : 'text-muted-foreground'}`}>
                           {format(day, 'd')}
@@ -915,6 +917,44 @@ const GodisnjiOdmori = () => {
               {editingItem ? 'Spremi' : 'Dodaj'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Day Detail Modal */}
+      <Dialog open={!!selectedDayDetail} onOpenChange={() => setSelectedDayDetail(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDayDetail && format(selectedDayDetail.date, 'EEEE, dd. MMMM yyyy.', { locale: hr })}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {selectedDayDetail?.leaves.map((leave) => (
+              <div
+                key={leave.id}
+                className={`p-3 rounded-lg border ${
+                  leave.status === 'approved'
+                    ? 'bg-green-500/10 border-green-500/30'
+                    : leave.status === 'pending'
+                    ? 'bg-yellow-500/10 border-yellow-500/30'
+                    : 'bg-red-500/10 border-red-500/30'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{leave.employee_name}</span>
+                  {getStatusBadge(leave.status)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {getLeaveTypeLabel(leave.leave_type)} • {format(parseISO(leave.start_date), 'dd.MM.', { locale: hr })} - {format(parseISO(leave.end_date), 'dd.MM.yyyy.', { locale: hr })}
+                </div>
+                {leave.reason && (
+                  <div className="text-sm text-muted-foreground mt-1 italic">
+                    {leave.reason}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
 
