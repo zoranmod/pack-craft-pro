@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2 } from 'lucide-react';
-import { Document, DocumentType, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
+import { Document, DocumentType, DocumentStatus, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,13 +21,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn, formatDateHR } from '@/lib/utils';
-import { useConvertDocument, useCopyDocument, useDeleteDocument } from '@/hooks/useDocuments';
+import { useConvertDocument, useCopyDocument, useDeleteDocument, useUpdateDocumentStatus } from '@/hooks/useDocuments';
 import { toast } from 'sonner';
 import { getDocumentTypeStyle } from '@/lib/documentTypeStyles';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplates } from '@/hooks/useDocumentTemplates';
+import { UI_VISIBLE_STATUSES, STATUS_LABELS } from '@/config/documentStatus';
 
 interface DocumentListProps {
   documents: Document[];
@@ -39,11 +47,20 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const convertDocument = useConvertDocument();
   const copyDocument = useCopyDocument();
   const deleteDocument = useDeleteDocument();
+  const updateDocumentStatus = useUpdateDocumentStatus();
   const { data: companySettings } = useCompanySettings();
   const { data: templates } = useDocumentTemplates();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
   const [pdfGeneratingId, setPdfGeneratingId] = useState<string | null>(null);
+
+  const handleQuickStatusChange = async (docId: string, docNumber: string, newStatus: DocumentStatus) => {
+    try {
+      await updateDocumentStatus.mutateAsync({ id: docId, status: newStatus, number: docNumber });
+    } catch (error) {
+      // Error toast handled in hook
+    }
+  };
   
   const filteredDocs = filter === 'all' 
     ? documents 
@@ -172,7 +189,23 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                   {formatDateHR(doc.date)}
                 </td>
                 <td className="px-6 py-4">
-                  <StatusBadge status={doc.status} />
+                  <Select
+                    value={doc.status}
+                    onValueChange={(newStatus) => handleQuickStatusChange(doc.id, doc.number, newStatus as DocumentStatus)}
+                  >
+                    <SelectTrigger className="w-[140px] h-8 border-transparent hover:border-border focus:border-border bg-transparent">
+                      <SelectValue>
+                        <StatusBadge status={doc.status} />
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UI_VISIBLE_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          <StatusBadge status={status} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </td>
                 <td className="px-6 py-4 text-right font-medium text-foreground">
                   {doc.totalAmount.toLocaleString('hr-HR')} €
