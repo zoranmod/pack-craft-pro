@@ -615,15 +615,32 @@ const ContractDocumentPDF = ({
           </View>
         )}
 
-        {/* Footer */}
+        {/* Footer (only on last page) */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerLegal}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</Text>
-          <Text style={styles.footerContent}>
-            www.akord-zupanja.hr • info@akord-zupanja.hr • Besplatan info tel: 0800 9455
-          </Text>
-          <Text style={styles.footerContent}>
-            Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900
-          </Text>
+          <Text
+            style={styles.footerLegal}
+            render={({ pageNumber, totalPages }) =>
+              pageNumber === totalPages
+                ? 'Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.'
+                : ''
+            }
+          />
+          <Text
+            style={styles.footerContent}
+            render={({ pageNumber, totalPages }) =>
+              pageNumber === totalPages
+                ? 'www.akord-zupanja.hr • info@akord-zupanja.hr • Besplatan info tel: 0800 9455'
+                : ''
+            }
+          />
+          <Text
+            style={styles.footerContent}
+            render={({ pageNumber, totalPages }) =>
+              pageNumber === totalPages
+                ? 'Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900'
+                : ''
+            }
+          />
         </View>
       </Page>
     </PDFDocument>
