@@ -301,6 +301,13 @@ const GodisnjiOdmori = () => {
     setIsAddOpen(true);
   };
 
+  const handleQuickStatusChange = async (id: string, newStatus: string) => {
+    await updateLeave.mutateAsync({
+      id,
+      status: newStatus,
+    });
+  };
+
   const handleSubmit = async () => {
     if (!form.employee_id || !form.start_date || !form.end_date) return;
     
@@ -533,7 +540,33 @@ const GodisnjiOdmori = () => {
                           </TableCell>
                           <TableCell>{item.days_requested}</TableCell>
                           <TableCell>{getLeaveTypeLabel(item.leave_type)}</TableCell>
-                          <TableCell>{getStatusBadge(item.status)}</TableCell>
+                          <TableCell>
+                            {hasFullAccess ? (
+                              <Select
+                                value={item.status}
+                                onValueChange={(newStatus) => handleQuickStatusChange(item.id, newStatus)}
+                              >
+                                <SelectTrigger className="w-[130px] h-8 text-xs">
+                                  <SelectValue>
+                                    {getStatusBadge(item.status)}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">
+                                    <Badge variant="secondary">Na čekanju</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="approved">
+                                    <Badge className="bg-green-500/20 text-green-700 dark:text-green-400">Odobren</Badge>
+                                  </SelectItem>
+                                  <SelectItem value="rejected">
+                                    <Badge variant="destructive">Odbijen</Badge>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              getStatusBadge(item.status)
+                            )}
+                          </TableCell>
                           <TableCell className="max-w-[200px] truncate text-muted-foreground">
                             {item.reason || '-'}
                           </TableCell>
