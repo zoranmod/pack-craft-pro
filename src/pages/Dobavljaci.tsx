@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Truck, Phone, Mail, MapPin, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Truck, Phone, Mail, MapPin, Building2, Upload } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, Supplier, CreateSupplierData } from '@/hooks/useSuppliers';
 import { useDebounce } from '@/hooks/useDebounce';
+import { SupplierImportDialog } from '@/components/suppliers/SupplierImportDialog';
 
 const emptyForm: CreateSupplierData = {
   name: '',
@@ -47,6 +48,7 @@ const Dobavljaci = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateSupplierData>(emptyForm);
@@ -110,10 +112,16 @@ const Dobavljaci = () => {
             placeholder="Pretraži dobavljače..."
             className="flex-1 max-w-md"
           />
-          <Button onClick={openNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Dodaj dobavljača
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsImportOpen(true)} className="gap-2">
+              <Upload className="h-4 w-4" />
+              Uvoz iz Excel-a
+            </Button>
+            <Button onClick={openNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Dodaj dobavljača
+            </Button>
+          </div>
         </div>
 
         {/* Supplier List */}
@@ -328,6 +336,9 @@ const Dobavljaci = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Dialog */}
+      <SupplierImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
     </MainLayout>
   );
 };
