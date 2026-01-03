@@ -786,7 +786,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
               {items.map((item, index) => (
                 <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3">
                   {/* First row - Name, Quantity, Unit */}
-                  <div className="grid gap-3 sm:grid-cols-12 items-end">
+                  <div className="grid gap-3 sm:grid-cols-12 items-start">
                     <div className={hasPrices ? "sm:col-span-6" : "sm:col-span-6"}>
                       <Label>Naziv</Label>
                       <div className="mt-1.5">
