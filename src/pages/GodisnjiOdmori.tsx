@@ -44,7 +44,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle, CalendarIcon } from 'lucide-react';
+import { Calendar, List, Plus, Search, X, Edit, Trash2, Users, CalendarDays, ChevronLeft, ChevronRight, AlertCircle, CalendarIcon, FileDown } from 'lucide-react';
+import { generateAndDownloadLeaveRequestPdf } from '@/lib/leaveRequestPdfGenerator';
+import { toast } from 'sonner';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -587,6 +589,24 @@ const GodisnjiOdmori = () => {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Preuzmi PDF"
+                                onClick={async () => {
+                                  const emp = employeeMap.get(item.employee_id);
+                                  if (emp) {
+                                    try {
+                                      await generateAndDownloadLeaveRequestPdf(item, emp);
+                                      toast.success('PDF zahtjeva je uspješno generiran');
+                                    } catch (error) {
+                                      toast.error('Greška pri generiranju PDF-a');
+                                    }
+                                  }
+                                }}
+                              >
+                                <FileDown className="h-4 w-4" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
