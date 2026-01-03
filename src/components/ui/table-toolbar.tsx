@@ -10,8 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { documentStatusLabels } from '@/types/document';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { UI_VISIBLE_STATUSES, STATUS_LABELS } from '@/config/documentStatus';
+
+// Status styles matching StatusBadge component
+const statusStyles: Record<string, string> = {
+  draft: 'bg-muted text-muted-foreground',
+  sent: 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400',
+  accepted: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400',
+  completed: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400',
+  cancelled: 'bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400',
+};
 
 interface TableToolbarProps {
   // Status filter
@@ -73,13 +83,16 @@ export function TableToolbar({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Svi statusi</SelectItem>
-                  {Object.entries(documentStatusLabels)
-                    .filter(([value]) => !['rejected', 'pending'].includes(value))
-                    .map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
+                  {UI_VISIBLE_STATUSES.map((status) => (
+                    <SelectItem key={status} value={status} className="py-2">
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium",
+                        statusStyles[status]
+                      )}>
+                        {STATUS_LABELS[status]}
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </>
