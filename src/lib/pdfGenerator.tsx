@@ -422,16 +422,20 @@ const StandardDocumentPDF = ({
               </View>
             </View>
 
-            {/* Monter 1 */}
-            <View style={{ marginTop: 20, alignItems: 'center' }}>
-              {doc.monter1 && <Text style={styles.text}>{doc.monter1}</Text>}
-              <View style={[styles.signatureLine, { width: 200, marginTop: 0 }]} />
+            {/* Monter 1 - left aligned like preview */}
+            <View style={{ marginTop: 20, flexDirection: 'row', paddingLeft: 60 }}>
+              <View style={{ width: 200, alignItems: 'center' }}>
+                {doc.monter1 && <Text style={styles.text}>{doc.monter1}</Text>}
+                <View style={[styles.signatureLine, { width: '100%', marginTop: 0 }]} />
+              </View>
             </View>
 
-            {/* Monter 2 */}
-            <View style={{ marginTop: 12, alignItems: 'center' }}>
-              {doc.monter2 && <Text style={styles.text}>{doc.monter2}</Text>}
-              <View style={[styles.signatureLine, { width: 200, marginTop: 0 }]} />
+            {/* Monter 2 - left aligned like preview */}
+            <View style={{ marginTop: 12, flexDirection: 'row', paddingLeft: 60 }}>
+              <View style={{ width: 200, alignItems: 'center' }}>
+                {doc.monter2 && <Text style={styles.text}>{doc.monter2}</Text>}
+                <View style={[styles.signatureLine, { width: '100%', marginTop: 0 }]} />
+              </View>
             </View>
           </View>
         )}
