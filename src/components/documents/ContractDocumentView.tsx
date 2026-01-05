@@ -95,7 +95,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
           {/* Intro */}
           <div className="mb-5 text-sm leading-relaxed">
             <p>
-              U Zagrebu, dana {formatDateHR(document.date)} godine, sklapaju:
+              U Županji, dana {formatDateHR(document.date)} godine, sklapaju:
             </p>
           </div>
 
@@ -129,11 +129,11 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
 
           {/* Contract Articles */}
           <div className="space-y-4">
-            {sortedArticles.map(article => <div key={article.id} className="text-sm">
+            {sortedArticles.map(article => <div key={article.id} className="text-sm text-center">
                 <p className="font-bold mb-1">
                   Članak {article.articleNumber}.
                 </p>
-                {article.title && <p className="font-semibold uppercase mb-1 text-center">
+                {article.title && <p className="font-semibold uppercase mb-1">
                     {article.title}
                   </p>}
                 <div className="leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{
