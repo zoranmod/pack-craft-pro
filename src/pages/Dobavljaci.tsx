@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Truck, Phone, Mail, MapPin, Building2, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Truck, Phone, Mail, MapPin, Building2, Upload, Copy } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -26,6 +26,9 @@ import {
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, Supplier, CreateSupplierData } from '@/hooks/useSuppliers';
 import { useDebounce } from '@/hooks/useDebounce';
 import { SupplierImportDialog } from '@/components/suppliers/SupplierImportDialog';
+import { DuplicateCheckerDialog } from '@/components/shared/DuplicateCheckerDialog';
+import { getDuplicateCount } from '@/lib/duplicateUtils';
+import { toast } from '@/hooks/use-toast';
 
 const emptyForm: CreateSupplierData = {
   name: '',
@@ -49,9 +52,13 @@ const Dobavljaci = () => {
   const debouncedSearch = useDebounce(search, 300);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isDuplicateCheckOpen, setIsDuplicateCheckOpen] = useState(false);
+  const [isDeletingDuplicates, setIsDeletingDuplicates] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateSupplierData>(emptyForm);
+
+  const { groupCount: duplicateGroupCount } = getDuplicateCount(suppliers);
 
   const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -101,6 +108,27 @@ const Dobavljaci = () => {
     }
   };
 
+  const handleDeleteDuplicates = async (idsToDelete: string[]) => {
+    setIsDeletingDuplicates(true);
+    try {
+      for (const id of idsToDelete) {
+        await deleteSupplier.mutateAsync(id);
+      }
+      toast({
+        title: 'Duplikati obrisani',
+        description: `Uspješno obrisano ${idsToDelete.length} duplikata.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Greška',
+        description: 'Nije moguće obrisati sve duplikate.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeletingDuplicates(false);
+    }
+  };
+
   return (
     <MainLayout title="Dobavljači" subtitle="Upravljajte bazom dobavljača">
       <div className="space-y-6">
@@ -113,6 +141,19 @@ const Dobavljaci = () => {
             className="flex-1 max-w-md"
           />
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDuplicateCheckOpen(true)} 
+              className="gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Duplikati
+              {duplicateGroupCount > 0 && (
+                <span className="ml-1 bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {duplicateGroupCount}
+                </span>
+              )}
+            </Button>
             <Button variant="outline" onClick={() => setIsImportOpen(true)} className="gap-2">
               <Upload className="h-4 w-4" />
               Uvoz iz Excel-a
@@ -339,6 +380,16 @@ const Dobavljaci = () => {
 
       {/* Import Dialog */}
       <SupplierImportDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
+
+      {/* Duplicate Checker Dialog */}
+      <DuplicateCheckerDialog
+        open={isDuplicateCheckOpen}
+        onOpenChange={setIsDuplicateCheckOpen}
+        entities={suppliers}
+        entityType="supplier"
+        onDeleteDuplicates={handleDeleteDuplicates}
+        isDeleting={isDeletingDuplicates}
+      />
     </MainLayout>
   );
 };
