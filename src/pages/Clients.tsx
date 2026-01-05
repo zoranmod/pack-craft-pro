@@ -29,6 +29,7 @@ import { useClients, useCreateClient, useUpdateClient, useDeleteClient, Client, 
 import { useDebounce } from '@/hooks/useDebounce';
 import { DuplicateCheckerDialog } from '@/components/shared/DuplicateCheckerDialog';
 import { getDuplicateCount } from '@/lib/duplicateUtils';
+import { useIgnoredDuplicates } from '@/hooks/useIgnoredDuplicates';
 import { toast } from '@/hooks/use-toast';
 
 const emptyForm: CreateClientData = {
@@ -59,7 +60,8 @@ const Clients = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateClientData>(emptyForm);
 
-  const { groupCount: duplicateGroupCount } = getDuplicateCount(clients);
+  const { isGroupIgnored } = useIgnoredDuplicates('client');
+  const { groupCount: duplicateGroupCount } = getDuplicateCount(clients, isGroupIgnored);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||

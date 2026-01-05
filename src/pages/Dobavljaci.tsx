@@ -28,6 +28,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { SupplierImportDialog } from '@/components/suppliers/SupplierImportDialog';
 import { DuplicateCheckerDialog } from '@/components/shared/DuplicateCheckerDialog';
 import { getDuplicateCount } from '@/lib/duplicateUtils';
+import { useIgnoredDuplicates } from '@/hooks/useIgnoredDuplicates';
 import { toast } from '@/hooks/use-toast';
 
 const emptyForm: CreateSupplierData = {
@@ -58,7 +59,8 @@ const Dobavljaci = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateSupplierData>(emptyForm);
 
-  const { groupCount: duplicateGroupCount } = getDuplicateCount(suppliers);
+  const { isGroupIgnored } = useIgnoredDuplicates('supplier');
+  const { groupCount: duplicateGroupCount } = getDuplicateCount(suppliers, isGroupIgnored);
 
   const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
