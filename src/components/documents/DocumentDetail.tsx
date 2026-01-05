@@ -287,7 +287,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             )}
             {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
           </Button>
-          <Link to={`/documents/${id}/edit`}>
+          <Link to={isContract ? `/documents/${id}/edit-contract` : `/documents/${id}/edit`}>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
               Uredi
