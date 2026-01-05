@@ -520,7 +520,7 @@ const ContractDocumentPDF = ({
 
         {/* Intro */}
         <Text style={[styles.text, { marginBottom: 10 }]}>
-          U Zagrebu, dana {formatDateHR(doc.date)} godine, sklapaju:
+          U Županji, dana {formatDateHR(doc.date)} godine, sklapaju:
         </Text>
 
         {/* Seller */}
@@ -552,13 +552,13 @@ const ContractDocumentPDF = ({
         {/* Contract Articles */}
         {sortedArticles.map((article) => (
           <View key={article.id} style={{ marginBottom: 10 }}>
-            <Text style={styles.textBold}>Članak {article.articleNumber}.</Text>
+            <Text style={[styles.textBold, { textAlign: 'center' }]}>Članak {article.articleNumber}.</Text>
             {article.title && (
               <Text style={[styles.textBold, { textAlign: 'center', textTransform: 'uppercase', marginBottom: 4 }]}>
                 {article.title}
               </Text>
             )}
-            <Text style={[styles.text, { lineHeight: 1.4 }]}>
+            <Text style={[styles.text, { lineHeight: 1.4, textAlign: 'center' }]}>
               {replacePlaceholders(article.content)}
             </Text>
           </View>
