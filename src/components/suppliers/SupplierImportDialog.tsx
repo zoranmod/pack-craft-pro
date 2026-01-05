@@ -227,25 +227,30 @@ export function SupplierImportDialog({ open, onOpenChange }: SupplierImportDialo
 
   const previewData = excelData.slice(0, 5);
 
-  const MappingSelect = ({ label, value, field, required = false }: { label: string; value: string; field: keyof ColumnMapping; required?: boolean }) => (
-    <div>
-      <Label>{label}{required && ' *'}</Label>
-      <Select 
-        value={value || (required ? "" : "__skip__")} 
-        onValueChange={(v) => setMapping({ ...mapping, [field]: v === "__skip__" ? "" : v })}
-      >
-        <SelectTrigger className="mt-1.5">
-          <SelectValue placeholder={required ? "Odaberi stupac *" : "Odaberi stupac"} />
-        </SelectTrigger>
-        <SelectContent>
-          {!required && <SelectItem value="__skip__">-- Preskoči --</SelectItem>}
-          {columns.map(col => (
-            <SelectItem key={col} value={col}>{col}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
+  const MappingSelect = ({ label, value, field, required = false }: { label: string; value: string; field: keyof ColumnMapping; required?: boolean }) => {
+    // For Radix Select, we need a non-empty value or undefined for placeholder to show
+    const selectValue = value || (required ? undefined : "__skip__");
+    
+    return (
+      <div>
+        <Label>{label}{required && ' *'}</Label>
+        <Select 
+          value={selectValue}
+          onValueChange={(v) => setMapping({ ...mapping, [field]: v === "__skip__" ? "" : v })}
+        >
+          <SelectTrigger className="mt-1.5">
+            <SelectValue placeholder={required ? "Odaberi stupac *" : "Odaberi stupac"} />
+          </SelectTrigger>
+          <SelectContent>
+            {!required && <SelectItem value="__skip__">-- Preskoči --</SelectItem>}
+            {columns.map(col => (
+              <SelectItem key={col} value={col}>{col}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
