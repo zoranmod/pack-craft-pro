@@ -231,11 +231,11 @@ export function SupplierImportDialog({ open, onOpenChange }: SupplierImportDialo
     <div>
       <Label>{label}{required && ' *'}</Label>
       <Select 
-        value={value || "__skip__"} 
+        value={value || (required ? "" : "__skip__")} 
         onValueChange={(v) => setMapping({ ...mapping, [field]: v === "__skip__" ? "" : v })}
       >
         <SelectTrigger className="mt-1.5">
-          <SelectValue placeholder="Odaberi stupac" />
+          <SelectValue placeholder={required ? "Odaberi stupac *" : "Odaberi stupac"} />
         </SelectTrigger>
         <SelectContent>
           {!required && <SelectItem value="__skip__">-- Preskoči --</SelectItem>}
@@ -329,6 +329,12 @@ export function SupplierImportDialog({ open, onOpenChange }: SupplierImportDialo
                 </p>
               )}
             </div>
+            
+            {!mapping.name && (
+              <p className="text-sm text-destructive">
+                Morate odabrati stupac za Naziv kako biste nastavili s uvozom.
+              </p>
+            )}
           </div>
         )}
 
