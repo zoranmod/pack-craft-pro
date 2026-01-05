@@ -1157,6 +1157,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ignored_duplicates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          entity_id_1: string
+          entity_id_2: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          entity_id_1: string
+          entity_id_2: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          entity_id_1?: string
+          entity_id_2?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       leave_request_excluded_dates: {
         Row: {
           created_at: string

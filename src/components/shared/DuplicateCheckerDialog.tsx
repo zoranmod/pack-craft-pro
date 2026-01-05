@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Copy, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Copy, Trash2, Check, AlertTriangle, CheckCheck } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { findDuplicates, getDuplicateCount } from '@/lib/duplicateUtils';
+import { useIgnoredDuplicates } from '@/hooks/useIgnoredDuplicates';
 import { format } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -44,26 +45,34 @@ export function DuplicateCheckerDialog<T extends Entity>({
   isDeleting = false,
 }: DuplicateCheckerDialogProps<T>) {
   const [selectedToKeep, setSelectedToKeep] = useState<Record<string, string>>({});
+  const { ignoreDuplicate, isIgnoring, isGroupIgnored } = useIgnoredDuplicates(entityType);
   
   const duplicates = useMemo(() => findDuplicates(entities), [entities]);
-  const { groupCount, totalDuplicates } = useMemo(
-    () => getDuplicateCount(entities),
-    [entities]
-  );
 
-  const duplicateGroups = useMemo(() => {
-    return Array.from(duplicates.entries()).map(([normalizedName, group]) => ({
-      normalizedName,
-      items: group.sort((a, b) => 
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      ),
-    }));
-  }, [duplicates]);
+  // Filter out ignored duplicate groups
+  const activeDuplicateGroups = useMemo(() => {
+    const groups = Array.from(duplicates.entries())
+      .map(([normalizedName, group]) => ({
+        normalizedName,
+        items: group.sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        ),
+      }))
+      .filter(group => !isGroupIgnored(group.items.map(item => item.id)));
+    
+    return groups;
+  }, [duplicates, isGroupIgnored]);
+
+  const groupCount = activeDuplicateGroups.length;
+  const totalDuplicates = activeDuplicateGroups.reduce(
+    (sum, group) => sum + group.items.length - 1,
+    0
+  );
 
   // Initialize selectedToKeep with the oldest item in each group
   useMemo(() => {
     const initial: Record<string, string> = {};
-    duplicateGroups.forEach(group => {
+    activeDuplicateGroups.forEach(group => {
       if (!selectedToKeep[group.normalizedName] && group.items.length > 0) {
         initial[group.normalizedName] = group.items[0].id;
       }
@@ -71,12 +80,12 @@ export function DuplicateCheckerDialog<T extends Entity>({
     if (Object.keys(initial).length > 0) {
       setSelectedToKeep(prev => ({ ...prev, ...initial }));
     }
-  }, [duplicateGroups]);
+  }, [activeDuplicateGroups]);
 
   const handleDeleteSelected = async () => {
     const idsToDelete: string[] = [];
     
-    duplicateGroups.forEach(group => {
+    activeDuplicateGroups.forEach(group => {
       const keepId = selectedToKeep[group.normalizedName];
       group.items.forEach(item => {
         if (item.id !== keepId) {
@@ -91,8 +100,12 @@ export function DuplicateCheckerDialog<T extends Entity>({
     }
   };
 
+  const handleKeepBoth = (group: { normalizedName: string; items: T[] }) => {
+    const entityIds = group.items.map(item => item.id);
+    ignoreDuplicate(entityIds);
+  };
+
   const entityLabel = entityType === 'supplier' ? 'dobavljača' : 'klijenata';
-  const entityLabelSingular = entityType === 'supplier' ? 'dobavljač' : 'klijent';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -130,7 +143,7 @@ export function DuplicateCheckerDialog<T extends Entity>({
 
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-6">
-                  {duplicateGroups.map((group) => (
+                  {activeDuplicateGroups.map((group) => (
                     <div
                       key={group.normalizedName}
                       className="border border-border rounded-lg p-4 space-y-3"
@@ -139,9 +152,21 @@ export function DuplicateCheckerDialog<T extends Entity>({
                         <h4 className="font-medium text-foreground capitalize">
                           "{group.items[0].name}"
                         </h4>
-                        <Badge variant="secondary">
-                          {group.items.length} zapisa
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary">
+                            {group.items.length} zapisa
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleKeepBoth(group)}
+                            disabled={isIgnoring}
+                            className="gap-1.5"
+                          >
+                            <CheckCheck className="h-3.5 w-3.5" />
+                            Zadrži sve
+                          </Button>
+                        </div>
                       </div>
 
                       <RadioGroup

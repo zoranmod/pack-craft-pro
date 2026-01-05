@@ -39,18 +39,25 @@ export function findDuplicates<T extends { id: string; name: string }>(
  * Get total count of duplicate items
  */
 export function getDuplicateCount<T extends { id: string; name: string }>(
-  items: T[]
+  items: T[],
+  isGroupIgnored?: (ids: string[]) => boolean
 ): { groupCount: number; totalDuplicates: number } {
   const duplicates = findDuplicates(items);
+  let groupCount = 0;
   let totalDuplicates = 0;
   
   duplicates.forEach(group => {
+    // Skip ignored groups if callback provided
+    if (isGroupIgnored && isGroupIgnored(group.map(item => item.id))) {
+      return;
+    }
+    groupCount++;
     // Count all but one as "duplicates" (extras beyond the original)
     totalDuplicates += group.length - 1;
   });
   
   return {
-    groupCount: duplicates.size,
+    groupCount,
     totalDuplicates,
   };
 }
