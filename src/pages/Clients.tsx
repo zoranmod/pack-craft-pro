@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2, Copy } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -27,6 +27,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient, Client, CreateClientData } from '@/hooks/useClients';
 import { useDebounce } from '@/hooks/useDebounce';
+import { DuplicateCheckerDialog } from '@/components/shared/DuplicateCheckerDialog';
+import { getDuplicateCount } from '@/lib/duplicateUtils';
+import { toast } from '@/hooks/use-toast';
 
 const emptyForm: CreateClientData = {
   name: '',
@@ -50,9 +53,13 @@ const Clients = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDuplicateCheckOpen, setIsDuplicateCheckOpen] = useState(false);
+  const [isDeletingDuplicates, setIsDeletingDuplicates] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateClientData>(emptyForm);
+
+  const { groupCount: duplicateGroupCount } = getDuplicateCount(clients);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -103,6 +110,27 @@ const Clients = () => {
     }
   };
 
+  const handleDeleteDuplicates = async (idsToDelete: string[]) => {
+    setIsDeletingDuplicates(true);
+    try {
+      for (const id of idsToDelete) {
+        await deleteClient.mutateAsync(id);
+      }
+      toast({
+        title: 'Duplikati obrisani',
+        description: `Uspješno obrisano ${idsToDelete.length} duplikata.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Greška',
+        description: 'Nije moguće obrisati sve duplikate.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeletingDuplicates(false);
+    }
+  };
+
   return (
     <MainLayout title="Klijenti" subtitle="Upravljajte bazom klijenata">
       <div className="space-y-6">
@@ -114,10 +142,25 @@ const Clients = () => {
             placeholder="Pretraži klijente..."
             className="flex-1 max-w-md"
           />
-          <Button onClick={openNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Dodaj klijenta
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDuplicateCheckOpen(true)} 
+              className="gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Duplikati
+              {duplicateGroupCount > 0 && (
+                <span className="ml-1 bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {duplicateGroupCount}
+                </span>
+              )}
+            </Button>
+            <Button onClick={openNew} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Dodaj klijenta
+            </Button>
+          </div>
         </div>
 
         {/* Client List */}
@@ -356,6 +399,16 @@ const Clients = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Duplicate Checker Dialog */}
+      <DuplicateCheckerDialog
+        open={isDuplicateCheckOpen}
+        onOpenChange={setIsDuplicateCheckOpen}
+        entities={clients}
+        entityType="client"
+        onDeleteDuplicates={handleDeleteDuplicates}
+        isDeleting={isDeletingDuplicates}
+      />
     </MainLayout>
   );
 };
