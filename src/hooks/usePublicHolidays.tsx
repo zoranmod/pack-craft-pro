@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { PublicHoliday } from '@/types/calendar';
 import { toast } from 'sonner';
+import { format, addDays } from 'date-fns';
 
 const mapDbToHoliday = (row: any): PublicHoliday => ({
   id: row.id,
@@ -17,6 +18,7 @@ const mapDbToHoliday = (row: any): PublicHoliday => ({
 });
 
 // Calculate Easter Sunday using Anonymous Gregorian algorithm
+// Returns date in local timezone to avoid UTC conversion issues
 function calculateEaster(year: number): Date {
   const a = year % 19;
   const b = Math.floor(year / 100);
@@ -32,7 +34,13 @@ function calculateEaster(year: number): Date {
   const m = Math.floor((a + 11 * h + 22 * l) / 451);
   const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
-  return new Date(year, month - 1, day);
+  // Create date at noon to avoid timezone issues
+  return new Date(year, month - 1, day, 12, 0, 0);
+}
+
+// Format date to YYYY-MM-DD without timezone conversion
+function formatDateLocal(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
 }
 
 // Get Croatian holidays for a year
@@ -56,18 +64,15 @@ function getCroatianHolidays(year: number): Array<{ date: string; name: string }
   const easter = calculateEaster(year);
   
   // Easter Sunday
-  const easterStr = easter.toISOString().split('T')[0];
-  holidays.push({ date: easterStr, name: 'Uskrs' });
+  holidays.push({ date: formatDateLocal(easter), name: 'Uskrs' });
   
   // Easter Monday (Easter + 1 day)
-  const easterMonday = new Date(easter);
-  easterMonday.setDate(easter.getDate() + 1);
-  holidays.push({ date: easterMonday.toISOString().split('T')[0], name: 'Uskrsni ponedjeljak' });
+  const easterMonday = addDays(easter, 1);
+  holidays.push({ date: formatDateLocal(easterMonday), name: 'Uskrsni ponedjeljak' });
   
   // Corpus Christi / Tijelovo (Easter + 60 days)
-  const corpusChristi = new Date(easter);
-  corpusChristi.setDate(easter.getDate() + 60);
-  holidays.push({ date: corpusChristi.toISOString().split('T')[0], name: 'Tijelovo' });
+  const corpusChristi = addDays(easter, 60);
+  holidays.push({ date: formatDateLocal(corpusChristi), name: 'Tijelovo' });
   
   return holidays;
 }
