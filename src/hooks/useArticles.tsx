@@ -224,6 +224,54 @@ export function useDeleteArticle() {
   });
 }
 
+export function useDeleteAllArticles() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const logActivity = useLogActivity();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+      
+      // Soft delete all articles for this user
+      const { error } = await supabase
+        .from('articles')
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user.id,
+        })
+        .is('deleted_at', null);
+
+      if (error) throw error;
+      
+      // Get count of affected rows
+      const { count } = await supabase
+        .from('articles')
+        .select('id', { count: 'exact', head: true })
+        .eq('deleted_by', user.id)
+        .not('deleted_at', 'is', null);
+      
+      return count || 0;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+      queryClient.invalidateQueries({ queryKey: ['article-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['trash'] });
+      toast.success(`Obrisano ${count} artikala`);
+      
+      logActivity.mutate({
+        action_type: 'delete',
+        entity_type: 'article',
+        entity_id: 'bulk-delete',
+        entity_name: `Bulk delete (${count} artikala)`,
+      });
+    },
+    onError: (error) => {
+      toast.error('Greška pri brisanju artikala: ' + error.message);
+    },
+  });
+}
+
 // Hook for fetching only templates (excluding deleted)
 export function useArticleTemplates() {
   const { user } = useAuth();
