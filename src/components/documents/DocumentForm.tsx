@@ -29,6 +29,7 @@ import { Article, useSaveAsTemplate } from '@/hooks/useArticles';
 import { useDefaultTemplate, useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useSettings';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
 
 // Helper function to calculate item totals with rounding
 const calculateItemTotals = (item: Omit<DocumentItem, 'id'>) => {
@@ -53,6 +54,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
   // Get current user info for auto-fill
   const { user } = useAuth();
   const { data: userProfile } = useUserProfile();
+  const { employee } = useCurrentEmployee();
 
   // Determine document type: fixedType > URL param > default
   const typeParam = searchParams.get('type');
@@ -69,8 +71,13 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
   const updateDocument = useUpdateDocument();
   const { data: existingDocument, isLoading: isLoadingDocument } = useDocument(documentId || '');
   
-  // Get display name for auto-fill
+  // Get display name for auto-fill - prioritize employee data, then user profile
   const getCurrentUserDisplayName = () => {
+    // First check if user is an employee
+    if (employee?.first_name || employee?.last_name) {
+      return [employee.first_name, employee.last_name].filter(Boolean).join(' ');
+    }
+    // Then check user profile (for owner/admin)
     if (userProfile?.first_name || userProfile?.last_name) {
       return [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ');
     }
@@ -186,16 +193,18 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
   // Auto-fill preparedBy with current user's full name when creating new document
   useEffect(() => {
     if (!isEditMode) {
-      // Only auto-fill if we have the full name from user profile
-      const fullName = userProfile?.first_name || userProfile?.last_name
-        ? [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ')
-        : null;
+      // Priority: employee name > user profile name
+      const fullName = employee?.first_name || employee?.last_name
+        ? [employee.first_name, employee.last_name].filter(Boolean).join(' ')
+        : userProfile?.first_name || userProfile?.last_name
+          ? [userProfile.first_name, userProfile.last_name].filter(Boolean).join(' ')
+          : null;
       
       if (fullName && !formData.preparedBy) {
         setFormData(prev => ({ ...prev, preparedBy: fullName }));
       }
     }
-  }, [isEditMode, userProfile]);
+  }, [isEditMode, employee, userProfile]);
 
 
   // Contract articles state
