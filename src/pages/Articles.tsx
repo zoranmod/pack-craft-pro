@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Upload, ChevronLeft, ChevronRight, Bookmark, Trash } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -43,7 +43,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, Article, CreateArticleData } from '@/hooks/useArticles';
+import { useArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, useDeleteAllArticles, Article, CreateArticleData } from '@/hooks/useArticles';
 import { ArticleImportDialog } from '@/components/articles/ArticleImportDialog';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -82,11 +82,13 @@ const Articles = () => {
   const createArticle = useCreateArticle();
   const updateArticle = useUpdateArticle();
   const deleteArticle = useDeleteArticle();
+  const deleteAllArticles = useDeleteAllArticles();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteAllConfirm, setDeleteAllConfirm] = useState(false);
   const [formData, setFormData] = useState<CreateArticleData>(emptyForm);
 
   const openNew = () => {
@@ -131,6 +133,11 @@ const Articles = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    await deleteAllArticles.mutateAsync();
+    setDeleteAllConfirm(false);
+  };
+
   return (
     <MainLayout title="Artikli" subtitle="Upravljajte bazom artikala">
       <div className="space-y-6">
@@ -143,6 +150,12 @@ const Articles = () => {
             className="flex-1 max-w-md"
           />
           <div className="flex gap-2">
+            {totalCount > 0 && (
+              <Button onClick={() => setDeleteAllConfirm(true)} variant="outline" className="gap-2 text-destructive hover:text-destructive">
+                <Trash className="h-4 w-4" />
+                Obriši sve
+              </Button>
+            )}
             <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2">
               <Upload className="h-4 w-4" />
               Uvoz iz Excel-a
@@ -481,6 +494,29 @@ const Articles = () => {
             <AlertDialogCancel>Odustani</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete All Confirmation */}
+      <AlertDialog open={deleteAllConfirm} onOpenChange={setDeleteAllConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Obrisati sve artikle?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ova radnja će obrisati svih <strong>{totalCount.toLocaleString('hr-HR')}</strong> artikala.
+              Artikli će biti premješteni u kantu za smeće.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Odustani</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteAll} 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteAllArticles.isPending}
+            >
+              {deleteAllArticles.isPending ? 'Brisanje...' : 'Obriši sve'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
