@@ -42,15 +42,16 @@ function parseSettingsValue(value: Json | null): Partial<DocumentHeaderFooterSet
   return value as unknown as Partial<DocumentHeaderFooterSettings>;
 }
 
-// Fetch global document header settings
+// Fetch global document header settings - RLS handles access control
 export function useDocumentHeaderSettings() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['document-settings', 'global_document_header', user?.id],
+    queryKey: ['document-settings', 'global_document_header'],
     queryFn: async () => {
       if (!user) return defaultHeaderSettings;
 
+      // RLS policies handle access control - employees see owner's settings
       const { data, error } = await supabase
         .from('document_settings')
         .select('setting_value')
@@ -73,15 +74,16 @@ export function useDocumentHeaderSettings() {
   });
 }
 
-// Fetch global document footer settings
+// Fetch global document footer settings - RLS handles access control
 export function useDocumentFooterSettings() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['document-settings', 'global_document_footer', user?.id],
+    queryKey: ['document-settings', 'global_document_footer'],
     queryFn: async () => {
       if (!user) return defaultFooterSettings;
 
+      // RLS policies handle access control - employees see owner's settings
       const { data, error } = await supabase
         .from('document_settings')
         .select('setting_value')

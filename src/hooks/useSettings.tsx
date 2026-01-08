@@ -14,14 +14,14 @@ export function useCompanySettings() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['company-settings', user?.id],
+    queryKey: ['company-settings'],
     queryFn: async () => {
       if (!user) return null;
 
+      // RLS policies handle access control - employees see owner's settings
       const { data, error } = await supabase
         .from('company_settings')
         .select('*')
-        .eq('user_id', user.id)
         .maybeSingle();
 
       if (error) throw error;
