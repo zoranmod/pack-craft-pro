@@ -865,10 +865,15 @@ const GodisnjiOdmori = () => {
                       selected={form.start_date ? parseISO(form.start_date) : undefined}
                       onSelect={(date) => {
                         userModifiedSaturdays.current = false;
-                        setForm(prev => ({ 
-                          ...prev, 
-                          start_date: date ? format(date, 'yyyy-MM-dd') : '' 
-                        }));
+                        const startDateStr = date ? format(date, 'yyyy-MM-dd') : '';
+                        setForm(prev => {
+                          const newState = { ...prev, start_date: startDateStr };
+                          // Ako je end_date prazan ili manji od start_date, postavi na start_date
+                          if (date && (!prev.end_date || parseISO(prev.end_date) < date)) {
+                            newState.end_date = startDateStr;
+                          }
+                          return newState;
+                        });
                       }}
                       initialFocus
                       className="pointer-events-auto"
@@ -904,6 +909,7 @@ const GodisnjiOdmori = () => {
                           end_date: date ? format(date, 'yyyy-MM-dd') : '' 
                         }));
                       }}
+                      disabled={(date) => form.start_date ? date < parseISO(form.start_date) : false}
                       initialFocus
                       className="pointer-events-auto"
                     />

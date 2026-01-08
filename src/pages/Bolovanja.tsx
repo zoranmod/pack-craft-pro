@@ -500,7 +500,17 @@ const Bolovanja = () => {
                   <Input
                     type="date"
                     value={form.start_date}
-                    onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+                    onChange={(e) => {
+                      const newStartDate = e.target.value;
+                      setForm(prev => {
+                        const newState = { ...prev, start_date: newStartDate };
+                        // Ako je end_date prazan ili manji od start_date, postavi na start_date
+                        if (newStartDate && (!prev.end_date || prev.end_date < newStartDate)) {
+                          newState.end_date = newStartDate;
+                        }
+                        return newState;
+                      });
+                    }}
                   />
                 </div>
                 <div>
@@ -508,6 +518,7 @@ const Bolovanja = () => {
                   <Input
                     type="date"
                     value={form.end_date}
+                    min={form.start_date || undefined}
                     onChange={(e) => setForm({ ...form, end_date: e.target.value })}
                   />
                 </div>
