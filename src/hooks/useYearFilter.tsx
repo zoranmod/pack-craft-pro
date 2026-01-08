@@ -8,11 +8,12 @@ const YEAR_STORAGE_KEY = 'akord_year_filter';
 
 export type YearFilter = number | 'all';
 
-async function fetchAvailableYears(userId: string): Promise<number[]> {
+async function fetchAvailableYears(): Promise<number[]> {
+  // Don't filter by user_id - RLS policies handle access control
+  // This allows employees to see all years from documents they have access to
   const { data, error } = await supabase
     .from('documents')
     .select('date')
-    .eq('user_id', userId)
     .is('deleted_at', null);
 
   if (error) throw error;
@@ -54,8 +55,8 @@ export function useYearFilter() {
 
   // Fetch available years from database
   const { data: availableYears = [] } = useQuery({
-    queryKey: ['available-years', user?.id],
-    queryFn: () => fetchAvailableYears(user!.id),
+    queryKey: ['available-years'],
+    queryFn: () => fetchAvailableYears(),
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
