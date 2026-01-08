@@ -73,7 +73,8 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
 
 // Generate document number based on type with sequential counter
 // Format: PON-0001/25 (PREFIX-NNNN/YY)
-const generateDocumentNumber = async (type: DocumentType, userId: string): Promise<string> => {
+// Note: RLS policies handle access control, so we don't filter by user_id
+const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
   const prefixes: Record<DocumentType, string> = {
     'otpremnica': 'OTP',
     'ponuda': 'PON',
@@ -88,11 +89,11 @@ const generateDocumentNumber = async (type: DocumentType, userId: string): Promi
   // Pattern to match: PREFIX-NNNN/YY (e.g., PON-0001/25)
   const searchPattern = `${prefix}-%/${yearSuffix}`;
   
-  // Get all documents for this type, year, and user to find the highest number
+  // Get all documents for this type and year to find the highest number
+  // RLS policies handle access control - employees see owner's documents
   const { data: existingDocs } = await supabase
     .from('documents')
     .select('number')
-    .eq('user_id', userId)
     .like('number', searchPattern)
     .order('number', { ascending: false })
     .limit(1);
@@ -201,7 +202,7 @@ export function useCreateDocument() {
       const totalAmount = data.items.reduce((sum, item) => sum + item.total, 0);
 
       // Generate sequential document number
-      const documentNumber = await generateDocumentNumber(data.type, user.id);
+      const documentNumber = await generateDocumentNumber(data.type);
 
       // Create document
       const { data: doc, error: docError } = await supabase
@@ -446,7 +447,7 @@ export function useConvertDocument() {
       const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
 
       // Generate sequential document number
-      const documentNumber = await generateDocumentNumber(targetType, user.id);
+      const documentNumber = await generateDocumentNumber(targetType);
 
       // Build notes with source document reference
       const sourceNote = `Kreirano iz dokumenta: ${sourceDocument.number}`;
@@ -562,7 +563,7 @@ export function useCopyDocument() {
       const totalAmount = sourceDocument.items.reduce((sum, item) => sum + item.total, 0);
 
       // Generate new sequential document number for the same type
-      const documentNumber = await generateDocumentNumber(sourceDocument.type, user.id);
+      const documentNumber = await generateDocumentNumber(sourceDocument.type);
 
       // Create new document with data from source
       const { data: doc, error: docError } = await supabase

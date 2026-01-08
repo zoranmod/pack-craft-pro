@@ -24,15 +24,16 @@ function parseSettingsValue(value: Json | null): Partial<PonudaLayoutSettings> {
   return value as unknown as Partial<PonudaLayoutSettings>;
 }
 
-// Fetch ponuda layout settings
+// Fetch ponuda layout settings - RLS handles access control
 export function usePonudaLayoutSettings() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['document-settings', 'ponuda_layout', user?.id],
+    queryKey: ['document-settings', 'ponuda_layout'],
     queryFn: async () => {
       if (!user) return defaultPonudaLayoutSettings;
 
+      // RLS policies handle access control - employees see owner's settings
       const { data, error } = await supabase
         .from('document_settings')
         .select('setting_value')

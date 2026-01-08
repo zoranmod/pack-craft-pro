@@ -4,19 +4,19 @@ import { ContractArticleTemplate, DocumentContractArticle, defaultContractArticl
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
-// Fetch all contract article templates for the current user
+// Fetch all contract article templates - RLS handles access control
 export function useContractArticleTemplates() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['contract-article-templates', user?.id],
+    queryKey: ['contract-article-templates'],
     queryFn: async () => {
       if (!user?.id) return [];
 
+      // RLS policies handle access control - employees see owner's templates
       const { data, error } = await supabase
         .from('contract_article_templates')
         .select('*')
-        .eq('user_id', user.id)
         .order('article_number', { ascending: true });
 
       if (error) throw error;
@@ -46,7 +46,7 @@ export function useDocumentContractArticles(documentId: string) {
   });
 }
 
-// Initialize default templates for a user
+// Initialize default templates - checks if any templates exist (via RLS)
 export function useInitializeDefaultTemplates() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -55,11 +55,10 @@ export function useInitializeDefaultTemplates() {
     mutationFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      // Check if user already has templates
+      // Check if templates already exist (RLS returns owner's templates for employees)
       const { data: existingTemplates, error: checkError } = await supabase
         .from('contract_article_templates')
         .select('id')
-        .eq('user_id', user.id)
         .limit(1);
 
       if (checkError) throw checkError;
@@ -68,7 +67,8 @@ export function useInitializeDefaultTemplates() {
         return { alreadyExists: true };
       }
 
-      // Insert default templates
+      // Insert default templates - only owner should do this
+      // RLS will prevent employees from inserting
       const templatesWithUserId = defaultContractArticles.map(template => ({
         ...template,
         user_id: user.id,
