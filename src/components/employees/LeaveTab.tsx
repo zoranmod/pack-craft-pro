@@ -93,6 +93,14 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
   // Auto-calculate days when dates change
   const handleDateChange = (field: 'start_date' | 'end_date', value: string) => {
     const newForm = { ...requestForm, [field]: value };
+    
+    // Ako se mijenja start_date i end_date je prazan/manji, postavi end_date
+    if (field === 'start_date' && value) {
+      if (!requestForm.end_date || requestForm.end_date < value) {
+        newForm.end_date = value;
+      }
+    }
+    
     if (newForm.start_date && newForm.end_date) {
       newForm.days_requested = calculateWorkingDays(newForm.start_date, newForm.end_date, worksSaturday);
     }
@@ -598,6 +606,7 @@ export function LeaveTab({ employeeId }: LeaveTabProps) {
                       mode="single"
                       selected={requestForm.end_date ? new Date(requestForm.end_date) : undefined}
                       onSelect={(date) => handleDateChange('end_date', date ? format(date, 'yyyy-MM-dd') : '')}
+                      disabled={(date) => requestForm.start_date ? date < new Date(requestForm.start_date) : false}
                       locale={hr}
                       className="pointer-events-auto"
                     />
