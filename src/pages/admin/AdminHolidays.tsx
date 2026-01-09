@@ -31,7 +31,7 @@ import {
   Loader2,
   AlertTriangle
 } from 'lucide-react';
-import { usePublicHolidays, useCreatePublicHoliday, useUpdatePublicHoliday, useDeletePublicHoliday } from '@/hooks/usePublicHolidays';
+import { usePublicHolidays, useCreateHoliday, useUpdateHoliday, useDeleteHoliday } from '@/hooks/usePublicHolidays';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
@@ -53,9 +53,9 @@ const AdminHolidays = () => {
   });
 
   const { data: holidays, isLoading, refetch } = usePublicHolidays(parseInt(selectedYear));
-  const createHoliday = useCreatePublicHoliday();
-  const updateHoliday = useUpdatePublicHoliday();
-  const deleteHoliday = useDeletePublicHoliday();
+  const createHoliday = useCreateHoliday();
+  const updateHoliday = useUpdateHoliday();
+  const deleteHoliday = useDeleteHoliday();
 
   const handleOpenDialog = (holiday?: any) => {
     if (holiday) {
@@ -63,7 +63,7 @@ const AdminHolidays = () => {
       setForm({
         name: holiday.name,
         date: holiday.date,
-        is_non_working: holiday.is_non_working,
+        is_non_working: holiday.isNonWorking,
       });
     } else {
       setEditingHoliday(null);
@@ -87,17 +87,13 @@ const AdminHolidays = () => {
         await updateHoliday.mutateAsync({
           id: editingHoliday.id,
           name: form.name,
-          date: form.date,
-          is_non_working: form.is_non_working,
+          isNonWorking: form.is_non_working,
         });
         toast.success('Blagdan ažuriran');
       } else {
         await createHoliday.mutateAsync({
           name: form.name,
           date: form.date,
-          is_non_working: form.is_non_working,
-          source: 'manual',
-          country_code: 'HR',
         });
         toast.success('Blagdan dodan');
       }
@@ -117,8 +113,8 @@ const AdminHolidays = () => {
     }
   };
 
-  const automaticHolidays = holidays?.filter(h => h.source === 'automatic') || [];
-  const manualHolidays = holidays?.filter(h => h.source === 'manual') || [];
+  const automaticHolidays = holidays?.filter(h => h.source === 'auto') || [];
+  const manualHolidays = holidays?.filter(h => h.source === 'admin') || [];
 
   return (
     <MainLayout title="Blagdani" subtitle="Upravljanje neradnim danima i praznicima">
@@ -288,17 +284,17 @@ const AdminHolidays = () => {
                       </TableCell>
                       <TableCell>{holiday.name}</TableCell>
                       <TableCell>
-                        <Badge variant={holiday.source === 'automatic' ? 'secondary' : 'outline'}>
-                          {holiday.source === 'automatic' ? 'Automatski' : 'Ručni'}
+                        <Badge variant={holiday.source === 'auto' ? 'secondary' : 'outline'}>
+                          {holiday.source === 'auto' ? 'Automatski' : 'Ručni'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={holiday.is_non_working ? 'default' : 'outline'}>
-                          {holiday.is_non_working ? 'Da' : 'Ne'}
+                        <Badge variant={holiday.isNonWorking ? 'default' : 'outline'}>
+                          {holiday.isNonWorking ? 'Da' : 'Ne'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {holiday.source === 'manual' && (
+                        {holiday.source === 'admin' && (
                           <div className="flex items-center gap-1">
                             <Button
                               variant="ghost"
