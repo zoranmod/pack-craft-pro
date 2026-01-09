@@ -32,7 +32,7 @@ const AdminDashboard = () => {
   // Filter documents by selected year if needed
   const currentYearDocs = selectedYear === 'all' 
     ? documents 
-    : documents?.filter(d => new Date(d.date).getFullYear().toString() === selectedYear);
+    : documents?.filter(d => new Date(d.date).getFullYear() === selectedYear);
 
   const stats = [
     { label: 'Dokumenti', value: currentYearDocs?.length || 0, icon: FileText, suffix: selectedYear !== 'all' ? ` (${selectedYear})` : '' },

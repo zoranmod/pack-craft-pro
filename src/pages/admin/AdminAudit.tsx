@@ -15,7 +15,7 @@ import {
   Info
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useTrash } from '@/hooks/useTrash';
+import { useTrashItems } from '@/hooks/useTrash';
 
 interface AuditResult {
   category: string;
@@ -29,7 +29,7 @@ interface AuditResult {
 const AdminAudit = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [results, setResults] = useState<AuditResult[]>([]);
-  const { trashedDocuments, isLoading: trashLoading } = useTrash();
+  const { data: trashedDocuments } = useTrashItems('documents');
 
   const runAudit = async () => {
     setIsRunning(true);
