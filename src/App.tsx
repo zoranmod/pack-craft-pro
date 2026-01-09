@@ -37,6 +37,15 @@ import GodisnjiOdmori from "./pages/GodisnjiOdmori";
 import RadnaOdjeca from "./pages/RadnaOdjeca";
 import Bolovanja from "./pages/Bolovanja";
 import AdminQA from "./pages/AdminQA";
+import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
+import {
+  AdminDashboard,
+  AdminSettings,
+  AdminTemplates,
+  AdminUsers,
+  AdminHolidays,
+  AdminAudit
+} from "./pages/admin";
 
 const queryClient = new QueryClient();
 
@@ -80,7 +89,14 @@ const App = () => (
                 <Route path="/settings/templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
                 <Route path="/settings/templates/new" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
                 <Route path="/settings/templates/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
-                <Route path="/admin/qa" element={<ProtectedRoute><AdminQA /></ProtectedRoute>} />
+                {/* Admin routes - protected by AdminProtectedRoute */}
+                <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+                <Route path="/admin/settings" element={<AdminProtectedRoute><AdminSettings /></AdminProtectedRoute>} />
+                <Route path="/admin/templates" element={<AdminProtectedRoute><AdminTemplates /></AdminProtectedRoute>} />
+                <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+                <Route path="/admin/holidays" element={<AdminProtectedRoute><AdminHolidays /></AdminProtectedRoute>} />
+                <Route path="/admin/qa" element={<AdminProtectedRoute><AdminQA /></AdminProtectedRoute>} />
+                <Route path="/admin/audit" element={<AdminProtectedRoute><AdminAudit /></AdminProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

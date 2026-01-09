@@ -20,7 +20,10 @@ import {
   ChevronRight,
   Stethoscope,
   Plus,
-  ClipboardList
+  ClipboardList,
+  Shield,
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -30,6 +33,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useCurrentEmployee } from '@/hooks/useCurrentEmployee';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,6 +103,21 @@ const bottomItems: NavItem[] = [
   { icon: Trash2, label: 'Kanta za smeće', path: '/trash' },
 ];
 
+// Admin navigation group
+const adminNavGroup: NavGroup = {
+  id: 'admin',
+  label: 'Admin',
+  items: [
+    { icon: LayoutDashboard, label: 'Pregled', path: '/admin' },
+    { icon: Settings, label: 'Postavke', path: '/admin/settings' },
+    { icon: FileText, label: 'Predlošci', path: '/admin/templates' },
+    { icon: Users, label: 'Korisnici', path: '/admin/users' },
+    { icon: Calendar, label: 'Blagdani', path: '/admin/holidays' },
+    { icon: CheckCircle, label: 'QA provjera', path: '/admin/qa' },
+    { icon: AlertTriangle, label: 'Audit', path: '/admin/audit' },
+  ],
+};
+
 interface SidebarProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -110,8 +129,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   const { data: companySettings } = useCompanySettings();
+  const { isAdmin, hasFullAccess } = useCurrentEmployee();
   const [newDocMenuOpen, setNewDocMenuOpen] = useState(false);
   const navPointerHandledRef = useRef(false);
+  
+  const showAdminSection = isAdmin || hasFullAccess;
   
   const STORAGE_KEY = 'sidebar-expanded-groups';
   
@@ -352,6 +374,31 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             </CollapsibleContent>
           </Collapsible>
         ))}
+
+        {/* Admin section - only visible to admins */}
+        {showAdminSection && (
+          <Collapsible
+            open={expandedGroups['admin']}
+            onOpenChange={() => toggleGroup('admin')}
+          >
+            <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 mt-2 text-[11px] font-semibold uppercase tracking-wider text-primary/70 hover:text-primary transition-colors duration-150">
+              <span className="flex items-center gap-1">
+                <Shield className="h-3 w-3" />
+                {adminNavGroup.label}
+              </span>
+              {expandedGroups['admin'] ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-0.5 mt-0.5">
+              {adminNavGroup.items.map((item) => (
+                <NavItem key={item.path} item={item} />
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
       </nav>
 
       {/* Bottom Items (Trash) */}
