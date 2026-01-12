@@ -1299,6 +1299,56 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_id: string | null
+          due_date: string
+          id: string
+          is_dismissed: boolean
+          is_sent: boolean
+          reminder_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_id?: string | null
+          due_date: string
+          id?: string
+          is_dismissed?: boolean
+          is_sent?: boolean
+          reminder_type?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_id?: string | null
+          due_date?: string
+          id?: string
+          is_dismissed?: boolean
+          is_sent?: boolean
+          reminder_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           created_at: string

@@ -23,7 +23,8 @@ import {
   ClipboardList,
   Shield,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logoLight from '@/assets/logo.png';
@@ -90,6 +91,7 @@ const navGroups: NavGroup[] = [
     id: 'pregledi',
     label: 'Pregledi',
     items: [
+      { icon: BarChart3, label: 'Izvještaji', path: '/reports' },
       { icon: Palmtree, label: 'Godišnji odmori', path: '/godisnji-odmori' },
       { icon: Stethoscope, label: 'Bolovanja', path: '/bolovanja' },
       { icon: Shirt, label: 'Radna odjeća', path: '/radna-odjeca' },
