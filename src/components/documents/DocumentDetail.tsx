@@ -22,6 +22,8 @@ import { DocumentType } from '@/types/document';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import { usePonudaLayoutSettings, useSavePonudaLayoutSettings, defaultPonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
+import { useDocumentChain } from '@/hooks/useDocumentChain';
+import { DocumentChain } from './DocumentChain';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +78,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const updateStatus = useUpdateDocumentStatus();
   const convertDocument = useConvertDocument();
   const deleteDocument = useDeleteDocument();
+  const { data: documentChain, isLoading: isLoadingChain } = useDocumentChain(document?.id);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
@@ -381,6 +384,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </div>
             </div>
           </div>
+
+          {/* Document Chain */}
+          <DocumentChain 
+            chain={documentChain} 
+            isLoading={isLoadingChain} 
+            currentDocumentId={document.id} 
+          />
 
           {/* Convert Document Panel */}
           <div className="bg-card rounded-xl border border-border p-6">
