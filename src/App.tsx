@@ -37,6 +37,7 @@ import GodisnjiOdmori from "./pages/GodisnjiOdmori";
 import RadnaOdjeca from "./pages/RadnaOdjeca";
 import Bolovanja from "./pages/Bolovanja";
 import AdminQA from "./pages/AdminQA";
+import Reports from "./pages/Reports";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
   AdminDashboard,
@@ -78,6 +79,7 @@ const App = () => (
                 <Route path="/bolovanja" element={<ProtectedRoute><Bolovanja /></ProtectedRoute>} />
                 <Route path="/radna-odjeca" element={<ProtectedRoute><RadnaOdjeca /></ProtectedRoute>} />
                 <Route path="/trash" element={<ProtectedRoute><Trash /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
                 <Route path="/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />

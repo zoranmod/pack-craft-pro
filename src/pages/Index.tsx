@@ -7,6 +7,8 @@ import { ActivityLogList } from '@/components/activity/ActivityLogList';
 import { DeadlinesSection } from '@/components/dashboard/DeadlinesSection';
 import { AnalyticsSection } from '@/components/dashboard/AnalyticsSection';
 import { CollapsibleSection } from '@/components/dashboard/CollapsibleSection';
+import { RemindersWidget } from '@/components/dashboard/RemindersWidget';
+import { HRStatsSection } from '@/components/dashboard/HRStatsSection';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useClients } from '@/hooks/useClients';
 import { useAuth } from '@/hooks/useAuth';
@@ -110,6 +112,16 @@ const Index = () => {
             <ActivityLogList limit={12} />
           </div>
         </CollapsibleSection>
+      </div>
+
+      {/* Reminders Section */}
+      <div className="mb-6">
+        <RemindersWidget />
+      </div>
+
+      {/* HR Stats Section */}
+      <div className="mb-6">
+        <HRStatsSection />
       </div>
 
       {/* Bottom Sections - Deadlines & Analytics */}

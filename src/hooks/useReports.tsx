@@ -38,8 +38,8 @@ export interface ReportFilters {
 
 export function useClientReport(filters?: ReportFilters) {
   const { user } = useAuth();
-  const ownerQuery = useOwnerUserId();
-  const effectiveUserId = ownerQuery.data || user?.id;
+  const ownerUserId = useOwnerUserId();
+  const effectiveUserId = ownerUserId || user?.id;
 
   return useQuery({
     queryKey: ['client-report', effectiveUserId, filters],
@@ -97,7 +97,7 @@ export function useClientReport(filters?: ReportFilters) {
 
 export function useConversionReport(filters?: ReportFilters) {
   const { user } = useAuth();
-  const { data: ownerUserId } = useOwnerUserId();
+  const ownerUserId = useOwnerUserId();
   const effectiveUserId = ownerUserId || user?.id;
 
   return useQuery({
@@ -168,7 +168,7 @@ export function useConversionReport(filters?: ReportFilters) {
 
 export function useMonthlyReport(filters?: ReportFilters) {
   const { user } = useAuth();
-  const { data: ownerUserId } = useOwnerUserId();
+  const ownerUserId = useOwnerUserId();
   const effectiveUserId = ownerUserId || user?.id;
 
   return useQuery({
