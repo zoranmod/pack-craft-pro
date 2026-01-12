@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Edit2, Trash2, Star, StarOff, Loader2 } from 'lucide-react';
+import { Plus, FileText, Edit2, Trash2, Star, StarOff, Loader2, FileCode } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -109,19 +109,33 @@ const DocumentTemplates = () => {
                               {documentTypeLabels[template.document_type as DocumentType]}
                             </CardDescription>
                           </div>
-                          {template.is_default && (
-                            <Badge variant="secondary">Zadani</Badge>
-                          )}
+                          <div className="flex gap-1">
+                            {template.use_wysiwyg && (
+                              <Badge variant="outline" className="text-xs">
+                                <FileCode className="h-3 w-3 mr-1" />
+                                WYSIWYG
+                              </Badge>
+                            )}
+                            {template.is_default && (
+                              <Badge variant="secondary">Zadani</Badge>
+                            )}
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <div className="text-sm text-muted-foreground space-y-1">
-                          <p>Font: {template.font_family}</p>
-                          <p>Stupci tablice: {template.table_columns?.length || 0}</p>
-                          <p>
-                            {template.show_logo ? '✓ Logo' : '✗ Logo'} | 
-                            {template.show_signature_line ? ' ✓ Potpis' : ' ✗ Potpis'}
-                          </p>
+                          {template.use_wysiwyg ? (
+                            <p className="text-primary">Slobodno uređivanje sadržaja</p>
+                          ) : (
+                            <>
+                              <p>Font: {template.font_family}</p>
+                              <p>Stupci tablice: {template.table_columns?.length || 0}</p>
+                              <p>
+                                {template.show_logo ? '✓ Logo' : '✗ Logo'} | 
+                                {template.show_signature_line ? ' ✓ Potpis' : ' ✗ Potpis'}
+                              </p>
+                            </>
+                          )}
                         </div>
                         <div className="flex gap-2 mt-4">
                           <Button
