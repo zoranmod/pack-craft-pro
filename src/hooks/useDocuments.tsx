@@ -46,6 +46,7 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   deliveryAddress: row.delivery_address,
   monter1: row.monter1,
   monter2: row.monter2,
+  customHtmlContent: row.custom_html_content,
   items: items.map(item => ({
     id: item.id,
     name: item.name,
