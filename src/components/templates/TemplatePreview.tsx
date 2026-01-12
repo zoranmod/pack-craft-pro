@@ -4,6 +4,7 @@ import { documentTypeLabels, DocumentType } from '@/types/document';
 import { MemorandumHeader } from '@/components/documents/MemorandumHeader';
 import { MemorandumFooter } from '@/components/documents/MemorandumFooter';
 import { formatDateHR } from '@/lib/utils';
+import DOMPurify from 'dompurify';
 
 interface TemplatePreviewProps {
   template: CreateDocumentTemplate;
@@ -28,9 +29,57 @@ const mockItems = [
   { rbr: 2, sifra: 'ART-002', naziv: 'Primjer artikla 2', jmj: 'kom', kolicina: 1, cijena: 200, rabat: 0, cijena_s_rabatom: 200, pdv: 25, pdv_iznos: 50, ukupno: 250 },
 ];
 
+// Helper to replace placeholders in WYSIWYG content
+const replacePlaceholders = (content: string, template: CreateDocumentTemplate): string => {
+  const replacements: Record<string, string> = {
+    '{vrsta_dokumenta}': documentTypeLabels[template.document_type as DocumentType] || 'Dokument',
+    '{broj_dokumenta}': 'PON-2025-0001',
+    '{datum}': formatDateHR(new Date()),
+    '{ime_klijenta}': 'Primjer Kupac d.o.o.',
+    '{adresa_klijenta}': 'Ulica 123, 10000 Zagreb',
+    '{oib_klijenta}': '12345678901',
+    '{ukupno}': '475,00',
+    '{tablica_stavki}': '<em>(Tablica stavki će biti prikazana ovdje)</em>',
+  };
+  
+  let result = content;
+  Object.entries(replacements).forEach(([placeholder, value]) => {
+    result = result.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+  });
+  return result;
+};
+
 export const TemplatePreview = ({ template }: TemplatePreviewProps) => {
   const { data: companySettings } = useCompanySettings();
 
+  // WYSIWYG mode - render custom HTML content
+  if (template.use_wysiwyg && template.html_content) {
+    const processedContent = replacePlaceholders(template.html_content, template);
+    const sanitizedContent = DOMPurify.sanitize(processedContent);
+    
+    return (
+      <div
+        className="a4-page"
+        style={{
+          fontFamily: template.font_family,
+          fontSize: `${template.body_font_size}px`,
+        }}
+      >
+        <div className="doc-body">
+          <MemorandumHeader />
+          <div 
+            className="prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          />
+        </div>
+        <div className="doc-footer">
+          <MemorandumFooter />
+        </div>
+      </div>
+    );
+  }
+
+  // Structured mode - original rendering
   // Otpremnica i nalog za dostavu/montažu ne bi trebali prikazivati novčane iznose
   const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(template.document_type as DocumentType);
   const tableColumns = template.table_columns || ['rbr', 'naziv', 'jmj', 'kolicina'];

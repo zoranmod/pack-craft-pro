@@ -10,6 +10,10 @@ export interface DocumentTemplate {
   name: string;
   is_default: boolean;
   
+  // WYSIWYG mode
+  use_wysiwyg: boolean;
+  html_content: string | null;
+  
   // Header
   show_logo: boolean;
   header_layout: string;
@@ -57,6 +61,8 @@ export type CreateDocumentTemplate = Omit<DocumentTemplate, 'id' | 'user_id' | '
 
 const defaultTemplate: Omit<CreateDocumentTemplate, 'document_type' | 'name'> = {
   is_default: false,
+  use_wysiwyg: false,
+  html_content: null,
   show_logo: true,
   header_layout: 'left-right',
   show_company_info: true,

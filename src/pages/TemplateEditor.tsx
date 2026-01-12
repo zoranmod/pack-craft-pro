@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, FileCode, Settings } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,8 +26,30 @@ import {
 import { documentTypeLabels, DocumentType } from '@/types/document';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
 import { TableColumnsEditor } from '@/components/templates/TableColumnsEditor';
+import { WysiwygEditor } from '@/components/contracts/WysiwygEditor';
+import { Badge } from '@/components/ui/badge';
 
 const documentTypes: DocumentType[] = ['ponuda', 'ugovor', 'otpremnica', 'racun', 'nalog-dostava-montaza'];
+
+const getDefaultWysiwygContent = () => `
+<h1 style="text-align: center;">{vrsta_dokumenta} br. {broj_dokumenta}</h1>
+
+<p><strong>Datum:</strong> {datum}</p>
+<p><strong>Klijent:</strong> {ime_klijenta}</p>
+<p><strong>Adresa:</strong> {adresa_klijenta}</p>
+
+<h2>Stavke</h2>
+<p>{tablica_stavki}</p>
+
+<h2>Ukupno</h2>
+<p><strong>Ukupan iznos:</strong> {ukupno} EUR</p>
+
+<hr />
+
+<p style="text-align: center; font-size: 0.875em; color: #666;">
+Dokument je kreiran u sustavu za upravljanje dokumentima.
+</p>
+`;
 
 const TemplateEditor = () => {
   const navigate = useNavigate();
@@ -108,7 +130,6 @@ const TemplateEditor = () => {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Editor */}
           <div className="space-y-6">
-            {/* Basic Info */}
             <Card>
               <CardHeader>
                 <CardTitle>Osnovni podaci</CardTitle>
@@ -155,10 +176,54 @@ const TemplateEditor = () => {
                     onCheckedChange={(checked) => updateField('is_default', checked)}
                   />
                 </div>
+                <div className="flex items-center justify-between border-t pt-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Label>WYSIWYG editor</Label>
+                      {template.use_wysiwyg && (
+                        <Badge variant="secondary" className="text-xs">
+                          <FileCode className="h-3 w-3 mr-1" />
+                          Slobodno uređivanje
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Omogućuje potpunu slobodu u dizajnu dokumenta
+                    </p>
+                  </div>
+                  <Switch
+                    checked={template.use_wysiwyg}
+                    onCheckedChange={(checked) => updateField('use_wysiwyg', checked)}
+                  />
+                </div>
               </CardContent>
             </Card>
 
-            <Tabs defaultValue="header">
+            {template.use_wysiwyg ? (
+              /* WYSIWYG Editor Mode */
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileCode className="h-5 w-5" />
+                    Sadržaj dokumenta
+                  </CardTitle>
+                  <CardDescription>
+                    Koristite editor za potpunu kontrolu nad izgledom dokumenta. 
+                    Dostupni placeholderi: {'{'}broj_dokumenta{'}'}, {'{'}datum{'}'}, {'{'}ime_klijenta{'}'}, {'{'}adresa_klijenta{'}'}, {'{'}ukupno{'}'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <WysiwygEditor
+                    content={template.html_content || getDefaultWysiwygContent()}
+                    onChange={(content) => updateField('html_content', content)}
+                    placeholder="Dizajnirajte svoj dokument..."
+                    editorClassName="min-h-[500px]"
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              /* Structured Template Mode */
+              <Tabs defaultValue="header">
               <TabsList className="w-full">
                 <TabsTrigger value="header" className="flex-1">Zaglavlje</TabsTrigger>
                 <TabsTrigger value="metadata" className="flex-1">Podaci</TabsTrigger>
@@ -460,6 +525,7 @@ const TemplateEditor = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+            )}
           </div>
 
           {/* Preview */}

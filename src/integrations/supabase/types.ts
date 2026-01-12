@@ -582,6 +582,7 @@ export type Database = {
           footer_note: string | null
           header_font_size: number | null
           header_layout: string | null
+          html_content: string | null
           id: string
           is_default: boolean | null
           name: string
@@ -606,6 +607,7 @@ export type Database = {
           show_validity_days: boolean | null
           table_columns: Json | null
           updated_at: string | null
+          use_wysiwyg: boolean | null
           user_id: string
         }
         Insert: {
@@ -620,6 +622,7 @@ export type Database = {
           footer_note?: string | null
           header_font_size?: number | null
           header_layout?: string | null
+          html_content?: string | null
           id?: string
           is_default?: boolean | null
           name: string
@@ -644,6 +647,7 @@ export type Database = {
           show_validity_days?: boolean | null
           table_columns?: Json | null
           updated_at?: string | null
+          use_wysiwyg?: boolean | null
           user_id: string
         }
         Update: {
@@ -658,6 +662,7 @@ export type Database = {
           footer_note?: string | null
           header_font_size?: number | null
           header_layout?: string | null
+          html_content?: string | null
           id?: string
           is_default?: boolean | null
           name?: string
@@ -682,6 +687,7 @@ export type Database = {
           show_validity_days?: boolean | null
           table_columns?: Json | null
           updated_at?: string | null
+          use_wysiwyg?: boolean | null
           user_id?: string
         }
         Relationships: []
