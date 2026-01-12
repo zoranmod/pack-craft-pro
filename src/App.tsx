@@ -38,6 +38,8 @@ import RadnaOdjeca from "./pages/RadnaOdjeca";
 import Bolovanja from "./pages/Bolovanja";
 import AdminQA from "./pages/AdminQA";
 import Reports from "./pages/Reports";
+import ContractLayoutTemplates from "./pages/ContractLayoutTemplates";
+import ContractLayoutEditor from "./pages/ContractLayoutEditor";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
   AdminDashboard,
@@ -70,6 +72,9 @@ const App = () => (
                 <Route path="/print/:id" element={<ProtectedRoute><PrintDocument /></ProtectedRoute>} />
                 <Route path="/ponude" element={<ProtectedRoute><Ponude /></ProtectedRoute>} />
                 <Route path="/ugovori" element={<ProtectedRoute><Ugovori /></ProtectedRoute>} />
+                <Route path="/ugovori/predlosci" element={<ProtectedRoute><ContractLayoutTemplates /></ProtectedRoute>} />
+                <Route path="/ugovori/predlosci/novi" element={<ProtectedRoute><ContractLayoutEditor /></ProtectedRoute>} />
+                <Route path="/ugovori/predlosci/:id" element={<ProtectedRoute><ContractLayoutEditor /></ProtectedRoute>} />
                 <Route path="/otpremnice" element={<ProtectedRoute><Otpremnice /></ProtectedRoute>} />
                 <Route path="/nalozi" element={<ProtectedRoute><Nalozi /></ProtectedRoute>} />
                 <Route path="/racuni" element={<ProtectedRoute><Racuni /></ProtectedRoute>} />
