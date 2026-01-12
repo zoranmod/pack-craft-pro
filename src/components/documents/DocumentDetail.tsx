@@ -24,6 +24,7 @@ import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/us
 import { usePonudaLayoutSettings, useSavePonudaLayoutSettings, defaultPonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
 import { useDocumentChain } from '@/hooks/useDocumentChain';
 import { DocumentChain } from './DocumentChain';
+import { DocumentHistory } from './DocumentHistory';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -391,6 +392,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             isLoading={isLoadingChain} 
             currentDocumentId={document.id} 
           />
+
+          {/* Document History */}
+          <DocumentHistory documentId={document.id} />
 
           {/* Convert Document Panel */}
           <div className="bg-card rounded-xl border border-border p-6">

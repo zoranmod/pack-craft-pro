@@ -8,6 +8,8 @@ interface DashboardSections {
   activities: boolean;
   deadlines: boolean;
   analytics: boolean;
+  hrStats: boolean;
+  reminders: boolean;
 }
 
 const DEFAULT_SECTIONS: DashboardSections = {
@@ -17,6 +19,8 @@ const DEFAULT_SECTIONS: DashboardSections = {
   activities: true,
   deadlines: true,
   analytics: true,
+  hrStats: true,
+  reminders: true,
 };
 
 const STORAGE_KEY = 'dashboard_sections_';
