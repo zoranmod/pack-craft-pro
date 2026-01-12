@@ -701,6 +701,7 @@ export type Database = {
           client_phone: string | null
           contact_person: string | null
           created_at: string
+          custom_html_content: string | null
           date: string
           deleted_at: string | null
           deleted_by: string | null
@@ -730,6 +731,7 @@ export type Database = {
           client_phone?: string | null
           contact_person?: string | null
           created_at?: string
+          custom_html_content?: string | null
           date?: string
           deleted_at?: string | null
           deleted_by?: string | null
@@ -759,6 +761,7 @@ export type Database = {
           client_phone?: string | null
           contact_person?: string | null
           created_at?: string
+          custom_html_content?: string | null
           date?: string
           deleted_at?: string | null
           deleted_by?: string | null

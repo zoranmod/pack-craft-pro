@@ -49,6 +49,7 @@ export interface Document {
   deliveryAddress?: string;
   monter1?: string;
   monter2?: string;
+  customHtmlContent?: string | null; // WYSIWYG custom content
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {

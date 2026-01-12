@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { useRef, useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
+import { DocumentWysiwygEditor } from './DocumentWysiwygEditor';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useActiveTemplate } from '@/hooks/useActiveTemplate';
 import { MemorandumHeader } from './MemorandumHeader';
@@ -83,6 +84,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
+  const [isWysiwygEditing, setIsWysiwygEditing] = useState(false);
   const [draftMpYMm, setDraftMpYMm] = useState(0);
   const didInitMpYMm = useRef(false);
   
@@ -297,6 +299,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               Uredi
             </Button>
           </Link>
+          <Button 
+            variant={isWysiwygEditing ? "default" : "outline"}
+            size="sm" 
+            className="rounded-lg"
+            onClick={() => setIsWysiwygEditing(!isWysiwygEditing)}
+          >
+            <FileCode className="mr-2 h-4 w-4" />
+            {isWysiwygEditing ? 'Zatvori editor' : 'WYSIWYG'}
+          </Button>
           {document.type === 'ponuda' && (
             <LayoutEditor
               isEditing={isLayoutEditing}
@@ -319,6 +330,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
           )}
         </div>
       </div>
+
+      {/* WYSIWYG Editor - shown when active */}
+      {isWysiwygEditing && (
+        <DocumentWysiwygEditor
+          document={document}
+          companySettings={companySettings}
+          onClose={() => setIsWysiwygEditing(false)}
+        />
+      )}
 
       {/* Responsive grid: stack on small screens, side-by-side on xl+ */}
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6">
