@@ -1,4 +1,4 @@
-export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza' | 'racun' | 'ugovor';
+export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza' | 'racun' | 'ugovor' | 'ponuda-komarnici';
 
 export type DocumentStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
 
@@ -58,6 +58,7 @@ export const documentTypeLabels: Record<DocumentType, string> = {
   'nalog-dostava-montaza': 'Nalog za dostavu i montažu',
   'racun': 'Račun',
   'ugovor': 'Ugovor',
+  'ponuda-komarnici': 'Ponuda za izradu komarnika',
 };
 
 export const documentStatusLabels: Record<DocumentStatus, string> = {
@@ -71,6 +72,9 @@ export const documentStatusLabels: Record<DocumentStatus, string> = {
 
 // Status workflow for quotes (ponuda)
 export const quoteStatusFlow: DocumentStatus[] = ['draft', 'sent', 'accepted'];
+
+// Status workflow for mosquito net quotes (ponuda-komarnici)
+export const mosquitoNetQuoteStatusFlow: DocumentStatus[] = ['draft', 'sent', 'accepted'];
 export const getNextQuoteStatus = (current: DocumentStatus): DocumentStatus | null => {
   const currentIndex = quoteStatusFlow.indexOf(current);
   if (currentIndex === -1 || currentIndex === quoteStatusFlow.length - 1) return null;
@@ -90,6 +94,7 @@ export const invoiceStatusFlow: DocumentStatus[] = ['draft', 'sent', 'completed'
 export const getStatusFlowForType = (type: DocumentType): DocumentStatus[] => {
   switch (type) {
     case 'ponuda':
+    case 'ponuda-komarnici':
       return quoteStatusFlow;
     case 'ugovor':
       return contractStatusFlow;
@@ -137,12 +142,13 @@ export const getNextDocumentLabel = (currentType: DocumentType): string | null =
   const nextType = getNextDocumentType(currentType);
   if (!nextType) return null;
   
-  const labels: Record<DocumentType, string> = {
+const labels: Record<DocumentType, string> = {
     'ponuda': 'Kreiraj ponudu',
     'ugovor': 'Kreiraj ugovor',
     'otpremnica': 'Kreiraj otpremnicu',
     'racun': 'Kreiraj račun',
     'nalog-dostava-montaza': 'Kreiraj nalog',
+    'ponuda-komarnici': 'Kreiraj ponudu za komarnik',
   };
   return labels[nextType];
 };

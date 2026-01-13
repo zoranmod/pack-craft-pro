@@ -1267,6 +1267,172 @@ export type Database = {
           },
         ]
       }
+      mosquito_net_locations: {
+        Row: {
+          created_at: string
+          door_installation_price: number
+          id: string
+          measurement_price: number
+          place_name: string
+          sort_order: number | null
+          updated_at: string
+          user_id: string
+          window_installation_price: number
+        }
+        Insert: {
+          created_at?: string
+          door_installation_price?: number
+          id?: string
+          measurement_price?: number
+          place_name: string
+          sort_order?: number | null
+          updated_at?: string
+          user_id: string
+          window_installation_price?: number
+        }
+        Update: {
+          created_at?: string
+          door_installation_price?: number
+          id?: string
+          measurement_price?: number
+          place_name?: string
+          sort_order?: number | null
+          updated_at?: string
+          user_id?: string
+          window_installation_price?: number
+        }
+        Relationships: []
+      }
+      mosquito_net_products: {
+        Row: {
+          code: string | null
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          price_per_m2: number
+          product_type: string | null
+          sort_order: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          price_per_m2?: number
+          product_type?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          price_per_m2?: number
+          product_type?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mosquito_net_quote_items: {
+        Row: {
+          calculated_m2: number | null
+          created_at: string
+          document_id: string
+          door_count: number | null
+          door_price: number | null
+          height_cm: number | null
+          id: string
+          location_id: string | null
+          location_name: string | null
+          measurement_price: number | null
+          product_id: string | null
+          product_name: string | null
+          quantity: number | null
+          section_type: string
+          sort_order: number | null
+          total: number
+          unit_price: number | null
+          width_cm: number | null
+          window_count: number | null
+          window_price: number | null
+        }
+        Insert: {
+          calculated_m2?: number | null
+          created_at?: string
+          document_id: string
+          door_count?: number | null
+          door_price?: number | null
+          height_cm?: number | null
+          id?: string
+          location_id?: string | null
+          location_name?: string | null
+          measurement_price?: number | null
+          product_id?: string | null
+          product_name?: string | null
+          quantity?: number | null
+          section_type: string
+          sort_order?: number | null
+          total?: number
+          unit_price?: number | null
+          width_cm?: number | null
+          window_count?: number | null
+          window_price?: number | null
+        }
+        Update: {
+          calculated_m2?: number | null
+          created_at?: string
+          document_id?: string
+          door_count?: number | null
+          door_price?: number | null
+          height_cm?: number | null
+          id?: string
+          location_id?: string | null
+          location_name?: string | null
+          measurement_price?: number | null
+          product_id?: string | null
+          product_name?: string | null
+          quantity?: number | null
+          section_type?: string
+          sort_order?: number | null
+          total?: number
+          unit_price?: number | null
+          width_cm?: number | null
+          window_count?: number | null
+          window_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mosquito_net_quote_items_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mosquito_net_quote_items_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "mosquito_net_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mosquito_net_quote_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "mosquito_net_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
