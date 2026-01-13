@@ -40,6 +40,9 @@ import AdminQA from "./pages/AdminQA";
 import Reports from "./pages/Reports";
 import ContractLayoutTemplates from "./pages/ContractLayoutTemplates";
 import ContractLayoutEditor from "./pages/ContractLayoutEditor";
+import PonudaKomarnici from "./pages/PonudaKomarnici";
+import NewMosquitoNetQuote from "./pages/NewMosquitoNetQuote";
+import MosquitoNetPriceList from "./pages/MosquitoNetPriceList";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
   AdminDashboard,
@@ -71,6 +74,10 @@ const App = () => (
                 <Route path="/documents/:id/edit" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
                 <Route path="/print/:id" element={<ProtectedRoute><PrintDocument /></ProtectedRoute>} />
                 <Route path="/ponude" element={<ProtectedRoute><Ponude /></ProtectedRoute>} />
+                <Route path="/ponuda-komarnici" element={<ProtectedRoute><PonudaKomarnici /></ProtectedRoute>} />
+                <Route path="/ponuda-komarnici/nova" element={<ProtectedRoute><NewMosquitoNetQuote /></ProtectedRoute>} />
+                <Route path="/ponuda-komarnici/:id/edit" element={<ProtectedRoute><NewMosquitoNetQuote /></ProtectedRoute>} />
+                <Route path="/ponuda-komarnici/cjenik" element={<ProtectedRoute><MosquitoNetPriceList /></ProtectedRoute>} />
                 <Route path="/ugovori" element={<ProtectedRoute><Ugovori /></ProtectedRoute>} />
                 <Route path="/ugovori/predlosci" element={<ProtectedRoute><ContractLayoutTemplates /></ProtectedRoute>} />
                 <Route path="/ugovori/predlosci/novi" element={<ProtectedRoute><ContractLayoutEditor /></ProtectedRoute>} />

@@ -45,6 +45,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 const documentTypes = [
   { label: 'Ponuda', icon: FileText, href: '/documents/new?type=ponuda' },
+  { label: 'Ponuda za komarnik', icon: Package, href: '/ponuda-komarnici/nova' },
   { label: 'Ugovor', icon: FileSignature, href: '/documents/new?type=ugovor' },
   { label: 'Otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
   { label: 'Nalog dostava + montaža', icon: ClipboardList, href: '/documents/new?type=nalog-dostava-montaza' },
@@ -71,6 +72,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: FileText, label: 'Svi dokumenti', path: '/documents' },
       { icon: FileText, label: 'Ponude', path: '/ponude' },
+      { icon: Package, label: 'Komarnici', path: '/ponuda-komarnici' },
       { icon: FileSignature, label: 'Ugovori', path: '/ugovori' },
       { icon: Package, label: 'Otpremnice', path: '/otpremnice' },
       { icon: Truck, label: 'Nalozi', path: '/nalozi' },
