@@ -42,6 +42,16 @@ export function MosquitoNetQuoteForm({ documentId }: MosquitoNetQuoteFormProps) 
   const saveQuoteItems = useSaveMosquitoNetQuoteItems();
   const seedData = useSeedMosquitoNetData();
 
+  // Auto-seed data if empty
+  const [hasAttemptedSeed, setHasAttemptedSeed] = useState(false);
+  
+  useEffect(() => {
+    if (!hasAttemptedSeed && products.length === 0 && locations.length === 0 && !seedData.isPending) {
+      setHasAttemptedSeed(true);
+      seedData.mutate();
+    }
+  }, [hasAttemptedSeed, products.length, locations.length, seedData.isPending]);
+
   // Form state
   const [clientName, setClientName] = useState('');
   const [clientAddress, setClientAddress] = useState('');
