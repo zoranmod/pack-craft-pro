@@ -26,6 +26,7 @@ import { usePonudaLayoutSettings, useSavePonudaLayoutSettings, defaultPonudaLayo
 import { useDocumentChain } from '@/hooks/useDocumentChain';
 import { DocumentChain } from './DocumentChain';
 import { DocumentHistory } from './DocumentHistory';
+import { MosquitoNetDocumentView } from './MosquitoNetDocumentView';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,9 +145,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     });
   };
   const isContract = document?.type === 'ugovor';
+  const isMosquitoNetQuote = document?.type === 'ponuda-komarnici';
   
   // Document types that should NOT show prices (otpremnica, nalog-dostava-montaza)
-  const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor'].includes(document.type) : true;
+  const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type) : true;
 
   // Enrich items with codes from articles if not already present
   const enrichedItems = useMemo(() => {
@@ -293,7 +295,13 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             )}
             {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
           </Button>
-          <Link to={isContract ? `/documents/${id}/edit-contract` : `/documents/${id}/edit`}>
+          <Link to={
+            isContract 
+              ? `/documents/${id}/edit-contract` 
+              : isMosquitoNetQuote 
+                ? `/ponuda-komarnici/${id}/edit`
+                : `/documents/${id}/edit`
+          }>
             <Button size="sm" className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <Edit className="mr-2 h-4 w-4" />
               Uredi
@@ -350,6 +358,30 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 ref={printRef} 
                 document={document} 
               />
+            </div>
+          ) : isMosquitoNetQuote ? (
+            <div 
+              ref={printRef} 
+              className="a4-page"
+              style={{ 
+                fontFamily: template?.font_family || 'Arial',
+                fontSize: '11.5px',
+                '--print-footer-bottom-mm': `${companySettings?.print_footer_bottom_mm ?? 14}mm`,
+                '--print-footer-max-height-mm': `${companySettings?.print_footer_max_height_mm ?? 14}mm`,
+                '--print-content-bottom-padding-mm': `${companySettings?.print_content_bottom_padding_mm ?? 42}mm`,
+              } as React.CSSProperties}
+            >
+              <div className="doc-body">
+                <GlobalDocumentHeader settings={headerSettings} />
+                <MemorandumHeader />
+                <MosquitoNetDocumentView 
+                  document={document} 
+                  companySettings={companySettings} 
+                />
+              </div>
+              <div className="doc-footer">
+                <GlobalDocumentFooter settings={footerSettings} />
+              </div>
             </div>
           ) : (
             <div 
