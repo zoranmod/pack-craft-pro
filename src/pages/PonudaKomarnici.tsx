@@ -46,11 +46,11 @@ export default function PonudaKomarnici() {
             <p className="text-muted-foreground">Upravljajte ponudama za izradu komarnika</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate('/settings/komarnici-cjenik')}>
+            <Button variant="outline" onClick={() => navigate('/ponuda-komarnici/cjenik')}>
               <Settings className="h-4 w-4 mr-2" />
               Cjenik
             </Button>
-            <Button onClick={() => navigate('/documents/new?type=ponuda-komarnici')}>
+            <Button onClick={() => navigate('/ponuda-komarnici/nova')}>
               <Plus className="h-4 w-4 mr-2" />
               Nova ponuda
             </Button>
@@ -86,7 +86,7 @@ export default function PonudaKomarnici() {
                   {searchQuery ? 'Nema rezultata pretrage' : 'Nema ponuda za komarnik'}
                 </p>
                 {!searchQuery && (
-                  <Button onClick={() => navigate('/documents/new?type=ponuda-komarnici')}>
+                  <Button onClick={() => navigate('/ponuda-komarnici/nova')}>
                     <Plus className="h-4 w-4 mr-2" />
                     Kreiraj prvu ponudu
                   </Button>
