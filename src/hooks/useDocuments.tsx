@@ -82,6 +82,7 @@ const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
     'nalog-dostava-montaza': 'NDM',
     'racun': 'RAC',
     'ugovor': 'UGO',
+    'ponuda-komarnici': 'PKO',
   };
   const year = new Date().getFullYear();
   const yearSuffix = year.toString().slice(-2); // e.g., "25" for 2025

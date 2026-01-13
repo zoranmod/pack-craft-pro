@@ -80,6 +80,15 @@ export const documentTypeStyles: Record<DocumentType, DocumentTypeStyle> = {
     icon: Truck,
     emoji: '🚚',
   },
+  'ponuda-komarnici': {
+    iconBg: 'bg-teal-100 dark:bg-teal-500/15',
+    iconFg: 'text-teal-600 dark:text-teal-400',
+    badgeBg: 'bg-teal-100 dark:bg-teal-500/15',
+    badgeFg: 'text-teal-700 dark:text-teal-400',
+    borderColor: 'border-l-teal-500',
+    icon: FileText,
+    emoji: '🪟',
+  },
 };
 
 /**

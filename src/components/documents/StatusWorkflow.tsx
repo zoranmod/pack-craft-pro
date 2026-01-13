@@ -45,6 +45,7 @@ const conversionIcons: Record<DocumentType, React.ReactNode> = {
   otpremnica: <Package className="h-4 w-4" />,
   racun: <Receipt className="h-4 w-4" />,
   'nalog-dostava-montaza': <Package className="h-4 w-4" />,
+  'ponuda-komarnici': <FileText className="h-4 w-4" />,
 };
 
 export function StatusWorkflow({ document }: StatusWorkflowProps) {

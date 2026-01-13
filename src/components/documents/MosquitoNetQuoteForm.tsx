@@ -392,8 +392,10 @@ export function MosquitoNetQuoteForm({ documentId }: MosquitoNetQuoteFormProps) 
             <Label>Kupac *</Label>
             <ClientAutocomplete
               value={clientName}
-              onChange={setClientName}
-              onSelect={(client) => handleClientSelect(client.id)}
+              onSelect={(client) => {
+                handleClientSelect(client.id);
+                setClientName(client.name);
+              }}
             />
           </div>
           <div className="space-y-2">
