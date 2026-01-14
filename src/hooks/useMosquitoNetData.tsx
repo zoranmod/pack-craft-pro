@@ -250,7 +250,7 @@ export function useSeedMosquitoNetData() {
   const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (forceReseed: boolean = false) => {
       if (!user) throw new Error('Not authenticated');
       
       // Check if data already exists
@@ -259,8 +259,19 @@ export function useSeedMosquitoNetData() {
         .select('id')
         .limit(1);
       
-      if (existingProducts && existingProducts.length > 0) {
+      const { data: existingLocations } = await supabase
+        .from('mosquito_net_locations')
+        .select('id')
+        .limit(1);
+      
+      if (!forceReseed && existingProducts && existingProducts.length > 0) {
         throw new Error('Podaci već postoje');
+      }
+      
+      // If force reseed, delete existing data first
+      if (forceReseed) {
+        await supabase.from('mosquito_net_locations').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('mosquito_net_products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
       
       // Seed products from PDF
@@ -281,28 +292,28 @@ export function useSeedMosquitoNetData() {
       
       if (productsError) throw productsError;
       
-      // Seed locations from PDF
+      // Seed locations from PDF - correct locations for Županja region
       const locations = [
-        { place_name: 'Zagreb', measurement_price: 0, window_installation_price: 10, door_installation_price: 15, sort_order: 1 },
-        { place_name: 'Velika Gorica', measurement_price: 15, window_installation_price: 10, door_installation_price: 15, sort_order: 2 },
-        { place_name: 'Samobor', measurement_price: 20, window_installation_price: 10, door_installation_price: 15, sort_order: 3 },
-        { place_name: 'Zaprešić', measurement_price: 20, window_installation_price: 10, door_installation_price: 15, sort_order: 4 },
-        { place_name: 'Dugo Selo', measurement_price: 20, window_installation_price: 10, door_installation_price: 15, sort_order: 5 },
-        { place_name: 'Sesvete', measurement_price: 10, window_installation_price: 10, door_installation_price: 15, sort_order: 6 },
-        { place_name: 'Karlovac', measurement_price: 40, window_installation_price: 12, door_installation_price: 18, sort_order: 7 },
-        { place_name: 'Sisak', measurement_price: 45, window_installation_price: 12, door_installation_price: 18, sort_order: 8 },
-        { place_name: 'Varaždin', measurement_price: 50, window_installation_price: 12, door_installation_price: 18, sort_order: 9 },
-        { place_name: 'Čakovec', measurement_price: 55, window_installation_price: 12, door_installation_price: 18, sort_order: 10 },
-        { place_name: 'Koprivnica', measurement_price: 45, window_installation_price: 12, door_installation_price: 18, sort_order: 11 },
-        { place_name: 'Bjelovar', measurement_price: 50, window_installation_price: 12, door_installation_price: 18, sort_order: 12 },
-        { place_name: 'Križevci', measurement_price: 40, window_installation_price: 10, door_installation_price: 15, sort_order: 13 },
-        { place_name: 'Ivanić-Grad', measurement_price: 25, window_installation_price: 10, door_installation_price: 15, sort_order: 14 },
-        { place_name: 'Jastrebarsko', measurement_price: 25, window_installation_price: 10, door_installation_price: 15, sort_order: 15 },
-        { place_name: 'Sveta Nedelja', measurement_price: 15, window_installation_price: 10, door_installation_price: 15, sort_order: 16 },
-        { place_name: 'Zabok', measurement_price: 30, window_installation_price: 10, door_installation_price: 15, sort_order: 17 },
-        { place_name: 'Krapina', measurement_price: 40, window_installation_price: 12, door_installation_price: 18, sort_order: 18 },
-        { place_name: 'Rijeka', measurement_price: 80, window_installation_price: 15, door_installation_price: 20, sort_order: 19 },
-        { place_name: 'Split', measurement_price: 150, window_installation_price: 18, door_installation_price: 25, sort_order: 20 },
+        { place_name: 'Babina Greda', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 1 },
+        { place_name: 'Bošnjaci/Topola', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 2 },
+        { place_name: 'Cerna', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 3 },
+        { place_name: 'Drenovci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 4 },
+        { place_name: 'Đurići', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 5 },
+        { place_name: 'Gradište', measurement_price: 15, window_installation_price: 10, door_installation_price: 30, sort_order: 6 },
+        { place_name: 'Gundinci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 7 },
+        { place_name: 'Gunja', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 8 },
+        { place_name: 'Posavski Podgajci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 9 },
+        { place_name: 'Prkovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 10 },
+        { place_name: 'Račinovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 11 },
+        { place_name: 'Rajevo Selo', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 12 },
+        { place_name: 'Retkovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 13 },
+        { place_name: 'Rokovci/Andrijaševci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 14 },
+        { place_name: 'Soljani', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 15 },
+        { place_name: 'Strošinci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 16 },
+        { place_name: 'Šiškovci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 17 },
+        { place_name: 'Štitar', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 18 },
+        { place_name: 'Vrbanja', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 19 },
+        { place_name: 'Županja', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 20 },
       ];
       
       const { error: locationsError } = await supabase
@@ -324,6 +335,80 @@ export function useSeedMosquitoNetData() {
       } else {
         toast.error('Greška pri dodavanju podataka: ' + error.message);
       }
+    },
+  });
+}
+
+// Reset and reseed data function
+export function useResetMosquitoNetData() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error('Not authenticated');
+      
+      // Delete all existing locations and products
+      await supabase.from('mosquito_net_locations').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('mosquito_net_products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      // Seed products from PDF
+      const products = [
+        { name: 'Prozor komarnik BIJELI', code: 'PK-B', price_per_m2: 35, color: 'bijeli', product_type: 'prozor', sort_order: 1 },
+        { name: 'Prozor komarnik SMEĐI', code: 'PK-S', price_per_m2: 40, color: 'smeđi', product_type: 'prozor', sort_order: 2 },
+        { name: 'Prozor komarnik P-profil', code: 'PK-P', price_per_m2: 38, color: 'bijeli', product_type: 'prozor', sort_order: 3 },
+        { name: 'Vrata komarnik BIJELI', code: 'VK-B', price_per_m2: 65, color: 'bijeli', product_type: 'vrata', sort_order: 4 },
+        { name: 'Vrata komarnik SMEĐI', code: 'VK-S', price_per_m2: 70, color: 'smeđi', product_type: 'vrata', sort_order: 5 },
+        { name: 'Vrata komarnik ZIG-ZAG', code: 'VK-ZZ', price_per_m2: 90, color: 'bijeli', product_type: 'vrata', sort_order: 6 },
+        { name: 'Rolo komarnik BIJELI', code: 'RK-B', price_per_m2: 75, color: 'bijeli', product_type: 'rolo', sort_order: 7 },
+        { name: 'Rolo komarnik SMEĐI', code: 'RK-S', price_per_m2: 80, color: 'smeđi', product_type: 'rolo', sort_order: 8 },
+      ];
+      
+      const { error: productsError } = await supabase
+        .from('mosquito_net_products')
+        .insert(products.map(p => ({ ...p, user_id: user.id })));
+      
+      if (productsError) throw productsError;
+      
+      // Seed locations from PDF - correct locations for Županja region
+      const locations = [
+        { place_name: 'Babina Greda', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 1 },
+        { place_name: 'Bošnjaci/Topola', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 2 },
+        { place_name: 'Cerna', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 3 },
+        { place_name: 'Drenovci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 4 },
+        { place_name: 'Đurići', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 5 },
+        { place_name: 'Gradište', measurement_price: 15, window_installation_price: 10, door_installation_price: 30, sort_order: 6 },
+        { place_name: 'Gundinci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 7 },
+        { place_name: 'Gunja', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 8 },
+        { place_name: 'Posavski Podgajci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 9 },
+        { place_name: 'Prkovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 10 },
+        { place_name: 'Račinovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 11 },
+        { place_name: 'Rajevo Selo', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 12 },
+        { place_name: 'Retkovci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 13 },
+        { place_name: 'Rokovci/Andrijaševci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 14 },
+        { place_name: 'Soljani', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 15 },
+        { place_name: 'Strošinci', measurement_price: 35, window_installation_price: 10, door_installation_price: 30, sort_order: 16 },
+        { place_name: 'Šiškovci', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 17 },
+        { place_name: 'Štitar', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 18 },
+        { place_name: 'Vrbanja', measurement_price: 30, window_installation_price: 10, door_installation_price: 30, sort_order: 19 },
+        { place_name: 'Županja', measurement_price: 15, window_installation_price: 7, door_installation_price: 30, sort_order: 20 },
+      ];
+      
+      const { error: locationsError } = await supabase
+        .from('mosquito_net_locations')
+        .insert(locations.map(l => ({ ...l, user_id: user.id })));
+      
+      if (locationsError) throw locationsError;
+      
+      return { productsCount: products.length, locationsCount: locations.length };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['mosquito-net-products'] });
+      queryClient.invalidateQueries({ queryKey: ['mosquito-net-locations'] });
+      toast.success(`Cjenik resetiran: ${data.productsCount} proizvoda i ${data.locationsCount} lokacija`);
+    },
+    onError: (error) => {
+      toast.error('Greška pri resetiranju cjenika: ' + error.message);
     },
   });
 }

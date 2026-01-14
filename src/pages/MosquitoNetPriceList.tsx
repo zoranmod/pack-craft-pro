@@ -21,6 +21,7 @@ import {
   useUpdateMosquitoNetLocation,
   useDeleteMosquitoNetLocation,
   useSeedMosquitoNetData,
+  useResetMosquitoNetData,
 } from '@/hooks/useMosquitoNetData';
 import type { MosquitoNetProduct, MosquitoNetLocation } from '@/types/mosquitoNet';
 
@@ -39,6 +40,7 @@ export default function MosquitoNetPriceList() {
   const deleteLocation = useDeleteMosquitoNetLocation();
   
   const seedData = useSeedMosquitoNetData();
+  const resetData = useResetMosquitoNetData();
 
   // Product form state
   const [productDialogOpen, setProductDialogOpen] = useState(false);
@@ -167,12 +169,27 @@ export default function MosquitoNetPriceList() {
               <p className="text-muted-foreground">Upravljajte proizvodima i lokacijama za komarnik ponude</p>
             </div>
           </div>
-          {products.length === 0 && locations.length === 0 && (
-            <Button onClick={() => seedData.mutate()} disabled={seedData.isPending}>
-              <Database className="h-4 w-4 mr-2" />
-              Učitaj početne podatke
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {products.length === 0 && locations.length === 0 ? (
+              <Button onClick={() => seedData.mutate(false)} disabled={seedData.isPending}>
+                <Database className="h-4 w-4 mr-2" />
+                Učitaj početne podatke
+              </Button>
+            ) : (
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  if (confirm('Jeste li sigurni? Ovo će obrisati sve proizvode i lokacije i učitati zadane podatke.')) {
+                    resetData.mutate();
+                  }
+                }} 
+                disabled={resetData.isPending}
+              >
+                <Database className="h-4 w-4 mr-2" />
+                Resetiraj cjenik
+              </Button>
+            )}
+          </div>
         </div>
 
         <Tabs defaultValue="products">

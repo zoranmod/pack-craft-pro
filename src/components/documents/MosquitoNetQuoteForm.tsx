@@ -48,7 +48,7 @@ export function MosquitoNetQuoteForm({ documentId }: MosquitoNetQuoteFormProps) 
   useEffect(() => {
     if (!hasAttemptedSeed && products.length === 0 && locations.length === 0 && !seedData.isPending) {
       setHasAttemptedSeed(true);
-      seedData.mutate();
+      seedData.mutate(false);
     }
   }, [hasAttemptedSeed, products.length, locations.length, seedData.isPending]);
 
@@ -378,7 +378,7 @@ export function MosquitoNetQuoteForm({ documentId }: MosquitoNetQuoteFormProps) 
           {products.length === 0 && (
             <Button 
               variant="outline" 
-              onClick={() => seedData.mutate()}
+              onClick={() => seedData.mutate(false)}
               disabled={seedData.isPending}
             >
               <Database className="h-4 w-4 mr-2" />

@@ -170,12 +170,12 @@ export function MosquitoNetDocumentView({ document, companySettings }: MosquitoN
         </div>
       )}
 
-      {/* Grand Total */}
+      {/* Grand Total - calculated from items, not document.totalAmount */}
       <div className="flex justify-end mb-6">
         <div className="w-64 space-y-1" style={{ fontSize: '12px' }}>
           <div className="flex justify-between pt-2" style={{ borderTop: '3px solid #000' }}>
             <span className="font-bold">SVEUKUPNO:</span>
-            <span className="font-bold text-lg">{formatCurrency(document.totalAmount)} €</span>
+            <span className="font-bold text-lg">{(komarnikTotal + mjerenjeTotal + ugradnjaTotal).toFixed(2)} €</span>
           </div>
         </div>
       </div>
