@@ -43,6 +43,7 @@ import ContractLayoutEditor from "./pages/ContractLayoutEditor";
 import PonudaKomarnici from "./pages/PonudaKomarnici";
 import NewMosquitoNetQuote from "./pages/NewMosquitoNetQuote";
 import MosquitoNetPriceList from "./pages/MosquitoNetPriceList";
+import Reklamacije from "./pages/Reklamacije";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
   AdminDashboard,
@@ -85,6 +86,7 @@ const App = () => (
                 <Route path="/otpremnice" element={<ProtectedRoute><Otpremnice /></ProtectedRoute>} />
                 <Route path="/nalozi" element={<ProtectedRoute><Nalozi /></ProtectedRoute>} />
                 <Route path="/racuni" element={<ProtectedRoute><Racuni /></ProtectedRoute>} />
+                <Route path="/reklamacije" element={<ProtectedRoute><Reklamacije /></ProtectedRoute>} />
                 <Route path="/kalendar" element={<ProtectedRoute><Kalendar /></ProtectedRoute>} />
                 <Route path="/dobavljaci" element={<ProtectedRoute><Dobavljaci /></ProtectedRoute>} />
                 <Route path="/godisnji-odmori" element={<ProtectedRoute><GodisnjiOdmori /></ProtectedRoute>} />

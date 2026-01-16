@@ -47,6 +47,14 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
   monter1: row.monter1,
   monter2: row.monter2,
   customHtmlContent: row.custom_html_content,
+  // Reklamacija fields
+  supplierName: row.supplier_name,
+  supplierAddress: row.supplier_address,
+  supplierOib: row.supplier_oib,
+  supplierContact: row.supplier_contact,
+  pickupDate: row.pickup_date,
+  receivedBy: row.received_by,
+  companyRepresentative: row.company_representative,
   items: items.map(item => ({
     id: item.id,
     name: item.name,
@@ -58,6 +66,7 @@ const mapDbToDocument = (row: any, items: any[], contractArticles?: any[]): Docu
     pdv: Number(item.pdv),
     subtotal: Number(item.subtotal),
     total: Number(item.total),
+    invoiceNumber: item.invoice_number || undefined,
   })),
   notes: row.notes,
   totalAmount: Number(row.total_amount),
@@ -83,6 +92,7 @@ const generateDocumentNumber = async (type: DocumentType): Promise<string> => {
     'racun': 'RAC',
     'ugovor': 'UGO',
     'ponuda-komarnici': 'PKO',
+    'reklamacija': 'RZ',
   };
   const year = new Date().getFullYear();
   const yearSuffix = year.toString().slice(-2); // e.g., "25" for 2025

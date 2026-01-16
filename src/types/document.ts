@@ -1,4 +1,4 @@
-export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza' | 'racun' | 'ugovor' | 'ponuda-komarnici';
+export type DocumentType = 'otpremnica' | 'ponuda' | 'nalog-dostava-montaza' | 'racun' | 'ugovor' | 'ponuda-komarnici' | 'reklamacija';
 
 export type DocumentStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
 
@@ -13,6 +13,7 @@ export interface DocumentItem {
   pdv: number; // postotak PDV-a
   subtotal: number; // prije rabata i PDV-a
   total: number; // konačni iznos s rabatom i PDV-om
+  invoiceNumber?: string; // broj računa - za reklamacije
 }
 
 export interface DocumentContractArticle {
@@ -50,6 +51,14 @@ export interface Document {
   monter1?: string;
   monter2?: string;
   customHtmlContent?: string | null; // WYSIWYG custom content
+  // Fields for reklamacija (complaint record)
+  supplierName?: string;
+  supplierAddress?: string;
+  supplierOib?: string;
+  supplierContact?: string;
+  pickupDate?: string;
+  receivedBy?: string;
+  companyRepresentative?: string;
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {
@@ -59,6 +68,7 @@ export const documentTypeLabels: Record<DocumentType, string> = {
   'racun': 'Račun',
   'ugovor': 'Ugovor',
   'ponuda-komarnici': 'Ponuda za izradu komarnika',
+  'reklamacija': 'Reklamacijski zapisnik',
 };
 
 export const documentStatusLabels: Record<DocumentStatus, string> = {
@@ -90,6 +100,9 @@ export const deliveryStatusFlow: DocumentStatus[] = ['draft', 'completed'];
 // Status workflow for invoices (racun)
 export const invoiceStatusFlow: DocumentStatus[] = ['draft', 'sent', 'completed'];
 
+// Status workflow for reklamacija (complaint record)
+export const reklamacijaStatusFlow: DocumentStatus[] = ['draft', 'completed'];
+
 // Get status flow for a document type
 export const getStatusFlowForType = (type: DocumentType): DocumentStatus[] => {
   switch (type) {
@@ -103,6 +116,8 @@ export const getStatusFlowForType = (type: DocumentType): DocumentStatus[] => {
       return deliveryStatusFlow;
     case 'racun':
       return invoiceStatusFlow;
+    case 'reklamacija':
+      return reklamacijaStatusFlow;
     default:
       return ['draft'];
   }
@@ -149,6 +164,7 @@ const labels: Record<DocumentType, string> = {
     'racun': 'Kreiraj račun',
     'nalog-dostava-montaza': 'Kreiraj nalog',
     'ponuda-komarnici': 'Kreiraj ponudu za komarnik',
+    'reklamacija': 'Kreiraj reklamacijski zapisnik',
   };
   return labels[nextType];
 };

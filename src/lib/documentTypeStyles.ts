@@ -5,6 +5,7 @@ import {
   Receipt, 
   FileSignature, 
   Truck,
+  ClipboardList,
   type LucideIcon 
 } from 'lucide-react';
 
@@ -88,6 +89,15 @@ export const documentTypeStyles: Record<DocumentType, DocumentTypeStyle> = {
     borderColor: 'border-l-teal-500',
     icon: FileText,
     emoji: '🪟',
+  },
+  'reklamacija': {
+    iconBg: 'bg-rose-100 dark:bg-rose-500/15',
+    iconFg: 'text-rose-600 dark:text-rose-400',
+    badgeBg: 'bg-rose-100 dark:bg-rose-500/15',
+    badgeFg: 'text-rose-700 dark:text-rose-400',
+    borderColor: 'border-l-rose-500',
+    icon: ClipboardList,
+    emoji: '📋',
   },
 };
 

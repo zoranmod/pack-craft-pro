@@ -17,6 +17,7 @@ const typeIcons: Record<DocumentType, React.ElementType> = {
   'nalog-dostava-montaza': Truck,
   racun: Receipt,
   'ponuda-komarnici': FileText,
+  'reklamacija': FileText,
 };
 
 const typeColors: Record<DocumentType, string> = {
@@ -26,6 +27,7 @@ const typeColors: Record<DocumentType, string> = {
   'nalog-dostava-montaza': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   racun: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   'ponuda-komarnici': 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  'reklamacija': 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 };
 
 const statusColors: Record<string, string> = {
