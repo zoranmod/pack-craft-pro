@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { DocumentForm } from '@/components/documents/DocumentForm';
+import { ReklamacijaForm } from '@/components/documents/ReklamacijaForm';
 import { DocumentType, documentTypeLabels } from '@/types/document';
 
 const NewDocument = () => {
@@ -37,17 +38,25 @@ const NewDocument = () => {
       const typeLabel = documentTypeLabels[fixedType];
       // Handle special cases
       if (fixedType === 'nalog-dostava-montaza') return 'Novi nalog';
+      if (fixedType === 'reklamacija') return 'Novi reklamacijski zapisnik';
       return `Nov${typeLabel.endsWith('a') ? 'a' : 'i'} ${typeLabel.toLowerCase()}`;
     }
     return "Novi dokument";
   };
+
+  // Use ReklamacijaForm for reklamacija type
+  const isReklamacija = fixedType === 'reklamacija' || (isEditMode && typeParam === 'reklamacija');
 
   return (
     <MainLayout 
       title={getTitle()} 
       subtitle={isEditMode ? "Uredite postojeći dokument" : fixedType ? undefined : "Kreirajte novi poslovni dokument"}
     >
-      <DocumentForm key={formKey} fixedType={fixedType} />
+      {isReklamacija ? (
+        <ReklamacijaForm key={formKey} documentId={id} />
+      ) : (
+        <DocumentForm key={formKey} fixedType={fixedType} />
+      )}
     </MainLayout>
   );
 };

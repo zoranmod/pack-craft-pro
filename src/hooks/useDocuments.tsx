@@ -23,6 +23,14 @@ export interface CreateDocumentData {
   deliveryAddress?: string;
   monter1?: string;
   monter2?: string;
+  // Reklamacija fields
+  supplierName?: string;
+  supplierAddress?: string;
+  supplierOib?: string;
+  supplierContact?: string;
+  pickupDate?: string;
+  receivedBy?: string;
+  companyRepresentative?: string;
 }
 
 // Convert database row to Document type
@@ -239,6 +247,14 @@ export function useCreateDocument() {
           delivery_address: data.deliveryAddress,
           monter1: data.monter1,
           monter2: data.monter2,
+          // Reklamacija fields
+          supplier_name: data.supplierName,
+          supplier_address: data.supplierAddress,
+          supplier_oib: data.supplierOib,
+          supplier_contact: data.supplierContact,
+          pickup_date: data.pickupDate,
+          received_by: data.receivedBy,
+          company_representative: data.companyRepresentative,
         })
         .select()
         .single();
@@ -257,6 +273,7 @@ export function useCreateDocument() {
         pdv: item.pdv,
         subtotal: item.subtotal,
         total: item.total,
+        invoice_number: item.invoiceNumber || null,
       }));
 
       const { error: itemsError } = await supabase
@@ -316,6 +333,14 @@ export function useUpdateDocument() {
           delivery_address: data.deliveryAddress,
           monter1: data.monter1,
           monter2: data.monter2,
+          // Reklamacija fields
+          supplier_name: data.supplierName,
+          supplier_address: data.supplierAddress,
+          supplier_oib: data.supplierOib,
+          supplier_contact: data.supplierContact,
+          pickup_date: data.pickupDate,
+          received_by: data.receivedBy,
+          company_representative: data.companyRepresentative,
         })
         .eq('id', id)
         .select()
@@ -343,6 +368,7 @@ export function useUpdateDocument() {
         pdv: item.pdv,
         subtotal: item.subtotal,
         total: item.total,
+        invoice_number: item.invoiceNumber || null,
       }));
 
       const { error: itemsError } = await supabase
@@ -599,6 +625,14 @@ export function useCopyDocument() {
           prepared_by: sourceDocument.preparedBy,
           contact_person: sourceDocument.contactPerson,
           delivery_address: sourceDocument.deliveryAddress,
+          // Reklamacija fields
+          supplier_name: sourceDocument.supplierName,
+          supplier_address: sourceDocument.supplierAddress,
+          supplier_oib: sourceDocument.supplierOib,
+          supplier_contact: sourceDocument.supplierContact,
+          pickup_date: sourceDocument.pickupDate,
+          received_by: sourceDocument.receivedBy,
+          company_representative: sourceDocument.companyRepresentative,
         })
         .select()
         .single();
@@ -617,6 +651,7 @@ export function useCopyDocument() {
         pdv: item.pdv,
         subtotal: item.subtotal,
         total: item.total,
+        invoice_number: item.invoiceNumber || null,
       }));
 
       const { error: itemsError } = await supabase
