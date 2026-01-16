@@ -493,6 +493,7 @@ export type Database = {
           discount: number
           document_id: string
           id: string
+          invoice_number: string | null
           name: string
           pdv: number
           price: number
@@ -507,6 +508,7 @@ export type Database = {
           discount?: number
           document_id: string
           id?: string
+          invoice_number?: string | null
           name: string
           pdv?: number
           price?: number
@@ -521,6 +523,7 @@ export type Database = {
           discount?: number
           document_id?: string
           id?: string
+          invoice_number?: string | null
           name?: string
           pdv?: number
           price?: number
@@ -699,6 +702,7 @@ export type Database = {
           client_name: string
           client_oib: string | null
           client_phone: string | null
+          company_representative: string | null
           contact_person: string | null
           created_at: string
           custom_html_content: string | null
@@ -713,9 +717,15 @@ export type Database = {
           notes: string | null
           number: string
           payment_method: string | null
+          pickup_date: string | null
           prepared_by: string | null
+          received_by: string | null
           source_document_id: string | null
           status: string
+          supplier_address: string | null
+          supplier_contact: string | null
+          supplier_name: string | null
+          supplier_oib: string | null
           template_id: string | null
           total_amount: number
           type: string
@@ -729,6 +739,7 @@ export type Database = {
           client_name: string
           client_oib?: string | null
           client_phone?: string | null
+          company_representative?: string | null
           contact_person?: string | null
           created_at?: string
           custom_html_content?: string | null
@@ -743,9 +754,15 @@ export type Database = {
           notes?: string | null
           number: string
           payment_method?: string | null
+          pickup_date?: string | null
           prepared_by?: string | null
+          received_by?: string | null
           source_document_id?: string | null
           status?: string
+          supplier_address?: string | null
+          supplier_contact?: string | null
+          supplier_name?: string | null
+          supplier_oib?: string | null
           template_id?: string | null
           total_amount?: number
           type: string
@@ -759,6 +776,7 @@ export type Database = {
           client_name?: string
           client_oib?: string | null
           client_phone?: string | null
+          company_representative?: string | null
           contact_person?: string | null
           created_at?: string
           custom_html_content?: string | null
@@ -773,9 +791,15 @@ export type Database = {
           notes?: string | null
           number?: string
           payment_method?: string | null
+          pickup_date?: string | null
           prepared_by?: string | null
+          received_by?: string | null
           source_document_id?: string | null
           status?: string
+          supplier_address?: string | null
+          supplier_contact?: string | null
+          supplier_name?: string | null
+          supplier_oib?: string | null
           template_id?: string | null
           total_amount?: number
           type?: string

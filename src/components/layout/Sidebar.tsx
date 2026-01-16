@@ -50,6 +50,7 @@ const documentTypes = [
   { label: 'Otpremnica', icon: Truck, href: '/documents/new?type=otpremnica' },
   { label: 'Nalog dostava + montaža', icon: ClipboardList, href: '/documents/new?type=nalog-dostava-montaza' },
   { label: 'Račun', icon: Receipt, href: '/documents/new?type=racun' },
+  { label: 'Reklamacija', icon: ClipboardList, href: '/documents/new?type=reklamacija' },
 ];
 
 interface NavItem {
@@ -77,6 +78,7 @@ const navGroups: NavGroup[] = [
       { icon: Package, label: 'Otpremnice', path: '/otpremnice' },
       { icon: Truck, label: 'Nalozi', path: '/nalozi' },
       { icon: Receipt, label: 'Računi', path: '/racuni' },
+      { icon: ClipboardList, label: 'Reklamacije', path: '/reklamacije' },
     ],
   },
   {

@@ -9,6 +9,7 @@ import { useRef, useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { ContractDocumentView } from './ContractDocumentView';
+import { ReklamacijaDocumentView } from './ReklamacijaDocumentView';
 import { DocumentWysiwygEditor } from './DocumentWysiwygEditor';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useActiveTemplate } from '@/hooks/useActiveTemplate';
@@ -146,6 +147,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   };
   const isContract = document?.type === 'ugovor';
   const isMosquitoNetQuote = document?.type === 'ponuda-komarnici';
+  const isReklamacija = document?.type === 'reklamacija';
   
   // Document types that should NOT show prices (otpremnica, nalog-dostava-montaza)
   const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type) : true;
@@ -375,6 +377,30 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 <GlobalDocumentHeader settings={headerSettings} />
                 <MemorandumHeader />
                 <MosquitoNetDocumentView 
+                  document={document} 
+                  companySettings={companySettings} 
+                />
+              </div>
+              <div className="doc-footer">
+                <GlobalDocumentFooter settings={footerSettings} />
+              </div>
+            </div>
+          ) : isReklamacija ? (
+            <div 
+              ref={printRef} 
+              className="a4-page"
+              style={{ 
+                fontFamily: template?.font_family || 'Arial',
+                fontSize: '11.5px',
+                '--print-footer-bottom-mm': `${companySettings?.print_footer_bottom_mm ?? 14}mm`,
+                '--print-footer-max-height-mm': `${companySettings?.print_footer_max_height_mm ?? 14}mm`,
+                '--print-content-bottom-padding-mm': `${companySettings?.print_content_bottom_padding_mm ?? 42}mm`,
+              } as React.CSSProperties}
+            >
+              <div className="doc-body">
+                <GlobalDocumentHeader settings={headerSettings} />
+                <MemorandumHeader />
+                <ReklamacijaDocumentView 
                   document={document} 
                   companySettings={companySettings} 
                 />
