@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { hr } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 import { 
   FileText, 
   Users, 
@@ -15,7 +16,8 @@ import {
   Trash2,
   Eye,
   Check,
-  X
+  X,
+  ExternalLink
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DashboardCard } from '@/components/dashboard/DashboardCard';
@@ -73,6 +75,7 @@ function getDocumentTypeFromDetails(details: Record<string, unknown> | null): Do
 }
 
 function ActivityLogItem({ log }: { log: ActivityLog }) {
+  const navigate = useNavigate();
   const ActionIcon = actionIcons[log.action_type] || Plus;
   const actionColor = actionColors[log.action_type] || 'text-muted-foreground bg-muted';
   
@@ -98,11 +101,29 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
   const message = formatActivityMessage(log);
   const timeAgo = format(new Date(log.created_at), "d. MMM yyyy 'u' HH:mm", { locale: hr });
 
+  // Check if this activity is related to a document that can be navigated to
+  const isDocumentActivity = log.entity_type === 'document' && log.entity_id && log.action_type !== 'delete';
+  
+  const handleClick = () => {
+    if (isDocumentActivity && log.entity_id) {
+      navigate(`/documents/${log.entity_id}`);
+    }
+  };
+
   return (
-    <div className={cn(
-      "flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/50 dark:hover:bg-muted/40 transition-colors duration-150",
-      borderColor && `border-l-4 ${borderColor}`
-    )}>
+    <div 
+      className={cn(
+        "flex items-start gap-3 px-5 py-3 border-b border-border last:border-b-0 transition-colors duration-150",
+        borderColor && `border-l-4 ${borderColor}`,
+        isDocumentActivity 
+          ? "cursor-pointer hover:bg-accent/50 dark:hover:bg-accent/30" 
+          : "hover:bg-muted/50 dark:hover:bg-muted/40"
+      )}
+      onClick={handleClick}
+      role={isDocumentActivity ? "button" : undefined}
+      tabIndex={isDocumentActivity ? 0 : undefined}
+      onKeyDown={isDocumentActivity ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); } : undefined}
+    >
       <div className={`p-1.5 rounded-md ${actionColor} shrink-0`}>
         <ActionIcon className="h-3.5 w-3.5" />
       </div>
@@ -111,7 +132,15 @@ function ActivityLogItem({ log }: { log: ActivityLog }) {
           <div className={cn("p-1 rounded", entityIconBg)}>
             <EntityIcon className={cn("h-3 w-3", entityIconFg)} />
           </div>
-          <p className="text-sm font-medium truncate text-foreground">{message}</p>
+          <p className={cn(
+            "text-sm font-medium truncate text-foreground",
+            isDocumentActivity && "hover:underline"
+          )}>
+            {message}
+          </p>
+          {isDocumentActivity && (
+            <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
+          )}
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">
           {timeAgo}
