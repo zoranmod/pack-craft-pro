@@ -1,10 +1,10 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode } from 'lucide-react';
-import { Document, documentTypeLabels, documentStatusLabels, DocumentItem, DocumentStatus } from '@/types/document';
+import { Document, documentTypeLabels, documentStatusLabels, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { cn, formatDateHR, formatCurrency, round2 } from '@/lib/utils';
+import { cn, formatDateHR } from '@/lib/utils';
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -23,7 +23,7 @@ import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDelete
 import { DocumentType } from '@/types/document';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
-import { usePonudaLayoutSettings, useSavePonudaLayoutSettings, defaultPonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
+import { usePonudaLayoutSettings, useSavePonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
 import { useDocumentChain } from '@/hooks/useDocumentChain';
 import { DocumentChain } from './DocumentChain';
 import { DocumentHistory } from './DocumentHistory';

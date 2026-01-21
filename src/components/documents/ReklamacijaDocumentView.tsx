@@ -1,6 +1,5 @@
-import { Document, DocumentItem } from '@/types/document';
+import { Document } from '@/types/document';
 import { formatDateHR } from '@/lib/utils';
-import { useCompanySettings } from '@/hooks/useSettings';
 
 interface ReklamacijaDocumentViewProps {
   document: Document;
