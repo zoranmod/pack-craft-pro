@@ -308,7 +308,7 @@ const StandardDocumentPDF = ({
                   <Text style={[styles.tableCell, { width: colWidthsWithPrices.price, textAlign: 'right' }]}>{formatCurrency(item.price)} €</Text>
                   {showDiscount && (
                     <Text style={[styles.tableCell, { width: colWidthsWithPrices.discount, textAlign: 'right' }]}>
-                      {item.discount > 0 ? `${round2(item.discount)}%` : ''}
+                      {item.discount > 0 ? `${round2(item.discount)}%` : null}
                     </Text>
                   )}
                   <Text style={[styles.tableCell, { width: colWidthsWithPrices.pdv, textAlign: 'right' }]}>{round2(item.pdv)}%</Text>
@@ -631,7 +631,7 @@ const ContractDocumentPDF = ({
             render={({ pageNumber, totalPages }) =>
               pageNumber === totalPages
                 ? 'Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.'
-                : ''
+                : null
             }
           />
           <Text
@@ -639,7 +639,7 @@ const ContractDocumentPDF = ({
             render={({ pageNumber, totalPages }) =>
               pageNumber === totalPages
                 ? 'www.akord-zupanja.hr • info@akord-zupanja.hr • Besplatan info tel: 0800 9455'
-                : ''
+                : null
             }
           />
           <Text
@@ -647,7 +647,7 @@ const ContractDocumentPDF = ({
             render={({ pageNumber, totalPages }) =>
               pageNumber === totalPages
                 ? 'Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900'
-                : ''
+                : null
             }
           />
         </View>
