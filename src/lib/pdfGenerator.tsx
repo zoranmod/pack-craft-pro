@@ -10,6 +10,8 @@ import {
 } from '@react-pdf/renderer';
 import { Document, documentTypeLabels, DocumentItem } from '@/types/document';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { FurnitureContract1to1Pdf } from '@/lib/pdf/FurnitureContract1to1Pdf';
 
 // Import header image as base64 for PDF embedding
 import headerImageSrc from '@/assets/memorandum-header.jpg';
@@ -167,6 +169,68 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+type FurnitureContractBgSlot = 'p1' | 'p2' | 'p3';
+
+const furnitureBgSettingKeys: Record<FurnitureContractBgSlot, string> = {
+  p1: 'furniture_contract_bg_p1_path',
+  p2: 'furniture_contract_bg_p2_path',
+  p3: 'furniture_contract_bg_p3_path',
+};
+
+const parseFurnitureContractPayload = (
+  customHtmlContent?: string | null
+): { kind: 'furniture_contract_v1'; values: Record<string, string> } | null => {
+  if (!customHtmlContent) return null;
+  try {
+    const parsed = JSON.parse(customHtmlContent);
+    if (!parsed || typeof parsed !== 'object') return null;
+    if (parsed.kind !== 'furniture_contract_v1') return null;
+    const values = parsed.values;
+    if (!values || typeof values !== 'object' || Array.isArray(values)) return null;
+    return { kind: 'furniture_contract_v1', values: values as Record<string, string> };
+  } catch {
+    return null;
+  }
+};
+
+const getFurnitureContractBgUrls = async (): Promise<Record<FurnitureContractBgSlot, string> | null> => {
+  const keys = Object.values(furnitureBgSettingKeys);
+  const { data, error } = await supabase
+    .from('document_settings')
+    .select('setting_key, setting_value')
+    .in('setting_key', keys);
+
+  if (error) throw error;
+
+  const paths: Partial<Record<FurnitureContractBgSlot, string>> = {};
+  for (const row of data || []) {
+    const slot = (Object.entries(furnitureBgSettingKeys).find(([, k]) => k === row.setting_key)?.[0] || null) as
+      | FurnitureContractBgSlot
+      | null;
+    if (!slot) continue;
+    if (typeof row.setting_value === 'string') paths[slot] = row.setting_value;
+  }
+
+  const p1 = paths.p1;
+  const p2 = paths.p2;
+  const p3 = paths.p3;
+  if (!p1 || !p2 || !p3) return null;
+
+  const createUrl = async (path: string) => {
+    const { data: urlData, error: urlError } = await supabase.storage
+      .from('contract-templates')
+      .createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (urlError) throw urlError;
+    return urlData.signedUrl;
+  };
+
+  return {
+    p1: await createUrl(p1),
+    p2: await createUrl(p2),
+    p3: await createUrl(p3),
+  };
+};
 
 // Column widths for table (with prices)
 const colWidthsWithPrices = {
@@ -685,9 +749,23 @@ export const generateAndDownloadPdf = async (
   let pdfBlob: Blob;
 
   if (isContract) {
-    pdfBlob = await pdf(
-      <ContractDocumentPDF document={document} companySettings={companySettings} />
-    ).toBlob();
+    const furniturePayload = parseFurnitureContractPayload(document.customHtmlContent);
+    if (furniturePayload) {
+      const bgUrls = await getFurnitureContractBgUrls();
+      if (bgUrls) {
+        pdfBlob = await pdf(
+          <FurnitureContract1to1Pdf document={document} values={furniturePayload.values} bgUrls={bgUrls} />
+        ).toBlob();
+      } else {
+        pdfBlob = await pdf(
+          <ContractDocumentPDF document={document} companySettings={companySettings} />
+        ).toBlob();
+      }
+    } else {
+      pdfBlob = await pdf(
+        <ContractDocumentPDF document={document} companySettings={companySettings} />
+      ).toBlob();
+    }
   } else {
     pdfBlob = await pdf(
       <StandardDocumentPDF
@@ -724,6 +802,16 @@ export const generatePdfBlob = async (
   const items = enrichedItems || document.items?.map((item) => ({ ...item, code: '' })) || [];
 
   if (isContract) {
+    const furniturePayload = parseFurnitureContractPayload(document.customHtmlContent);
+    if (furniturePayload) {
+      const bgUrls = await getFurnitureContractBgUrls();
+      if (bgUrls) {
+        return pdf(
+          <FurnitureContract1to1Pdf document={document} values={furniturePayload.values} bgUrls={bgUrls} />
+        ).toBlob();
+      }
+    }
+
     return pdf(<ContractDocumentPDF document={document} companySettings={companySettings} />).toBlob();
   }
 
