@@ -191,11 +191,27 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const handlePrintPdf = async () => {
     if (!document || isPrinting) return;
     setIsPrinting(true);
+
+    // Open a blank tab synchronously (user gesture) to avoid Chrome popup blocker.
+    const win = window.open('', '_blank');
+    if (!win) {
+      toast.error('Popup blokiran: dopustite otvaranje novog taba za ispis');
+      setIsPrinting(false);
+      return;
+    }
+
     try {
+      // Lightweight loading UI while PDF is generating
+      try {
+        win.document.title = 'Generiram PDF…';
+        win.document.body.innerHTML = '<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">Generiram PDF…</div>';
+      } catch {
+        // ignore cross-origin / doc write issues
+      }
+
       const url = await generatePdfObjectUrl(document, template, companySettings, enrichedItems, draftMpYMm);
-      const win = window.open(url, '_blank');
-      if (!win) {
-        toast.error('Popup blokiran: dopustite otvaranje novog taba za ispis');
+      if (!win.closed) {
+        win.location.href = url;
       }
       // Cleanup after some time (keep URL alive long enough for the PDF viewer to load)
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
