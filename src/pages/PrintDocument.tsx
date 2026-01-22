@@ -771,8 +771,8 @@ const PrintDocument = () => {
   const { data: headerSettings } = useDocumentHeaderSettings();
   const { data: footerSettings } = useDocumentFooterSettings();
 
-  // Document types that should NOT show prices
-  const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor'].includes(document.type) : true;
+  // Document types that should show prices
+  const hasPrices = document?.type ? ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type) : true;
 
   // Enrich items with codes from articles
   const enrichedItems = useMemo(() => {

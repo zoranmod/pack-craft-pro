@@ -213,6 +213,13 @@ const StandardDocumentPDF = ({
   const qtyLabel = isOtpremnica ? 'Količina' : 'Kol.';
   const showDiscount = template?.show_discount_column !== false;
 
+  const website = companySettings?.website || 'www.akord-zupanja.hr';
+  const email = companySettings?.email_info || 'info@akord-zupanja.hr';
+  const phoneMain = companySettings?.phone_main;
+  const phoneSales = companySettings?.phone_sales;
+  const phoneAccounting = companySettings?.phone_accounting;
+  const phoneLine = [phoneMain, phoneSales, phoneAccounting].filter(Boolean).join(' • ');
+
   // Calculate totals
   const subtotal = doc.items?.reduce((sum, item) => sum + item.subtotal, 0) || 0;
   const totalDiscount = doc.items?.reduce((sum, item) => sum + round2(item.subtotal * item.discount / 100), 0) || 0;
@@ -456,12 +463,14 @@ const StandardDocumentPDF = ({
         {/* Footer */}
         <View style={styles.footer} fixed>
           <Text style={styles.footerLegal}>Dokument je pisan na računalu i pravovaljan je bez potpisa i pečata.</Text>
-          <Text style={styles.footerContent}>
-            www.akord-zupanja.hr • info@akord-zupanja.hr • Besplatan info tel: 0800 9455
-          </Text>
-          <Text style={styles.footerContent}>
-            Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900
-          </Text>
+          <Text style={styles.footerContent}>{website} • {email}</Text>
+          {phoneLine ? (
+            <Text style={styles.footerContent}>{phoneLine}</Text>
+          ) : (
+            <Text style={styles.footerContent}>
+              Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900
+            </Text>
+          )}
         </View>
       </Page>
     </PDFDocument>
