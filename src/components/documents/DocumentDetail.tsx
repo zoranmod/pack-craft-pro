@@ -21,7 +21,7 @@ import { LayoutEditor } from './LayoutEditor';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
+import { generateAndDownloadPdf, generatePdfObjectUrl } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import { usePonudaLayoutSettings, useSavePonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
 import { useDocumentChain } from '@/hooks/useDocumentChain';
@@ -85,6 +85,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: documentChain, isLoading: isLoadingChain } = useDocumentChain(document?.id);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
   const [isWysiwygEditing, setIsWysiwygEditing] = useState(false);
   const [draftMpYMm, setDraftMpYMm] = useState(0);
@@ -184,6 +185,25 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       toast.error('Greška pri generiranju PDF-a');
     } finally {
       setIsPdfGenerating(false);
+    }
+  };
+
+  const handlePrintPdf = async () => {
+    if (!document || isPrinting) return;
+    setIsPrinting(true);
+    try {
+      const url = await generatePdfObjectUrl(document, template, companySettings, enrichedItems, draftMpYMm);
+      const win = window.open(url, '_blank');
+      if (!win) {
+        toast.error('Popup blokiran: dopustite otvaranje novog taba za ispis');
+      }
+      // Cleanup after some time (keep URL alive long enough for the PDF viewer to load)
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (error) {
+      console.error('PDF print generation error:', error);
+      toast.error('Greška pri generiranju PDF-a za ispis');
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -297,16 +317,20 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             )}
             {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
           </Button>
-          <Link to={`/print/${id}`}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-lg"
-            >
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg"
+            onClick={handlePrintPdf}
+            disabled={isPrinting}
+          >
+            {isPrinting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
               <Printer className="mr-2 h-4 w-4" />
-              Ispis
-            </Button>
-          </Link>
+            )}
+            {isPrinting ? 'Pripremam...' : 'Ispis'}
+          </Button>
           <Link to={
             isContract 
               ? `/documents/${id}/edit-contract` 
@@ -554,15 +578,19 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 )}
                 {isPdfGenerating ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
-              <Link to={`/print/${id}`} className="block">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start rounded-lg"
-                >
+              <Button
+                variant="outline"
+                className="w-full justify-start rounded-lg"
+                onClick={handlePrintPdf}
+                disabled={isPrinting}
+              >
+                {isPrinting ? (
+                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
+                ) : (
                   <Printer className="mr-3 h-4 w-4" />
-                  Ispis
-                </Button>
-              </Link>
+                )}
+                {isPrinting ? 'Pripremam ispis...' : 'Ispis'}
+              </Button>
               <Separator className="my-3" />
               <Button 
                 variant="outline" 
