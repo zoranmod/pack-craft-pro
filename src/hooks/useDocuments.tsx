@@ -14,6 +14,7 @@ export interface CreateDocumentData {
   clientEmail?: string;
   notes?: string;
   items: Omit<DocumentItem, 'id'>[];
+  customHtmlContent?: string | null;
   templateId?: string;
   paymentMethod?: string;
   validityDays?: number;
@@ -238,6 +239,7 @@ export function useCreateDocument() {
           client_email: data.clientEmail,
           notes: data.notes,
           total_amount: totalAmount,
+          custom_html_content: data.customHtmlContent ?? null,
           template_id: data.templateId,
           payment_method: data.paymentMethod,
           validity_days: data.validityDays,
