@@ -302,7 +302,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             className="rounded-lg"
             asChild
           >
-            <Link to={`/pdf/${id}`} target="_blank" rel="noopener noreferrer">
+            <Link to={`/pdf/${id}`}>
               <Download className="mr-2 h-4 w-4" />
               Otvori PDF
             </Link>
@@ -555,7 +555,7 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 {isPdfGenerating ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
               <Button variant="outline" className="w-full justify-start rounded-lg" asChild>
-                <Link to={`/pdf/${id}`} target="_blank" rel="noopener noreferrer">
+                <Link to={`/pdf/${id}`}>
                   <Download className="mr-3 h-4 w-4" />
                   Otvori PDF
                 </Link>

@@ -69,8 +69,8 @@ export default function OpenPdf() {
           mpYMm
         );
 
-        // Display the PDF in this tab.
-        window.location.replace(url);
+        // Display the PDF in this tab. Use assign so browser Back can return.
+        window.location.assign(url);
 
         // Keep blob alive for viewer load.
         window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
