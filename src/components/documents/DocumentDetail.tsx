@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode, Printer } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import { LayoutEditor } from './LayoutEditor';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
 import { DocumentType } from '@/types/document';
-import { generateAndDownloadPdf, generatePdfObjectUrl } from '@/lib/pdfGenerator';
+import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
 import { usePonudaLayoutSettings, useSavePonudaLayoutSettings } from '@/hooks/usePonudaLayoutSettings';
 import { useDocumentChain } from '@/hooks/useDocumentChain';
@@ -85,7 +85,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
   const { data: documentChain, isLoading: isLoadingChain } = useDocumentChain(document?.id);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
   const [isLayoutEditing, setIsLayoutEditing] = useState(false);
   const [isWysiwygEditing, setIsWysiwygEditing] = useState(false);
   const [draftMpYMm, setDraftMpYMm] = useState(0);
@@ -187,48 +186,6 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
       setIsPdfGenerating(false);
     }
   };
-
-  const handlePrintPdf = async () => {
-    if (!document || isPrinting) return;
-    setIsPrinting(true);
-
-    // Try to open a blank tab synchronously (user gesture). If blocked, fallback to same-tab.
-    const win = window.open('', '_blank');
-    const popupBlocked = !win;
-    if (popupBlocked) {
-      toast.info('Popup blokiran — otvaram PDF u istom tabu');
-    }
-
-    try {
-      // Lightweight loading UI while PDF is generating (new tab flow)
-      if (win) {
-        try {
-          win.document.title = 'Generiram PDF…';
-          win.document.body.innerHTML = '<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">Generiram PDF…</div>';
-        } catch {
-          // ignore doc write issues
-        }
-      }
-
-      const url = await generatePdfObjectUrl(document, template, companySettings, enrichedItems, draftMpYMm);
-
-      if (win && !win.closed) {
-        win.location.href = url;
-      } else {
-        // Fallback: open in the same tab when popups are blocked (common in embedded previews)
-        window.location.href = url;
-      }
-
-      // Cleanup after some time (keep URL alive long enough for the PDF viewer to load)
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-    } catch (error) {
-      console.error('PDF print generation error:', error);
-      toast.error('Greška pri generiranju PDF-a za ispis');
-    } finally {
-      setIsPrinting(false);
-    }
-  };
-
 
   if (error) {
     return (
@@ -343,15 +300,12 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             variant="outline"
             size="sm"
             className="rounded-lg"
-            onClick={handlePrintPdf}
-            disabled={isPrinting}
+            asChild
           >
-            {isPrinting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Printer className="mr-2 h-4 w-4" />
-            )}
-            {isPrinting ? 'Pripremam...' : 'Ispis'}
+            <Link to={`/pdf/${id}`} target="_blank" rel="noopener noreferrer">
+              <Download className="mr-2 h-4 w-4" />
+              Otvori PDF
+            </Link>
           </Button>
           <Link to={
             isContract 
@@ -600,18 +554,11 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 )}
                 {isPdfGenerating ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start rounded-lg"
-                onClick={handlePrintPdf}
-                disabled={isPrinting}
-              >
-                {isPrinting ? (
-                  <Loader2 className="mr-3 h-4 w-4 animate-spin" />
-                ) : (
-                  <Printer className="mr-3 h-4 w-4" />
-                )}
-                {isPrinting ? 'Pripremam ispis...' : 'Ispis'}
+              <Button variant="outline" className="w-full justify-start rounded-lg" asChild>
+                <Link to={`/pdf/${id}`} target="_blank" rel="noopener noreferrer">
+                  <Download className="mr-3 h-4 w-4" />
+                  Otvori PDF
+                </Link>
               </Button>
               <Separator className="my-3" />
               <Button 
