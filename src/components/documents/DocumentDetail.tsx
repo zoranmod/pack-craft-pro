@@ -1,5 +1,5 @@
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Trash2, Copy, ChevronDown, FileText, Truck, ScrollText, Loader2, FileCode, Printer } from 'lucide-react';
 import { Document, documentTypeLabels, documentStatusLabels, DocumentStatus } from '@/types/document';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -297,6 +297,16 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
             )}
             {isPdfGenerating ? 'Generiram...' : 'Spremi PDF'}
           </Button>
+          <Link to={`/print/${id}`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg"
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              Ispis
+            </Button>
+          </Link>
           <Link to={
             isContract 
               ? `/documents/${id}/edit-contract` 
@@ -544,6 +554,15 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
                 )}
                 {isPdfGenerating ? 'Generiram PDF...' : 'Spremi PDF'}
               </Button>
+              <Link to={`/print/${id}`} className="block">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start rounded-lg"
+                >
+                  <Printer className="mr-3 h-4 w-4" />
+                  Ispis
+                </Button>
+              </Link>
               <Separator className="my-3" />
               <Button 
                 variant="outline" 
