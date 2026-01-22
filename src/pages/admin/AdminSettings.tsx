@@ -7,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCompanySettings, useSaveCompanySettings } from '@/hooks/useSettings';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Loader2, Save, Building2, FileText, Calculator, Clock } from 'lucide-react';
+import { Loader2, Save, Building2, FileText, Calculator, Clock, Layers } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { FurnitureContractTemplateUploader } from '@/components/settings/FurnitureContractTemplateUploader';
 
 const AdminSettings = () => {
   const { data: settings, isLoading } = useCompanySettings();
@@ -119,6 +120,10 @@ const AdminSettings = () => {
           <TabsTrigger value="defaults" className="gap-2">
             <Clock className="h-4 w-4" />
             Zadane vrijednosti
+          </TabsTrigger>
+          <TabsTrigger value="furniture-contract" className="gap-2">
+            <Layers className="h-4 w-4" />
+            Ugovor 1:1
           </TabsTrigger>
         </TabsList>
 
@@ -380,6 +385,11 @@ const AdminSettings = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Furniture contract 1:1 template backgrounds */}
+        <TabsContent value="furniture-contract">
+          <FurnitureContractTemplateUploader />
         </TabsContent>
       </Tabs>
     </MainLayout>

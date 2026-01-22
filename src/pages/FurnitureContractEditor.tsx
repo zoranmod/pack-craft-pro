@@ -109,6 +109,11 @@ export default function FurnitureContractEditor() {
     if (!validateForm()) return;
 
     try {
+      const furnitureContractPayload = {
+        kind: 'furniture_contract_v1',
+        values,
+      };
+
       // Create document
       const documentData: CreateDocumentData = {
         type: 'ugovor',
@@ -116,6 +121,7 @@ export default function FurnitureContractEditor() {
         clientAddress: values.kupac_adresa,
         clientOib: values.kupac_oib,
         clientPhone: values.kupac_kontakt,
+        customHtmlContent: JSON.stringify(furnitureContractPayload),
         notes: `Specifikacija: ${values.specifikacija || ''}\nRok isporuke: ${values.rok_isporuke || ''}`,
         items: [{
           name: 'Namještaj po mjeri',
