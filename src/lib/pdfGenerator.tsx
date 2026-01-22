@@ -679,7 +679,7 @@ export const generateAndDownloadPdf = async (
   mpYMm?: number
 ): Promise<void> => {
   const isContract = document.type === 'ugovor';
-  const hasPrices = ['ponuda', 'racun', 'ugovor'].includes(document.type);
+  const hasPrices = ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type);
   const items = enrichedItems || document.items?.map((item) => ({ ...item, code: '' })) || [];
 
   let pdfBlob: Blob;
@@ -710,4 +710,42 @@ export const generateAndDownloadPdf = async (
   link.click();
   window.document.body.removeChild(link);
   URL.revokeObjectURL(url);
+};
+
+export const generatePdfBlob = async (
+  document: Document,
+  template?: any,
+  companySettings?: any,
+  enrichedItems?: (DocumentItem & { code?: string })[],
+  mpYMm?: number
+): Promise<Blob> => {
+  const isContract = document.type === 'ugovor';
+  const hasPrices = ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type);
+  const items = enrichedItems || document.items?.map((item) => ({ ...item, code: '' })) || [];
+
+  if (isContract) {
+    return pdf(<ContractDocumentPDF document={document} companySettings={companySettings} />).toBlob();
+  }
+
+  return pdf(
+    <StandardDocumentPDF
+      document={document}
+      template={template}
+      companySettings={companySettings}
+      enrichedItems={items}
+      hasPrices={hasPrices}
+      mpYMm={mpYMm}
+    />
+  ).toBlob();
+};
+
+export const generatePdfObjectUrl = async (
+  document: Document,
+  template?: any,
+  companySettings?: any,
+  enrichedItems?: (DocumentItem & { code?: string })[],
+  mpYMm?: number
+): Promise<string> => {
+  const blob = await generatePdfBlob(document, template, companySettings, enrichedItems, mpYMm);
+  return URL.createObjectURL(blob);
 };
