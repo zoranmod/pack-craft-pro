@@ -11,6 +11,7 @@ import { Loader2, Save, Building2, FileText, Calculator, Clock, Layers } from 'l
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { FurnitureContractTemplateUploader } from '@/components/settings/FurnitureContractTemplateUploader';
+import { FurnitureContractTextTemplateEditor } from '@/components/settings/FurnitureContractTextTemplateEditor';
 
 const AdminSettings = () => {
   const { data: settings, isLoading } = useCompanySettings();
@@ -389,7 +390,10 @@ const AdminSettings = () => {
 
         {/* Furniture contract 1:1 template backgrounds */}
         <TabsContent value="furniture-contract">
-          <FurnitureContractTemplateUploader />
+          <div className="space-y-6">
+            <FurnitureContractTemplateUploader />
+            <FurnitureContractTextTemplateEditor />
+          </div>
         </TabsContent>
       </Tabs>
     </MainLayout>

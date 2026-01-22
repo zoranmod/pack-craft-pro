@@ -8,15 +8,34 @@ import { FurnitureContractPreview } from '@/components/contracts/FurnitureContra
 import { getDefaultContractTemplate, ContractTemplate } from '@/data/contractTemplates';
 import { useCreateDocument, type CreateDocumentData } from '@/hooks/useDocuments';
 import { useSaveDocumentContractArticles } from '@/hooks/useContractArticles';
+import { useFurnitureContractTextTemplate } from '@/hooks/useFurnitureContractTextTemplate';
 import { toast } from 'sonner';
 import { formatDateHR } from '@/lib/utils';
+
+function htmlToPlainText(html: string): string {
+  // Browser-only conversion; keeps line breaks reasonably.
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const text = doc.body.innerText || '';
+  // TipTap sometimes produces extra blank lines; normalize lightly.
+  return text.replace(/\n{3,}/g, '\n\n').trim();
+}
 
 export default function FurnitureContractEditor() {
   const navigate = useNavigate();
   const createDocument = useCreateDocument();
   const saveContractArticles = useSaveDocumentContractArticles();
+  const contractTextTemplate = useFurnitureContractTextTemplate();
   
   const template = getDefaultContractTemplate();
+
+  const effectiveTemplate: ContractTemplate = useMemo(() => {
+    const html = contractTextTemplate.html;
+    if (!html) return template;
+    return {
+      ...template,
+      content: htmlToPlainText(html),
+    };
+  }, [contractTextTemplate.html, template]);
   
   // Initialize form values with defaults
   const [values, setValues] = useState<Record<string, string>>(() => {
@@ -56,7 +75,7 @@ export default function FurnitureContractEditor() {
 
   // Generate contract content with replaced placeholders
   const generateContractContent = (): string => {
-    let content = template.content;
+    let content = effectiveTemplate.content;
     
     // Build appliances section
     const applianceFields = ['pecnica', 'ploca', 'napa', 'perilica', 'hladnjak', 'mikrovalna'];
@@ -78,7 +97,7 @@ export default function FurnitureContractEditor() {
       : '';
     
     // Replace all placeholders
-    template.fields.forEach(field => {
+    effectiveTemplate.fields.forEach(field => {
       let value = values[field.key] || field.defaultValue || '';
       
       if (field.type === 'date' && value) {
@@ -211,7 +230,7 @@ export default function FurnitureContractEditor() {
                 Pregled ugovora (A4)
               </h3>
               <div className="transform origin-top-left scale-[0.7] lg:scale-[0.65] xl:scale-[0.75] print:scale-100">
-                <FurnitureContractPreview template={template} values={values} />
+                <FurnitureContractPreview template={effectiveTemplate} values={values} />
               </div>
             </div>
           </div>
