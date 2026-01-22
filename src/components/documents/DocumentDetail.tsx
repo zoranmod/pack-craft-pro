@@ -192,27 +192,33 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
     if (!document || isPrinting) return;
     setIsPrinting(true);
 
-    // Open a blank tab synchronously (user gesture) to avoid Chrome popup blocker.
+    // Try to open a blank tab synchronously (user gesture). If blocked, fallback to same-tab.
     const win = window.open('', '_blank');
-    if (!win) {
-      toast.error('Popup blokiran: dopustite otvaranje novog taba za ispis');
-      setIsPrinting(false);
-      return;
+    const popupBlocked = !win;
+    if (popupBlocked) {
+      toast.info('Popup blokiran — otvaram PDF u istom tabu');
     }
 
     try {
-      // Lightweight loading UI while PDF is generating
-      try {
-        win.document.title = 'Generiram PDF…';
-        win.document.body.innerHTML = '<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">Generiram PDF…</div>';
-      } catch {
-        // ignore cross-origin / doc write issues
+      // Lightweight loading UI while PDF is generating (new tab flow)
+      if (win) {
+        try {
+          win.document.title = 'Generiram PDF…';
+          win.document.body.innerHTML = '<div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">Generiram PDF…</div>';
+        } catch {
+          // ignore doc write issues
+        }
       }
 
       const url = await generatePdfObjectUrl(document, template, companySettings, enrichedItems, draftMpYMm);
-      if (!win.closed) {
+
+      if (win && !win.closed) {
         win.location.href = url;
+      } else {
+        // Fallback: open in the same tab when popups are blocked (common in embedded previews)
+        window.location.href = url;
       }
+
       // Cleanup after some time (keep URL alive long enough for the PDF viewer to load)
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (error) {
