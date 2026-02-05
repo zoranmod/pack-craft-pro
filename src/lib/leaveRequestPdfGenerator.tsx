@@ -11,8 +11,9 @@ import {
 import { format, addDays, isWeekend, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
-// Import header image as base64 for PDF embedding
+// Import header image URL for PDF embedding
 import headerImageSrc from '@/assets/memorandum-header.jpg';
+import { imageUrlToBase64Cached } from '@/lib/imageUtils';
 
 // Register fonts for better Croatian character support
 Font.register({
@@ -271,9 +272,11 @@ const generateAutomaticNote = (
 const LeaveRequestPDF = ({
   leaveRequest,
   employee,
+  headerImageBase64,
 }: {
   leaveRequest: LeaveRequestData;
   employee: EmployeeData;
+  headerImageBase64?: string;
 }) => {
   const fullName = `${employee.first_name} ${employee.last_name}`;
   const startDate = format(new Date(leaveRequest.start_date), 'dd.MM.yyyy', { locale: hr });
@@ -296,7 +299,7 @@ const LeaveRequestPDF = ({
       <Page size="A4" style={styles.page}>
         {/* Header Image */}
         <View style={styles.header}>
-          <Image src={headerImageSrc} style={styles.headerImage} />
+          <Image src={headerImageBase64 || headerImageSrc} style={styles.headerImage} />
         </View>
 
         {/* Document Number */}
@@ -423,8 +426,11 @@ export const generateAndDownloadLeaveRequestPdf = async (
   leaveRequest: LeaveRequestData,
   employee: EmployeeData
 ): Promise<void> => {
+  // Load header image as base64 to ensure it works in PDF
+  const headerImageBase64 = await imageUrlToBase64Cached(headerImageSrc);
+
   const blob = await pdf(
-    <LeaveRequestPDF leaveRequest={leaveRequest} employee={employee} />
+    <LeaveRequestPDF leaveRequest={leaveRequest} employee={employee} headerImageBase64={headerImageBase64} />
   ).toBlob();
 
   const url = URL.createObjectURL(blob);

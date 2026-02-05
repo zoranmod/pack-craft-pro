@@ -12,8 +12,9 @@ import { Document, documentTypeLabels, DocumentItem } from '@/types/document';
 import { formatDateHR, formatCurrency, round2 } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { FurnitureContract1to1Pdf } from '@/lib/pdf/FurnitureContract1to1Pdf';
+import { imageUrlToBase64Cached } from '@/lib/imageUtils';
 
-// Import header image as base64 for PDF embedding
+// Import header image URL for PDF embedding
 import headerImageSrc from '@/assets/memorandum-header.jpg';
 
 // Register fonts for better Croatian character support
@@ -261,6 +262,7 @@ interface PDFDocumentComponentProps {
   enrichedItems: (DocumentItem & { code?: string })[];
   hasPrices: boolean;
   mpYMm?: number;
+  headerImageBase64?: string;
 }
 
 // Standard Document PDF Component
@@ -271,6 +273,7 @@ const StandardDocumentPDF = ({
   enrichedItems,
   hasPrices,
   mpYMm = 0,
+  headerImageBase64,
 }: PDFDocumentComponentProps) => {
   const isOtpremnica = doc.type === 'otpremnica' || doc.type === 'nalog-dostava-montaza';
   const unitLabel = isOtpremnica ? 'Jedinica' : 'Jed.';
@@ -297,7 +300,7 @@ const StandardDocumentPDF = ({
       <Page size="A4" style={styles.page}>
         {/* Header Image */}
         <View style={styles.header}>
-          <Image src={headerImageSrc} style={styles.headerImage} />
+          <Image src={headerImageBase64 || headerImageSrc} style={styles.headerImage} />
         </View>
 
         {/* Title */}
@@ -815,6 +818,9 @@ export const generatePdfBlob = async (
     return pdf(<ContractDocumentPDF document={document} companySettings={companySettings} />).toBlob();
   }
 
+  // Load header image as base64 to ensure it works in PDF
+  const headerImageBase64 = await imageUrlToBase64Cached(headerImageSrc);
+
   return pdf(
     <StandardDocumentPDF
       document={document}
@@ -823,6 +829,7 @@ export const generatePdfBlob = async (
       enrichedItems={items}
       hasPrices={hasPrices}
       mpYMm={mpYMm}
+      headerImageBase64={headerImageBase64}
     />
   ).toBlob();
 };
