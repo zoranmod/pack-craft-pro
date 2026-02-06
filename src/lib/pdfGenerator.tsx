@@ -548,9 +548,11 @@ const StandardDocumentPDF = ({
 const ContractDocumentPDF = ({
   document: doc,
   companySettings,
+  headerImageBase64,
 }: {
   document: Document;
   companySettings?: any;
+  headerImageBase64?: string;
 }) => {
   const sortedArticles = [...(doc.contractArticles || [])].sort((a, b) => a.sortOrder - b.sortOrder);
   
@@ -582,7 +584,7 @@ const ContractDocumentPDF = ({
       <Page size="A4" style={styles.page}>
         {/* Header Image */}
         <View style={styles.header}>
-          <Image src={headerImageSrc} style={styles.headerImage} />
+          <Image src={headerImageBase64 || headerImageSrc} style={styles.headerImage} />
         </View>
 
         {/* Title */}
@@ -745,42 +747,8 @@ export const generateAndDownloadPdf = async (
   enrichedItems?: (DocumentItem & { code?: string })[],
   mpYMm?: number
 ): Promise<void> => {
-  const isContract = document.type === 'ugovor';
-  const hasPrices = ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type);
-  const items = enrichedItems || document.items?.map((item) => ({ ...item, code: '' })) || [];
-
-  let pdfBlob: Blob;
-
-  if (isContract) {
-    const furniturePayload = parseFurnitureContractPayload(document.customHtmlContent);
-    if (furniturePayload) {
-      const bgUrls = await getFurnitureContractBgUrls();
-      if (bgUrls) {
-        pdfBlob = await pdf(
-          <FurnitureContract1to1Pdf document={document} values={furniturePayload.values} bgUrls={bgUrls} />
-        ).toBlob();
-      } else {
-        pdfBlob = await pdf(
-          <ContractDocumentPDF document={document} companySettings={companySettings} />
-        ).toBlob();
-      }
-    } else {
-      pdfBlob = await pdf(
-        <ContractDocumentPDF document={document} companySettings={companySettings} />
-      ).toBlob();
-    }
-  } else {
-    pdfBlob = await pdf(
-      <StandardDocumentPDF
-        document={document}
-        template={template}
-        companySettings={companySettings}
-        enrichedItems={items}
-        hasPrices={hasPrices}
-        mpYMm={mpYMm}
-      />
-    ).toBlob();
-  }
+  // Use generatePdfBlob which handles base64 header conversion properly
+  const pdfBlob = await generatePdfBlob(document, template, companySettings, enrichedItems, mpYMm);
 
   // Create download link and trigger download
   const url = URL.createObjectURL(pdfBlob);
@@ -804,6 +772,9 @@ export const generatePdfBlob = async (
   const hasPrices = ['ponuda', 'racun', 'ugovor', 'ponuda-komarnici'].includes(document.type);
   const items = enrichedItems || document.items?.map((item) => ({ ...item, code: '' })) || [];
 
+  // Load header image as base64 to ensure it works in PDF (shared for all types)
+  const headerImageBase64 = await imageUrlToBase64Cached(headerImageSrc);
+
   if (isContract) {
     const furniturePayload = parseFurnitureContractPayload(document.customHtmlContent);
     if (furniturePayload) {
@@ -815,11 +786,8 @@ export const generatePdfBlob = async (
       }
     }
 
-    return pdf(<ContractDocumentPDF document={document} companySettings={companySettings} />).toBlob();
+    return pdf(<ContractDocumentPDF document={document} companySettings={companySettings} headerImageBase64={headerImageBase64} />).toBlob();
   }
-
-  // Load header image as base64 to ensure it works in PDF
-  const headerImageBase64 = await imageUrlToBase64Cached(headerImageSrc);
 
   return pdf(
     <StandardDocumentPDF
