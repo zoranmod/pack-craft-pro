@@ -388,6 +388,7 @@ export function ReklamacijaForm({ documentId }: ReklamacijaFormProps) {
                           <SelectItem value="m²">m²</SelectItem>
                           <SelectItem value="usluga">usluga</SelectItem>
                           <SelectItem value="sat">sat</SelectItem>
+                          <SelectItem value="kpl">kpl</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

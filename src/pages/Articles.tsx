@@ -369,6 +369,7 @@ const Articles = () => {
                     <SelectItem value="sat">sat</SelectItem>
                     <SelectItem value="kg">kg</SelectItem>
                     <SelectItem value="l">l</SelectItem>
+                    <SelectItem value="kpl">kpl</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
