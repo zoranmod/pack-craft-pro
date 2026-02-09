@@ -1,30 +1,35 @@
 
-# Dodavanje jedinice mjere "kpl" (komplet)
+
+# Popravak prikaza prvog slova stavki na PDF-u
 
 ## Problem
-U aplikaciji nedostaje opcija "kpl" (komplet) kao jedinica mjere za stavke dokumenata i artikle.
+Prvo slovo naziva stavke na PDF ponudi prikazuje se cudno/iskrivljeno. Uzrok je nepotpuni (subsettirani) Roboto font koji se ucitava s CDN-a "ink" biblioteke (`cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/`). Taj font nema sve glifove, sto uzrokuje probleme pri renderiranju u @react-pdf/renderer.
 
-## Promjene
+## Rjesenje
+Zamijeniti URL-ove fontova s potpunim Roboto fontovima s Google Fonts CDN-a (`fonts.gstatic.com`), koji sadrze punu podrsku za latinske znakove ukljucujuci hrvatske dijakriticke znakove.
 
-Dodati `kpl` opciju u sve Select padajuce izbornike za jedinicu mjere, na ukupno 4 mjesta:
+## Tehnicke promjene
 
-### 1. DocumentForm (ponude, otpremnice, nalozi, racuni)
-**Datoteka:** `src/components/documents/DocumentForm.tsx` (linija 846-851)
-- Dodati: `<SelectItem value="kpl">kpl</SelectItem>`
+### Datoteka: `src/lib/pdfGenerator.tsx` (linije 21-27)
 
-### 2. Articles (sifrarnik artikala)
-**Datoteka:** `src/pages/Articles.tsx` (linija 364-372)
-- Dodati: `<SelectItem value="kpl">kpl</SelectItem>`
+Zamijeniti trenutne URL-ove:
+```text
+Staro:
+- roboto-regular-webfont.ttf  (ink CDN - nepotpun)
+- roboto-bold-webfont.ttf     (ink CDN - nepotpun)
 
-### 3. ReklamacijaForm (reklamacijski zapisnik)
-**Datoteka:** `src/components/documents/ReklamacijaForm.tsx` (linija 386-391)
-- Dodati: `<SelectItem value="kpl">kpl</SelectItem>`
+Novo:
+- Roboto-Regular.ttf  (fonts.gstatic.com - potpun)
+- Roboto-Bold.ttf     (fonts.gstatic.com - potpun)
+```
 
-### 4. ContractEditor i ContractEditorEdit (ugovori)
-**Datoteke:** `src/pages/ContractEditor.tsx` i `src/pages/ContractEditorEdit.tsx`
-- Ove forme koriste obican Input za jedinicu (slobodan unos teksta), pa vec podrzavaju "kpl" rucnim unosom -- nema promjene potrebne.
+Konkretno, zamjena registracije fontova na:
+```
+https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf  (regular)
+https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlvAw.ttf  (bold)
+```
 
-## Rezultat
-- "kpl" ce biti dostupna kao opcija u svim padajucim izbornicima za jedinicu mjere
-- Postojece stavke s drugim jedinicama ostaju nepromijenjene
-- Nema promjena u bazi podataka (polje `unit` je tekstualno)
+## Utjecaj
+- Popravlja prikaz svih znakova na svim PDF dokumentima (ponude, otpremnice, nalozi, racuni, ugovori)
+- Nema promjena u izgledu osim ispravnog renderiranja fontova
+- Nema promjena u bazi podataka
