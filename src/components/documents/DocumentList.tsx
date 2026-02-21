@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2 } from 'lucide-react';
+import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Document, DocumentType, DocumentStatus, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,9 @@ interface DocumentListProps {
   filter?: DocumentType | 'all';
 }
 
+type SortField = 'clientName' | 'date' | 'status' | 'totalAmount' | 'updatedAt';
+type SortDirection = 'asc' | 'desc';
+
 export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const navigate = useNavigate();
   const convertDocument = useConvertDocument();
@@ -53,6 +56,29 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
   const [pdfGeneratingId, setPdfGeneratingId] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortField(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5 ml-1 opacity-40" />;
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="h-3.5 w-3.5 ml-1 text-primary" />
+      : <ArrowDown className="h-3.5 w-3.5 ml-1 text-primary" />;
+  };
 
   const handleQuickStatusChange = async (docId: string, docNumber: string, newStatus: DocumentStatus) => {
     try {
@@ -65,6 +91,31 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const filteredDocs = filter === 'all' 
     ? documents 
     : documents.filter(doc => doc.type === filter);
+
+  const sortedDocs = useMemo(() => {
+    if (!sortField) return filteredDocs;
+    return [...filteredDocs].sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'clientName':
+          cmp = a.clientName.localeCompare(b.clientName, 'hr');
+          break;
+        case 'date':
+          cmp = a.date.localeCompare(b.date);
+          break;
+        case 'status':
+          cmp = a.status.localeCompare(b.status);
+          break;
+        case 'totalAmount':
+          cmp = a.totalAmount - b.totalAmount;
+          break;
+        case 'updatedAt':
+          cmp = a.updatedAt.localeCompare(b.updatedAt);
+          break;
+      }
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
+  }, [filteredDocs, sortField, sortDirection]);
 
   // Handle PDF generation for a specific document
   const handleSavePdf = async (doc: Document) => {
@@ -131,17 +182,35 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
               <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Dokument
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Klijent
+              <th 
+                className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none hover:text-foreground transition-colors"
+                onClick={() => handleSort('clientName')}
+              >
+                <span className="inline-flex items-center">Klijent <SortIcon field="clientName" /></span>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Datum
+              <th 
+                className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none hover:text-foreground transition-colors"
+                onClick={() => handleSort('date')}
+              >
+                <span className="inline-flex items-center">Datum <SortIcon field="date" /></span>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Status
+              <th 
+                className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none hover:text-foreground transition-colors"
+                onClick={() => handleSort('updatedAt')}
+              >
+                <span className="inline-flex items-center">Izmijenjeno <SortIcon field="updatedAt" /></span>
               </th>
-              <th className="px-6 py-4 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Iznos
+              <th 
+                className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none hover:text-foreground transition-colors"
+                onClick={() => handleSort('status')}
+              >
+                <span className="inline-flex items-center">Status <SortIcon field="status" /></span>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none hover:text-foreground transition-colors"
+                onClick={() => handleSort('totalAmount')}
+              >
+                <span className="inline-flex items-center justify-end">Iznos <SortIcon field="totalAmount" /></span>
               </th>
               <th className="px-6 py-4 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Akcije
@@ -149,7 +218,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredDocs.map((doc, index) => {
+            {sortedDocs.map((doc, index) => {
               const typeStyle = getDocumentTypeStyle(doc.type);
               const TypeIcon = typeStyle.icon;
               return (
@@ -187,6 +256,9 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                 </td>
                 <td className="px-6 py-4 text-muted-foreground">
                   {formatDateHR(doc.date)}
+                </td>
+                <td className="px-6 py-4 text-muted-foreground text-sm">
+                  {formatDateHR(doc.updatedAt)}
                 </td>
                 <td className="px-6 py-4">
                   <Select
@@ -284,7 +356,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
         </table>
       </div>
       
-      {filteredDocs.length === 0 && (
+      {sortedDocs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
           <p className="text-lg font-medium text-foreground">Nema dokumenata</p>
