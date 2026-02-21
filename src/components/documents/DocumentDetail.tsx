@@ -20,6 +20,7 @@ import { TemplateDebugIndicator } from './TemplateDebugIndicator';
 import { LayoutEditor } from './LayoutEditor';
 import { useArticles } from '@/hooks/useArticles';
 import { useCopyDocument, useUpdateDocumentStatus, useConvertDocument, useDeleteDocument } from '@/hooks/useDocuments';
+import { DocumentTags } from './DocumentTags';
 import { DocumentType } from '@/types/document';
 import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useDocumentHeaderSettings, useDocumentFooterSettings } from '@/hooks/useDocumentSettings';
@@ -258,6 +259,10 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
               </DropdownMenu>
             </div>
             <p className="text-muted-foreground mt-0.5">{documentTypeLabels[document.type]}</p>
+            {/* Document Tags */}
+            <div className="mt-2">
+              <DocumentTags documentId={document.id} />
+            </div>
             {/* Template debug indicator - admin only */}
             <TemplateDebugIndicator 
               template={template} 

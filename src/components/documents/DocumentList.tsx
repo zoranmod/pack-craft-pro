@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { FileText, MoreHorizontal, Eye, Edit, Trash2, Download, ArrowRight, Copy, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Users } from 'lucide-react';
 import { Document, DocumentType, DocumentStatus, documentTypeLabels, getNextDocumentType, getNextDocumentLabel } from '@/types/document';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,8 @@ import { generateAndDownloadPdf } from '@/lib/pdfGenerator';
 import { useCompanySettings } from '@/hooks/useSettings';
 import { useDocumentTemplates } from '@/hooks/useDocumentTemplates';
 import { UI_VISIBLE_STATUSES, STATUS_LABELS } from '@/config/documentStatus';
+import { ClientHoverCard } from './ClientHoverCard';
+import { CopyForClientDialog } from './CopyForClientDialog';
 
 interface DocumentListProps {
   documents: Document[];
@@ -58,6 +60,7 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const [pdfGeneratingId, setPdfGeneratingId] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [copyForClientDoc, setCopyForClientDoc] = useState<Document | null>(null);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -249,13 +252,15 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                     </Link>
                   </td>
                 <td className="px-6 py-4">
-                  <Link 
-                    to={`/clients?search=${encodeURIComponent(doc.clientName)}`}
-                    className="font-medium text-foreground hover:text-primary hover:underline transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {doc.clientName}
-                  </Link>
+                  <ClientHoverCard clientName={doc.clientName} documents={documents}>
+                    <Link 
+                      to={`/clients?search=${encodeURIComponent(doc.clientName)}`}
+                      className="font-medium text-foreground hover:text-primary hover:underline transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {doc.clientName}
+                    </Link>
+                  </ClientHoverCard>
                   <p className="text-sm text-muted-foreground truncate max-w-[200px]">
                     {doc.clientAddress}
                   </p>
@@ -332,6 +337,11 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                       >
                         <Copy className="mr-2 h-4 w-4" /> Kopiraj dokument
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setCopyForClientDoc(doc)}
+                      >
+                        <Users className="mr-2 h-4 w-4" /> Kopiraj za drugog klijenta
+                      </DropdownMenuItem>
                       {getNextDocumentType(doc.type) && (
                         <>
                           <DropdownMenuSeparator />
@@ -391,6 +401,15 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Copy for different client dialog */}
+      {copyForClientDoc && (
+        <CopyForClientDialog
+          open={!!copyForClientDoc}
+          onOpenChange={(open) => !open && setCopyForClientDoc(null)}
+          document={copyForClientDoc}
+        />
+      )}
     </div>
   );
 }
