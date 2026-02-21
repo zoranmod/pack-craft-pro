@@ -249,7 +249,13 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
                     </Link>
                   </td>
                 <td className="px-6 py-4">
-                  <p className="font-medium text-foreground">{doc.clientName}</p>
+                  <Link 
+                    to={`/clients?search=${encodeURIComponent(doc.clientName)}`}
+                    className="font-medium text-foreground hover:text-primary hover:underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {doc.clientName}
+                  </Link>
                   <p className="text-sm text-muted-foreground truncate max-w-[200px]">
                     {doc.clientAddress}
                   </p>
