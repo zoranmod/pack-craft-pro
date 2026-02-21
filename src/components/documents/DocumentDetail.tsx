@@ -27,6 +27,7 @@ import { usePonudaLayoutSettings, useSavePonudaLayoutSettings } from '@/hooks/us
 import { useDocumentChain } from '@/hooks/useDocumentChain';
 import { DocumentChain } from './DocumentChain';
 import { DocumentHistory } from './DocumentHistory';
+import { DocumentVersions } from './DocumentVersions';
 import { MosquitoNetDocumentView } from './MosquitoNetDocumentView';
 import {
   DropdownMenu,
@@ -483,6 +484,9 @@ export function DocumentDetail({ document, error }: DocumentDetailProps) {
 
           {/* Document History */}
           <DocumentHistory documentId={document.id} />
+
+          {/* Document Versions */}
+          <DocumentVersions documentId={document.id} />
 
           {/* Convert Document Panel */}
           <div className="bg-card rounded-xl border border-border p-6">

@@ -695,6 +695,47 @@ export type Database = {
         }
         Relationships: []
       }
+      document_versions: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          items_snapshot: Json
+          note: string | null
+          snapshot: Json
+          user_id: string
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          items_snapshot: Json
+          note?: string | null
+          snapshot: Json
+          user_id: string
+          version_number?: number
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          items_snapshot?: Json
+          note?: string | null
+          snapshot?: Json
+          user_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           client_address: string

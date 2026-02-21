@@ -312,6 +312,47 @@ export function useUpdateDocument() {
     mutationFn: async ({ id, data }: { id: string; data: CreateDocumentData }) => {
       if (!user) throw new Error('Not authenticated');
 
+      // --- Save current version before updating ---
+      try {
+        const { data: currentDoc } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        const { data: currentItems } = await supabase
+          .from('document_items')
+          .select('*')
+          .eq('document_id', id);
+
+        if (currentDoc) {
+          // Get next version number
+          const { data: lastVersion } = await supabase
+            .from('document_versions')
+            .select('version_number')
+            .eq('document_id', id)
+            .order('version_number', { ascending: false })
+            .limit(1);
+
+          const nextVersion = (lastVersion && lastVersion.length > 0) 
+            ? lastVersion[0].version_number + 1 
+            : 1;
+
+          await supabase
+            .from('document_versions')
+            .insert({
+              document_id: id,
+              version_number: nextVersion,
+              user_id: user.id,
+              snapshot: currentDoc as any,
+              items_snapshot: (currentItems || []) as any,
+            });
+        }
+      } catch (versionError) {
+        console.warn('Failed to save document version:', versionError);
+        // Don't block the update if versioning fails
+      }
+
       const totalAmount = data.items.reduce((sum, item) => sum + item.total, 0);
 
       // Update document
