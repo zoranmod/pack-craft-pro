@@ -188,7 +188,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   
   const defaultLogo = theme === 'dark' ? logoDark : logoLight;
   const logo = companySettings?.logo_url || defaultLogo;
-  const companyName = companySettings?.company_name || 'Akord';
+  const companyName = companySettings?.company_name || 'Adaptiva Design';
 
   const handleLinkClick = () => {
     if (isMobile && onOpenChange) {

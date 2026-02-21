@@ -142,7 +142,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
   }, [typeFromUrl, isTypeLocked]);
 
   const [items, setItems] = useState<Omit<DocumentItem, 'id'>[]>([
-    { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 25, subtotal: 0, total: 0 },
+    { name: '', quantity: 1, unit: 'kom', price: 0, discount: 0, pdv: 17, subtotal: 0, total: 0 },
   ]);
 
   // Load existing document data when in edit mode
@@ -502,7 +502,7 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
         </Button>
         <Button type="submit" className="gap-2 btn-float" disabled={isSaving}>
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {isEditMode ? 'Spremi promjene' : 'Spremi dokument'}
+          {isEditMode ? 'Sačuvaj promjene' : 'Sačuvaj dokument'}
         </Button>
       </div>
 
@@ -655,20 +655,20 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
               </div>
               <div>
                 <Label htmlFor="clientOib" className={validationErrors.clientOib ? 'text-destructive' : ''}>
-                  OIB
+                  JIB
                 </Label>
                 <Input
                   id="clientOib"
                   value={formData.clientOib}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 13);
                     setFormData({ ...formData, clientOib: value });
                     if (validationErrors.clientOib) {
                       setValidationErrors(prev => ({ ...prev, clientOib: undefined }));
                     }
                   }}
-                  placeholder="12345678901"
-                  maxLength={11}
+                  placeholder="4200000000000"
+                  maxLength={13}
                   className={cn("mt-1.5", validationErrors.clientOib && "border-destructive focus-visible:ring-destructive")}
                 />
                 {validationErrors.clientOib && (

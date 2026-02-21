@@ -45,7 +45,7 @@ export function MosquitoNetDocumentView({ document, companySettings }: MosquitoN
           <h3 className="font-medium mb-1">KUPAC / NARUČITELJ</h3>
           <p className="font-semibold">{document.clientName}</p>
           <p>{document.clientAddress}</p>
-          {document.clientOib && <p>OIB: {document.clientOib}</p>}
+          {document.clientOib && <p>JIB: {document.clientOib}</p>}
           {document.clientPhone && <p>Tel: {document.clientPhone}</p>}
           {document.clientEmail && <p>Email: {document.clientEmail}</p>}
         </div>

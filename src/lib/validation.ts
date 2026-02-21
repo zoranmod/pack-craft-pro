@@ -1,28 +1,15 @@
 // Validation utilities for documents
 
-// Croatian OIB validation
+// BiH JIB validation (13 digits)
 export const validateOIB = (oib: string): { valid: boolean; message: string } => {
-  // OIB is optional
+  // JIB is optional
   if (!oib || oib.trim() === '') {
     return { valid: true, message: '' };
   }
 
-  // Must be exactly 11 digits
-  if (!/^\d{11}$/.test(oib)) {
-    return { valid: false, message: 'OIB mora sadržavati točno 11 znamenaka' };
-  }
-
-  // Checksum validation (ISO 7064, MOD 11-10)
-  let remainder = 10;
-  for (let i = 0; i < 10; i++) {
-    remainder = (remainder + parseInt(oib[i], 10)) % 10;
-    if (remainder === 0) remainder = 10;
-    remainder = (remainder * 2) % 11;
-  }
-  const checkDigit = (11 - remainder) % 10;
-  
-  if (checkDigit !== parseInt(oib[10], 10)) {
-    return { valid: false, message: 'OIB nije validan (pogrešna kontrolna znamenka)' };
+  // Must be exactly 13 digits for BiH JIB
+  if (!/^\d{13}$/.test(oib)) {
+    return { valid: false, message: 'JIB mora sadržavati tačno 13 znamenki' };
   }
 
   return { valid: true, message: '' };

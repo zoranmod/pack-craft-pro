@@ -453,7 +453,7 @@ const Settings = () => {
                     id="companyName" 
                     value={company.company_name}
                     onChange={(e) => setCompany({ ...company, company_name: e.target.value })}
-                    placeholder="Akord d.o.o. za Proizvodnju, Trgovinu i Usluge,"
+                    placeholder="Adaptiva Design d.o.o."
                     className="mt-1.5" 
                   />
                 </div>
@@ -463,18 +463,18 @@ const Settings = () => {
                     id="address" 
                     value={company.address}
                     onChange={(e) => setCompany({ ...company, address: e.target.value })}
-                    placeholder="32270 Županja, Veliki kraj 131, Hrvatska"
+                    placeholder="Sarajevo, Bosna i Hercegovina"
                     className="mt-1.5" 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="oib">OIB</Label>
+                  <Label htmlFor="oib">JIB</Label>
                   <Input 
                     id="oib" 
                     value={company.oib}
                     onChange={(e) => setCompany({ ...company, oib: e.target.value })}
-                    placeholder="97777678206"
-                    maxLength={11}
+                    placeholder="4200000000000"
+                    maxLength={13}
                     className="mt-1.5" 
                   />
                 </div>
@@ -484,7 +484,7 @@ const Settings = () => {
                     id="pdvId" 
                     value={company.pdv_id}
                     onChange={(e) => setCompany({ ...company, pdv_id: e.target.value })}
-                    placeholder="HR9777767820"
+                    placeholder="200000000000"
                     className="mt-1.5" 
                   />
                 </div>
@@ -501,7 +501,7 @@ const Settings = () => {
             </div>
             <div>
               <h2 className="font-semibold text-foreground">Bankarski podaci</h2>
-              <p className="text-sm text-muted-foreground">IBAN računi i SWIFT kodovi</p>
+              <p className="text-sm text-muted-foreground">Transakcijski računi i SWIFT kodovi</p>
             </div>
           </div>
           
@@ -532,12 +532,12 @@ const Settings = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="iban">IBAN</Label>
+                    <Label htmlFor="iban">Transakcijski račun</Label>
                     <Input 
                       id="iban" 
                       value={company.iban}
                       onChange={(e) => setCompany({ ...company, iban: e.target.value })}
-                      placeholder="HR7123400091110309063"
+                      placeholder="1990000000000000"
                       className="mt-1.5" 
                     />
                   </div>
@@ -569,7 +569,7 @@ const Settings = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="iban2">IBAN</Label>
+                    <Label htmlFor="iban2">Transakcijski račun</Label>
                     <Input 
                       id="iban2" 
                       value={company.iban_2}
@@ -634,7 +634,7 @@ const Settings = () => {
                   id="website" 
                   value={company.website}
                   onChange={(e) => setCompany({ ...company, website: e.target.value })}
-                  placeholder="www.akord-zupanja.hr"
+                  placeholder="www.adaptivadesign.ba"
                   className="mt-1.5" 
                 />
               </div>
@@ -645,7 +645,7 @@ const Settings = () => {
                   type="email"
                   value={company.email_info}
                   onChange={(e) => setCompany({ ...company, email_info: e.target.value })}
-                  placeholder="info@akord-zupanja.hr"
+                  placeholder="info@adaptivadesign.ba"
                   className="mt-1.5" 
                 />
               </div>
@@ -668,12 +668,12 @@ const Settings = () => {
           {!companyLoading && (
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="registrationCourt">Sudski registar</Label>
+                <Label htmlFor="registrationCourt">Registracija</Label>
                 <Input 
                   id="registrationCourt" 
                   value={company.registration_court}
                   onChange={(e) => setCompany({ ...company, registration_court: e.target.value })}
-                  placeholder="Trgovački sud u Osijeku"
+                  placeholder="Općinski sud u Sarajevu"
                   className="mt-1.5" 
                 />
               </div>
@@ -693,7 +693,7 @@ const Settings = () => {
                   id="capitalAmount" 
                   value={company.capital_amount}
                   onChange={(e) => setCompany({ ...company, capital_amount: e.target.value })}
-                  placeholder="1.160.000,00 kn"
+                  placeholder="2.000,00 KM"
                   className="mt-1.5" 
                 />
               </div>
@@ -713,7 +713,7 @@ const Settings = () => {
           <div className="mt-6">
             <Button onClick={handleSaveCompany} disabled={saveCompany.isPending}>
               {saveCompany.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Spremi sve podatke o tvrtki
+              Sačuvaj sve podatke o firmi
             </Button>
           </div>
         </div>

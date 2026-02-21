@@ -280,8 +280,8 @@ const StandardDocumentPDF = ({
   const qtyLabel = isOtpremnica ? 'Količina' : 'Kol.';
   const showDiscount = template?.show_discount_column !== false;
 
-  const website = companySettings?.website || 'www.akord-zupanja.hr';
-  const email = companySettings?.email_info || 'info@akord-zupanja.hr';
+  const website = companySettings?.website || 'www.adaptivadesign.ba';
+  const email = companySettings?.email_info || 'info@adaptivadesign.ba';
   const phoneMain = companySettings?.phone_main;
   const phoneSales = companySettings?.phone_sales;
   const phoneAccounting = companySettings?.phone_accounting;
@@ -313,7 +313,7 @@ const StandardDocumentPDF = ({
             <Text style={styles.sectionTitle}>KUPAC / NARUČITELJ</Text>
             <Text style={styles.textBold}>{doc.clientName}</Text>
             <Text style={styles.text}>{doc.clientAddress}</Text>
-            {doc.clientOib && <Text style={styles.text}>OIB: {doc.clientOib}</Text>}
+            {doc.clientOib && <Text style={styles.text}>JIB: {doc.clientOib}</Text>}
             {doc.clientPhone && <Text style={styles.text}>Tel: {doc.clientPhone}</Text>}
             {doc.clientEmail && <Text style={styles.text}>Email: {doc.clientEmail}</Text>}
             {doc.contactPerson && <Text style={styles.text}>Kontakt: {doc.contactPerson}</Text>}
@@ -372,14 +372,14 @@ const StandardDocumentPDF = ({
               <Text style={[styles.tableCell, { width: hasPrices ? colWidthsWithPrices.qty : colWidthsNoPrices.qty, textAlign: 'center' }]}>{item.quantity}</Text>
               {hasPrices && (
                 <>
-                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.price, textAlign: 'right' }]}>{formatCurrency(item.price)} €</Text>
+                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.price, textAlign: 'right' }]}>{formatCurrency(item.price)} KM</Text>
                   {showDiscount && (
                     <Text style={[styles.tableCell, { width: colWidthsWithPrices.discount, textAlign: 'right' }]}>
                       {item.discount > 0 ? `${round2(item.discount)}%` : null}
                     </Text>
                   )}
                   <Text style={[styles.tableCell, { width: colWidthsWithPrices.pdv, textAlign: 'right' }]}>{round2(item.pdv)}%</Text>
-                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.total, textAlign: 'right', fontWeight: 'bold' }]}>{formatCurrency(item.total)} €</Text>
+                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.total, textAlign: 'right', fontWeight: 'bold' }]}>{formatCurrency(item.total)} KM</Text>
                 </>
               )}
             </View>
@@ -391,23 +391,23 @@ const StandardDocumentPDF = ({
           <View style={styles.totalsSection}>
             <View style={styles.totalsRow}>
               <Text style={styles.text}>Osnovica:</Text>
-              <Text style={styles.text}>{formatCurrency(subtotal)} €</Text>
+              <Text style={styles.text}>{formatCurrency(subtotal)} KM</Text>
             </View>
             {totalDiscount > 0 && (
               <View style={styles.totalsRow}>
                 <Text style={styles.text}>Rabat:</Text>
-                <Text style={styles.text}>-{formatCurrency(totalDiscount)} €</Text>
+                <Text style={styles.text}>-{formatCurrency(totalDiscount)} KM</Text>
               </View>
             )}
             {template?.show_pdv_breakdown !== false && (
               <View style={styles.totalsRow}>
-                <Text style={styles.text}>PDV (25%):</Text>
-                <Text style={styles.text}>{formatCurrency(totalPdv)} €</Text>
+                <Text style={styles.text}>PDV (17%):</Text>
+                <Text style={styles.text}>{formatCurrency(totalPdv)} KM</Text>
               </View>
             )}
             <View style={styles.totalsFinal}>
               <Text style={styles.textBold}>UKUPNO:</Text>
-              <Text style={styles.textBold}>{formatCurrency(doc.totalAmount)} €</Text>
+              <Text style={styles.textBold}>{formatCurrency(doc.totalAmount)} KM</Text>
             </View>
           </View>
         )}
@@ -561,14 +561,14 @@ const ContractDocumentPDF = ({
     const predujam = doc.totalAmount * 0.3;
     const ostatak = doc.totalAmount - predujam;
     const replacements: Record<string, string> = {
-      '{ukupna_cijena}': `${doc.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
-      '{predujam}': `${predujam.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
-      '{ostatak}': `${ostatak.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
+      '{ukupna_cijena}': `${doc.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
+      '{predujam}': `${predujam.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
+      '{ostatak}': `${ostatak.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
       '{adresa_kupca}': doc.clientAddress || '',
       '{ime_kupca}': doc.clientName || '',
       '{oib_kupca}': doc.clientOib || '',
       '{jamstveni_rok}': '24 mjeseca',
-      '{naziv_prodavatelja}': companySettings?.company_name || 'Akord d.o.o.',
+      '{naziv_prodavatelja}': companySettings?.company_name || 'Adaptiva Design d.o.o.',
       '{adresa_prodavatelja}': companySettings?.address || '',
       '{oib_prodavatelja}': companySettings?.oib || '',
     };
@@ -605,10 +605,10 @@ const ContractDocumentPDF = ({
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.textBold}>1. PRODAVATELJ:</Text>
           <View style={{ marginLeft: 15 }}>
-            <Text style={styles.textBold}>{companySettings?.company_name || 'Akord d.o.o.'}</Text>
+            <Text style={styles.textBold}>{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</Text>
             {companySettings?.address && <Text style={styles.text}>{companySettings.address}</Text>}
-            {companySettings?.oib && <Text style={styles.text}>OIB: {companySettings.oib}</Text>}
-            {companySettings?.iban && <Text style={styles.text}>IBAN: {companySettings.iban}</Text>}
+            {companySettings?.oib && <Text style={styles.text}>JIB: {companySettings.oib}</Text>}
+            {companySettings?.iban && <Text style={styles.text}>Transakcijski račun: {companySettings.iban}</Text>}
           </View>
         </View>
 
@@ -618,7 +618,7 @@ const ContractDocumentPDF = ({
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.textBold}>{doc.clientName}</Text>
             {doc.clientAddress && <Text style={styles.text}>{doc.clientAddress}</Text>}
-            {doc.clientOib && <Text style={styles.text}>OIB: {doc.clientOib}</Text>}
+            {doc.clientOib && <Text style={styles.text}>JIB: {doc.clientOib}</Text>}
             {doc.clientPhone && <Text style={styles.text}>Tel: {doc.clientPhone}</Text>}
             {doc.clientEmail && <Text style={styles.text}>Email: {doc.clientEmail}</Text>}
           </View>
@@ -660,13 +660,13 @@ const ContractDocumentPDF = ({
                 <Text style={[styles.tableCell, { width: '40%' }]}>{item.name}</Text>
                 <Text style={[styles.tableCell, { width: '12%', textAlign: 'center' }]}>{item.quantity}</Text>
                 <Text style={[styles.tableCell, { width: '12%', textAlign: 'center' }]}>{item.unit}</Text>
-                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.price)} €</Text>
-                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.total)} €</Text>
+                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.price)} KM</Text>
+                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.total)} KM</Text>
               </View>
             ))}
             <View style={[styles.tableRow, { borderTopWidth: 2, borderTopColor: '#000' }]}>
               <Text style={[styles.tableCellHeader, { width: '86%', textAlign: 'right' }]}>UKUPNO:</Text>
-              <Text style={[styles.tableCellHeader, { width: '14%', textAlign: 'right' }]}>{formatCurrency(doc.totalAmount)} €</Text>
+              <Text style={[styles.tableCellHeader, { width: '14%', textAlign: 'right' }]}>{formatCurrency(doc.totalAmount)} KM</Text>
             </View>
           </View>
         )}

@@ -71,7 +71,7 @@ const generateDefaultContent = (doc: Document, companySettings?: DocumentWysiwyg
   <p style="font-weight: 600; margin-bottom: 4px;">Klijent:</p>
   <p><strong>${doc.clientName}</strong></p>
   <p>${doc.clientAddress}</p>
-  ${doc.clientOib ? `<p>OIB: ${doc.clientOib}</p>` : ''}
+  ${doc.clientOib ? `<p>JIB: ${doc.clientOib}</p>` : ''}
   ${doc.clientPhone ? `<p>Tel: ${doc.clientPhone}</p>` : ''}
   ${doc.clientEmail ? `<p>Email: ${doc.clientEmail}</p>` : ''}
 </div>
