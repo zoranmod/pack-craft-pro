@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2, Copy } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -51,7 +52,9 @@ const Clients = () => {
   const updateClient = useUpdateClient();
   const deleteClient = useDeleteClient();
 
-  const [search, setSearch] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(initialSearch);
   const debouncedSearch = useDebounce(search, 300);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDuplicateCheckOpen, setIsDuplicateCheckOpen] = useState(false);
