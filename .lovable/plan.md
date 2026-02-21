@@ -1,102 +1,127 @@
 
-# Preporuke za poboljsanje programa
 
-Nakon detaljnog pregleda aplikacije, evo 5 konkretnih prijedloga koji bi donijeli najvecu prakticnu korist za svakodnevni rad:
+# Bosanska verzija programa -- Adaptiva Design ERP
 
----
+## Pregled
 
-## 1. Brzi pregled klijenta (Quick Preview) bez napustanja stranice
+Kreiranje zasebnog programa za bosansko trziste (BiH) kao remix ovog projekta, sa tri kljucne prilagodbe:
 
-**Problem:** Trenutno klik na ime klijenta navigira na drugu stranicu. Cesto korisnik samo zeli brzo pogledati telefon ili adresu klijenta.
-
-**Rjesenje:** Dodati hover karticu (popover) na ime klijenta u tablici dokumenata koja prikazuje:
-- Ime, OIB, adresa
-- Telefon, email
-- Broj dokumenata tog klijenta
-- Gumb "Otvori detalje" za punu navigaciju
-
-**Tehnicke promjene:**
-- Koristiti `HoverCard` komponentu (vec instalirana: `@radix-ui/react-hover-card`)
-- Izmjena u `DocumentList.tsx` -- wrap `clientName` linka u `HoverCard`
-- Novi upit u bazi za dohvat klijenta po imenu (ili kesirano iz vec ucitanih podataka)
+1. **Bosanski jezik** -- svi tekstovi prevedeni na bosanski
+2. **BiH PDV 17%** -- umjesto hrvatskog 25%
+3. **Adaptiva Design dizajn** -- boje, fontovi i stil preuzeti sa adaptivadesign.lovable.app
 
 ---
 
-## 2. Tipkovnicke precice (Keyboard Shortcuts)
+## Korak 1: Remix projekta
 
-**Problem:** Za ceste radnje (novi dokument, pretraga, navigacija) korisnik mora klikati kroz menije.
+Korisnik treba napraviti remix ovog projekta:
+- Ici na **Settings** (ikona zupcanika) u gornjem lijevom kutu
+- Kliknuti **"Remix this project"**
+- Nazvati novi projekt npr. "Adaptiva Design ERP" ili "Adaptiva BiH"
 
-**Rjesenje:** Dodati globalne tipkovnicke precice:
-- `Ctrl+K` / `Cmd+K` -- otvori globalnu pretragu
-- `Ctrl+N` / `Cmd+N` -- novi dokument (otvori dropdown za odabir tipa)
-- `Ctrl+S` / `Cmd+S` -- spremi (na stranicama za uredivanje)
-- `Escape` -- zatvori modal/vrati se nazad
-
-**Tehnicke promjene:**
-- Nova datoteka: `src/hooks/useKeyboardShortcuts.tsx`
-- Integracija u `MainLayout.tsx`
-- Mali indikator precica u tooltipu gumbova
+Nakon remixa, sve daljnje izmjene rade se iskljucivo u novom projektu.
 
 ---
 
-## 3. Oznake/tagovi na dokumentima
+## Korak 2: Promjena dizajna (tema i fontovi)
 
-**Problem:** Dokumenti se mogu filtrirati samo po tipu, statusu i klijentu. Nema mogucnosti grupiranja po projektu, lokaciji ili prilagodenom kriteriju.
+Preuzimamo vizualni identitet sa Adaptiva Design stranice:
 
-**Rjesenje:** Dodati sustav tagova (oznaka) na dokumente:
-- Korisnik moze dodati jedan ili vise tagova na dokument (npr. "Projekt Centar", "Hitno", "Zagreb")
-- Filtriranje po tagovima u tablici dokumenata
-- Automatsko predlaganje postojecih tagova pri unosu
+### Boje (CSS varijable u `index.css`)
+- **Primary/Accent:** Toplo zlatna `40 55% 45%` (light) / `42 60% 50%` (dark)
+- **Background:** Topla bjelkasta `40 10% 96%` umjesto ciste bijele
+- **Card:** `40 10% 98%`
+- **Border:** `35 8% 86%`
+- **Muted:** `35 6% 91%`
+- Dark mode: tamno-smeda osnova `30 8% 8%`
 
-**Tehnicke promjene:**
-- Nova tablica `document_tags` u bazi (id, document_id, tag_name, user_id, created_at)
-- RLS politike za pristup
-- Novi hook `useDocumentTags.tsx`
-- Chip komponenta za prikaz tagova u tablici i na detaljima dokumenta
-- Tag filter u toolbar-u
+### Fontovi
+- **Naslovi:** Space Grotesk (bold, geometric)
+- **Tekst:** Work Sans (clean, readable)
+- Dodati Google Fonts import i konfiguraciju u `tailwind.config.ts`
 
----
-
-## 4. Dupliciranje dokumenta s izmjenom klijenta
-
-**Problem:** Kopiranje dokumenta trenutno kopira sve podatke ukljucujuci klijenta. Cesto korisnik zeli istu ponudu poslati drugom klijentu.
-
-**Rjesenje:** Kod kopiranja dokumenta ponuditi opciju:
-- "Kopiraj za istog klijenta" (kao sada)
-- "Kopiraj za drugog klijenta" -- otvori dijalog za odabir/promjenu klijenta prije kopiranja
-
-**Tehnicke promjene:**
-- Izmjena u `DocumentList.tsx` i `DocumentDetail.tsx` -- novi dijalog s autocomplete za klijente
-- Koristiti vec postojecu `ClientAutocomplete` komponentu
-- Prosirivanje `useCopyDocument` hooka s opcionalnim override podacima
+### Radius
+- `0.5rem` umjesto `10px` -- blaze zaobljeni rubovi
 
 ---
 
-## 5. Statistika po klijentu na kartici klijenta
+## Korak 3: Lokalizacija na bosanski jezik
 
-**Problem:** Na stranici Klijenti nema uvida u to koliko je dokumenata/prometa vezano za pojedinog klijenta.
+Prijevod svih hardkodiranih tekstova u aplikaciji:
 
-**Rjesenje:** Prikazati uz svakog klijenta:
-- Broj dokumenata (po tipu)
-- Ukupni iznos svih ponuda/racuna
-- Datum zadnjeg dokumenta
-- Mini indikator aktivnosti (aktivan/neaktivan)
+| Hrvatski | Bosanski |
+|---|---|
+| Ponude | Ponude |
+| Otpremnice | Otpremnice |
+| Nalozi | Nalozi |
+| Računi | Računi |
+| Klijenti | Klijenti |
+| Dokumenti | Dokumenti |
+| Postavke | Postavke |
+| Novi dokument | Novi dokument |
+| Spremi | Spasi / Sačuvaj |
+| Obriši | Obriši |
+| Uredi | Uredi |
+| Pretraži | Pretraži |
+| Godišnji odmori | Godišnji odmori |
+| Bolovanja | Bolovanja |
+| Zaposlenici | Zaposlenici |
+| OIB | JIB |
+| IBAN | Transakcijski račun |
 
-**Tehnicke promjene:**
-- Agregacijski upit u bazi ili izracun na frontendu iz vec ucitanih dokumenata
-- Prosiriti prikaz klijenta na `Clients.tsx` s dodatnim stupcima ili karticama
-- Opcijski: klikabilni broj dokumenata koji vodi na filtrirani popis dokumenata tog klijenta
+Napomena: vecina poslovnih termina je ista ili vrlo slicna na bosanskom i hrvatskom. Glavne razlike su u terminologiji za porezne identifikatore (JIB umjesto OIB) i nekim glagolskim oblicima.
 
 ---
 
-## Preporuceni redoslijed implementacije
+## Korak 4: Porezne i pravne prilagodbe
 
-| Prioritet | Funkcionalnost | Razlog |
-|---|---|---|
-| 1 | Brzi pregled klijenta (hover) | Odmah koristan, nema promjena u bazi |
-| 2 | Dupliciranje s izmjenom klijenta | Cest use case, mala promjena |
-| 3 | Statistika po klijentu | Daje uvid u poslovanje |
-| 4 | Tagovi na dokumentima | Zahtijeva novu tablicu, ali jako koristan |
-| 5 | Tipkovnicke precice | Poboljsava brzinu rada |
+### PDV
+- Default stopa: **17%** (umjesto 25%)
+- BiH ima jednu stopu PDV-a (nema snizene stope)
 
-Odaberite koje od ovih zelite implementirati, ili mozemo kombinirati vise njih u jednom koraku.
+### Identifikatori tvrtke
+- **JIB** (Jedinstveni identifikacioni broj) umjesto OIB
+- **PDV broj** -- format drugaciji od hrvatskog
+- Registracija kod opcijskog suda umjesto trgovackog
+
+### Valuta
+- **KM (Konvertibilna marka)** umjesto EUR
+- Format: `1.234,56 KM`
+
+### Promjene u kodu
+- `companySettings.ts` -- polja `oib` preimenovati label u "JIB", dodati polje za PDV broj BiH formata
+- `DocumentForm` i svi PDF generatori -- KM umjesto EUR, 17% PDV
+- Default postavke u `defaultCompanySettings`
+
+---
+
+## Korak 5: Logo i branding
+
+- Zamijeniti Akord logo sa Adaptiva Design logom
+- Azurirati nazive u headeru, sidebar-u i memorandumu
+- Korisnik ce trebati uploadati svoj logo i memorandum header/footer
+
+---
+
+## Datoteke koje se mijenjaju (u remixanom projektu)
+
+| Datoteka | Promjena |
+|---|---|
+| `src/index.css` | Nove boje i font import iz Adaptiva teme |
+| `tailwind.config.ts` | Space Grotesk + Work Sans fontovi, novi radius |
+| `src/components/layout/Sidebar.tsx` | Bosanski nazivi navigacije |
+| `src/components/layout/Header.tsx` | Bosanski tekst |
+| `src/pages/*.tsx` | Prijevod svih page titlova i labela |
+| `src/components/documents/DocumentForm.tsx` | JIB, KM, 17% PDV |
+| `src/types/companySettings.ts` | JIB umjesto OIB, KM default |
+| `src/lib/pdfGenerator.tsx` | KM valuta, BiH format |
+| `src/hooks/useSettings.tsx` | Default 17% PDV |
+| `src/config/documentStatus.ts` | Bosanski nazivi statusa |
+| Svi form/dialog komponenti | Prevedeni labeli i placeholder tekst |
+
+---
+
+## Sljedeci korak
+
+**Korisnik treba napraviti remix projekta** -- nakon toga cu u novom projektu implementirati sve gore navedene promjene. Remix se pravi u Settings -> "Remix this project".
+
