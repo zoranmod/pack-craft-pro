@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2, Copy } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Plus, Edit, Trash2, User, Phone, Mail, MapPin, Building2, Copy, FileText } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -27,11 +27,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient, Client, CreateClientData } from '@/hooks/useClients';
+import { useDocuments } from '@/hooks/useDocuments';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DuplicateCheckerDialog } from '@/components/shared/DuplicateCheckerDialog';
 import { getDuplicateCount } from '@/lib/duplicateUtils';
 import { useIgnoredDuplicates } from '@/hooks/useIgnoredDuplicates';
 import { toast } from '@/hooks/use-toast';
+import { formatDateHR } from '@/lib/utils';
 
 const emptyForm: CreateClientData = {
   name: '',
@@ -48,9 +50,26 @@ const emptyForm: CreateClientData = {
 
 const Clients = () => {
   const { data: clients = [], isLoading } = useClients();
+  const { data: allDocuments = [] } = useDocuments();
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
   const deleteClient = useDeleteClient();
+
+  // Build client stats from documents
+  const clientStats = useMemo(() => {
+    const stats: Record<string, { docCount: number; totalAmount: number; lastDate: string }> = {};
+    allDocuments.forEach(doc => {
+      if (!stats[doc.clientName]) {
+        stats[doc.clientName] = { docCount: 0, totalAmount: 0, lastDate: '' };
+      }
+      stats[doc.clientName].docCount += 1;
+      stats[doc.clientName].totalAmount += doc.totalAmount;
+      if (doc.date > stats[doc.clientName].lastDate) {
+        stats[doc.clientName].lastDate = doc.date;
+      }
+    });
+    return stats;
+  }, [allDocuments]);
 
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
@@ -245,6 +264,25 @@ const Clients = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Client Stats */}
+                {clientStats[client.name] && (
+                  <div className="flex items-center gap-3 pt-2 mt-2 border-t border-border text-xs text-muted-foreground">
+                    <Link 
+                      to={`/documents?search=${encodeURIComponent(client.name)}`}
+                      className="flex items-center gap-1 hover:text-primary transition-colors"
+                    >
+                      <FileText className="h-3 w-3" />
+                      {clientStats[client.name].docCount} dok.
+                    </Link>
+                    <span className="font-medium text-foreground">
+                      {clientStats[client.name].totalAmount.toLocaleString('hr-HR')} €
+                    </span>
+                    <span>
+                      Zadnji: {formatDateHR(clientStats[client.name].lastDate)}
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>

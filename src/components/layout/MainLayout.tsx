@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -15,6 +16,8 @@ export function MainLayout({ children, title, subtitle, showGlobalSearch = false
   const isMobile = useIsMobile();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useKeyboardShortcuts();
 
   // Defensive cleanup: in rare cases Radix layers can leave pointer-events locked after fast route changes.
   useEffect(() => {
