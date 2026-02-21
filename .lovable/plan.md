@@ -1,36 +1,30 @@
 
-# Sortiranje dokumenata u tablici
+# Klik na ime klijenta u listi dokumenata
 
 ## Sto se radi
-Dodavanje mogucnosti sortiranja dokumenata klikom na zaglavlja stupaca tablice. Korisnik moze sortirati po: klijentu, datumu, statusu, iznosu i datumu izmjene.
+Omoguciti da klik na ime klijenta u tablici dokumenata otvori podatke tog klijenta. Posto ne postoji zasebna stranica za detalje klijenta, klik ce navigirati na stranicu **Klijenti** (`/clients`) s unaprijed popunjenim pretrazivanjem po imenu tog klijenta -- tako da korisnik odmah vidi podatke tog klijenta.
 
-## Kako funkcionira
-- Klik na zaglavlje stupca sortira po tom stupcu uzlazno (A-Z, najstariji prvo, najmanji iznos)
-- Drugi klik na isto zaglavlje sortira silazno (Z-A, najnoviji prvo, najveci iznos)
-- Treci klik vraca na defaultno (bez sortiranja)
-- Aktivni stupac prikazuje strelicu gore/dolje
+## Kako ce funkcionirati
+1. Korisnik klikne na ime klijenta u tablici dokumenata (npr. "Davor Kadic")
+2. Aplikacija otvara stranicu `/clients?search=Davor+Kadic`
+3. Stranica Klijenti automatski filtrira prikaz na tog klijenta
+4. Korisnik moze odmah vidjeti ili urediti podatke klijenta
 
 ## Tehnicke promjene
 
-### 1. Datoteka: `src/components/documents/DocumentList.tsx`
+### 1. `src/components/documents/DocumentList.tsx`
+- Ime klijenta u stupcu "Klijent" postaje klikabilni link
+- Link vodi na `/clients?search={clientName}` (URL-encoded)
+- Stilizacija: podvuceni tekst pri hoveru, kursor pointer
+- Klik na link ne smije triggerati klik na red tablice
 
-Dodati state za sortiranje i logiku:
+### 2. `src/pages/Clients.tsx`
+- Procitati `search` query parametar iz URL-a pri ucitavanju stranice
+- Ako postoji `search` parametar, inicijalizirati polje za pretrazivanje s tom vrijednoscu
 
-```text
-- Novi state: sortField (null | 'clientName' | 'date' | 'status' | 'totalAmount' | 'updatedAt')
-- Novi state: sortDirection ('asc' | 'desc')
-- Funkcija handleSort(field) koja togglea smjer ili resetira
-- sortedDocs = useMemo koji sortira filteredDocs prema aktivnom polju
-```
-
-Zamijeniti staticke `<th>` elemente s klikabilnim zaglavljima koja prikazuju strelicu sortiranja (koristeci `ArrowUpDown`, `ArrowUp`, `ArrowDown` ikone iz lucide-react).
-
-Dodati novi stupac "Izmijenjeno" (`updatedAt`) u tablicu -- izmedu "Datum" i "Status", ili na kraj prije "Akcije".
-
-### 2. Datoteke koje se mijenjaju
+## Datoteke koje se mijenjaju
 
 | Datoteka | Akcija |
 |---|---|
-| `src/components/documents/DocumentList.tsx` | Izmjena -- dodavanje sortiranja i stupca "Izmijenjeno" |
-
-Nema promjena u bazi podataka niti novih datoteka. Sortiranje se radi iskljucivo na frontend strani nad vec dohvacenim podacima.
+| `src/components/documents/DocumentList.tsx` | Izmjena -- klijent ime kao link |
+| `src/pages/Clients.tsx` | Izmjena -- citanje search parametra iz URL-a |
