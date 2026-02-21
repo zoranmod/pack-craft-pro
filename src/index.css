@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap");
 
 @layer base {
   :root {
@@ -12,33 +12,33 @@
        Light mode: clean white/gray, no warm tones
        ============================================= */
 
-    /* Core backgrounds: Pure white */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    /* Core backgrounds: Warm off-white */
+    --background: 40 10% 96%;
+    --foreground: 30 8% 12%;
 
     /* Card surfaces */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card: 40 10% 98%;
+    --card-foreground: 30 8% 12%;
 
     /* Popover/dropdown surfaces */
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover: 40 10% 98%;
+    --popover-foreground: 30 8% 12%;
 
-    /* Primary: Akord Amber (premium orange-gold) - ONLY accent color */
-    --primary: 38 92% 55%;
-    --primary-foreground: 0 0% 9%;
+    /* Primary: Adaptiva warm gold */
+    --primary: 40 55% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Neutral gray */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    /* Secondary: Warm neutral */
+    --secondary: 35 6% 91%;
+    --secondary-foreground: 30 8% 12%;
 
-    /* Muted: Neutral gray for backgrounds and text */
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    /* Muted: Warm neutral for backgrounds and text */
+    --muted: 35 6% 91%;
+    --muted-foreground: 30 5% 45%;
 
-    /* Accent: Uses Akord Amber for highlights */
-    --accent: 38 92% 55%;
-    --accent-foreground: 0 0% 9%;
+    /* Accent: Warm gold highlights */
+    --accent: 40 55% 45%;
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive: Clean red */
     --destructive: 0 84% 60%;
@@ -48,32 +48,32 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning: Matches primary for consistency */
-    --warning: 38 92% 55%;
-    --warning-foreground: 0 0% 9%;
+    /* Warning: Warm gold for consistency */
+    --warning: 40 55% 45%;
+    --warning-foreground: 0 0% 100%;
 
-    /* Borders and inputs: Neutral gray */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 38 92% 55%;
+    /* Borders and inputs: Warm gray */
+    --border: 35 8% 86%;
+    --input: 35 8% 86%;
+    --ring: 40 55% 45%;
 
     /* Badge neutral */
-    --badge-neutral: 0 0% 90%;
+    --badge-neutral: 35 8% 86%;
 
-    /* Radius: Stripe-like subtle rounding */
-    --radius: 10px;
+    /* Radius: Softer rounding */
+    --radius: 0.5rem;
 
-    /* Sidebar tokens: Pure neutral */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 9%;
-    --sidebar-primary: 38 92% 55%;
-    --sidebar-primary-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 38 92% 55%;
+    /* Sidebar tokens: Warm neutral */
+    --sidebar-background: 40 10% 98%;
+    --sidebar-foreground: 30 8% 12%;
+    --sidebar-primary: 40 55% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 35 6% 91%;
+    --sidebar-accent-foreground: 30 8% 12%;
+    --sidebar-border: 35 8% 86%;
+    --sidebar-ring: 40 55% 45%;
 
-    /* Minimal shadows (Stripe-like: borders > shadows) */
+    /* Minimal shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.08);
@@ -87,35 +87,35 @@
        Improved readability with subtle separation
        ============================================= */
 
-    /* Core backgrounds: Neutral charcoal */
-    --background: 0 0% 7%;
-    --foreground: 0 0% 96%;
+    /* Core backgrounds: Dark warm brown */
+    --background: 30 8% 8%;
+    --foreground: 35 10% 96%;
 
-    /* Card surfaces: Slightly lighter for separation */
-    --card: 0 0% 11%;
-    --card-foreground: 0 0% 96%;
+    /* Card surfaces */
+    --card: 30 8% 12%;
+    --card-foreground: 35 10% 96%;
 
-    /* Popover/dropdown surfaces: Match cards */
-    --popover: 0 0% 11%;
-    --popover-foreground: 0 0% 96%;
+    /* Popover/dropdown surfaces */
+    --popover: 30 8% 12%;
+    --popover-foreground: 35 10% 96%;
 
-    /* Primary: Akord Amber (only warm accent) */
-    --primary: 38 92% 60%;
+    /* Primary: Adaptiva warm gold (dark) */
+    --primary: 42 60% 50%;
     --primary-foreground: 0 0% 10%;
 
-    /* Secondary: Neutral dark */
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 96%;
+    /* Secondary */
+    --secondary: 30 6% 16%;
+    --secondary-foreground: 35 10% 96%;
 
-    /* Muted: Clearer for better visibility */
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 72%;
+    /* Muted */
+    --muted: 30 6% 16%;
+    --muted-foreground: 35 5% 72%;
 
-    /* Accent: Akord Amber for dark mode */
-    --accent: 38 92% 60%;
+    /* Accent */
+    --accent: 42 60% 50%;
     --accent-foreground: 0 0% 10%;
 
-    /* Destructive: Softer red for dark */
+    /* Destructive */
     --destructive: 0 62% 55%;
     --destructive-foreground: 0 0% 100%;
 
@@ -124,28 +124,28 @@
     --success-foreground: 0 0% 100%;
 
     /* Warning */
-    --warning: 38 92% 60%;
+    --warning: 42 60% 50%;
     --warning-foreground: 0 0% 10%;
 
-    /* Borders and inputs: Clearer separation */
-    --border: 0 0% 22%;
-    --input: 0 0% 22%;
-    --ring: 38 92% 60%;
+    /* Borders and inputs */
+    --border: 30 6% 22%;
+    --input: 30 6% 22%;
+    --ring: 42 60% 50%;
 
     /* Badge neutral */
-    --badge-neutral: 0 0% 24%;
+    --badge-neutral: 30 6% 24%;
 
-    /* Sidebar tokens: Neutral charcoal */
-    --sidebar-background: 0 0% 7%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 38 92% 60%;
+    /* Sidebar tokens */
+    --sidebar-background: 30 8% 8%;
+    --sidebar-foreground: 35 10% 96%;
+    --sidebar-primary: 42 60% 50%;
     --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 0 0% 22%;
-    --sidebar-ring: 38 92% 60%;
+    --sidebar-accent: 30 6% 16%;
+    --sidebar-accent-foreground: 35 10% 96%;
+    --sidebar-border: 30 6% 22%;
+    --sidebar-ring: 42 60% 50%;
 
-    /* Shadows: Subtle elevation + soft top highlight */
+    /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.5);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.6);
@@ -160,7 +160,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Work Sans", system-ui, sans-serif;
   }
 
   h1,

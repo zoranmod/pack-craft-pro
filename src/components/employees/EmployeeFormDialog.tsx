@@ -222,9 +222,9 @@ export function EmployeeFormDialog({ open, onOpenChange, employee }: EmployeeFor
                 name="oib"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>OIB</FormLabel>
+                    <FormLabel>JIB</FormLabel>
                     <FormControl>
-                      <Input {...field} maxLength={11} />
+                      <Input {...field} maxLength={13} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

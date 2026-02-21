@@ -25,18 +25,18 @@ const placeholders = [
   { key: '{broj_dokumenta}', label: 'Broj dokumenta', example: 'UG-2025-001' },
   { key: '{datum}', label: 'Datum', example: '12.01.2025.' },
   { key: '{mjesto}', label: 'Mjesto', example: 'Zagreb' },
-  { key: '{naziv_prodavatelja}', label: 'Naziv prodavatelja', example: 'Akord d.o.o.' },
-  { key: '{adresa_prodavatelja}', label: 'Adresa prodavatelja', example: 'Ulica 123, Zagreb' },
-  { key: '{oib_prodavatelja}', label: 'OIB prodavatelja', example: '12345678901' },
-  { key: '{iban_prodavatelja}', label: 'IBAN prodavatelja', example: 'HR1234567890123456789' },
-  { key: '{ime_kupca}', label: 'Ime kupca', example: 'Ivan Horvat' },
-  { key: '{adresa_kupca}', label: 'Adresa kupca', example: 'Ulica 456, Split' },
-  { key: '{oib_kupca}', label: 'OIB kupca', example: '98765432109' },
-  { key: '{telefon_kupca}', label: 'Telefon kupca', example: '+385 91 123 4567' },
-  { key: '{email_kupca}', label: 'Email kupca', example: 'ivan@example.com' },
-  { key: '{ukupna_cijena}', label: 'Ukupna cijena', example: '10.000,00 €' },
-  { key: '{predujam}', label: 'Predujam', example: '3.000,00 €' },
-  { key: '{ostatak}', label: 'Ostatak', example: '7.000,00 €' },
+  { key: '{naziv_prodavatelja}', label: 'Naziv prodavatelja', example: 'Adaptiva Design d.o.o.' },
+  { key: '{adresa_prodavatelja}', label: 'Adresa prodavatelja', example: 'Ulica 123, Sarajevo' },
+  { key: '{oib_prodavatelja}', label: 'JIB prodavatelja', example: '4200000000000' },
+  { key: '{iban_prodavatelja}', label: 'Transakcijski račun prodavatelja', example: '1990000000000000' },
+  { key: '{ime_kupca}', label: 'Ime kupca', example: 'Emir Hadžić' },
+  { key: '{adresa_kupca}', label: 'Adresa kupca', example: 'Ulica 456, Mostar' },
+  { key: '{oib_kupca}', label: 'JIB kupca', example: '4200000000001' },
+  { key: '{telefon_kupca}', label: 'Telefon kupca', example: '+387 61 123 456' },
+  { key: '{email_kupca}', label: 'Email kupca', example: 'emir@example.com' },
+  { key: '{ukupna_cijena}', label: 'Ukupna cijena', example: '10.000,00 KM' },
+  { key: '{predujam}', label: 'Predujam', example: '3.000,00 KM' },
+  { key: '{ostatak}', label: 'Ostatak', example: '7.000,00 KM' },
   { key: '{rok_isporuke}', label: 'Rok isporuke (dana)', example: '60' },
   { key: '{jamstveni_rok}', label: 'Jamstveni rok', example: '24 mjeseca' },
 ];
@@ -74,10 +74,10 @@ export default function ContractLayoutEditor() {
     let content = htmlContent;
     
     // Replace with company settings if available
-    content = content.replace(/\{naziv_prodavatelja\}/g, companySettings?.company_name || 'Akord d.o.o.');
-    content = content.replace(/\{adresa_prodavatelja\}/g, companySettings?.address || 'Adresa tvrtke');
-    content = content.replace(/\{oib_prodavatelja\}/g, companySettings?.oib || '12345678901');
-    content = content.replace(/\{iban_prodavatelja\}/g, companySettings?.iban || 'HR1234567890123456789');
+    content = content.replace(/\{naziv_prodavatelja\}/g, companySettings?.company_name || 'Adaptiva Design d.o.o.');
+    content = content.replace(/\{adresa_prodavatelja\}/g, companySettings?.address || 'Adresa firme');
+    content = content.replace(/\{oib_prodavatelja\}/g, companySettings?.oib || '4200000000000');
+    content = content.replace(/\{iban_prodavatelja\}/g, companySettings?.iban || '1990000000000000');
     
     // Replace other placeholders with examples
     placeholders.forEach(p => {

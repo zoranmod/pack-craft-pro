@@ -3,10 +3,10 @@ export const MemorandumFooter = () => {
     <div className="memorandum-footer">
       <div className="footer-lines-wrap">
         <p className="footer-line">
-          www.akord-zupanja.hr • info@akord-zupanja.hr • Besplatan info tel: 0800 9455
+          www.adaptivadesign.ba • info@adaptivadesign.ba
         </p>
         <p className="footer-line">
-          Maloprodaja +385 32 830 345 • Veleprodaja +385 32 830 346 • Projektiranje namještaja +385 32 638 776 • Računovodstvo +385 32 638 900
+          Adaptiva Design d.o.o.
         </p>
       </div>
     </div>
