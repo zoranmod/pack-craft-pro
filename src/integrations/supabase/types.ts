@@ -58,6 +58,275 @@ export type Database = {
           },
         ]
       }
+      apartment_documents: {
+        Row: {
+          created_at: string
+          date: string
+          document_type: string
+          guest_name: string | null
+          id: string
+          notes: string | null
+          number: string
+          owner_user_id: string
+          pdf_data: Json | null
+          reservation_id: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          document_type?: string
+          guest_name?: string | null
+          id?: string
+          notes?: string | null
+          number: string
+          owner_user_id: string
+          pdf_data?: Json | null
+          reservation_id?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          document_type?: string
+          guest_name?: string | null
+          id?: string
+          notes?: string | null
+          number?: string
+          owner_user_id?: string
+          pdf_data?: Json | null
+          reservation_id?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apartment_documents_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "apartment_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      apartment_guests: {
+        Row: {
+          address: string | null
+          company_name: string | null
+          contact_person: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          first_name: string | null
+          guest_type: string
+          id: string
+          id_number: string | null
+          jib: string | null
+          last_name: string | null
+          nationality: string | null
+          owner_user_id: string
+          pdv_number: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          company_name?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string | null
+          guest_type?: string
+          id?: string
+          id_number?: string | null
+          jib?: string | null
+          last_name?: string | null
+          nationality?: string | null
+          owner_user_id: string
+          pdv_number?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          company_name?: string | null
+          contact_person?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string | null
+          guest_type?: string
+          id?: string
+          id_number?: string | null
+          jib?: string | null
+          last_name?: string | null
+          nationality?: string | null
+          owner_user_id?: string
+          pdv_number?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apartment_reservations: {
+        Row: {
+          adults: number
+          booking_reference: string | null
+          breakfast_included: boolean
+          breakfast_price_per_person: number
+          check_in: string
+          check_out: string
+          children: number
+          created_at: string
+          guest_id: string | null
+          id: string
+          notes: string | null
+          owner_user_id: string
+          price_per_person: number
+          source: string
+          status: string
+          total_amount: number
+          tourist_tax_per_person: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          adults?: number
+          booking_reference?: string | null
+          breakfast_included?: boolean
+          breakfast_price_per_person?: number
+          check_in: string
+          check_out: string
+          children?: number
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          notes?: string | null
+          owner_user_id: string
+          price_per_person?: number
+          source?: string
+          status?: string
+          total_amount?: number
+          tourist_tax_per_person?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          adults?: number
+          booking_reference?: string | null
+          breakfast_included?: boolean
+          breakfast_price_per_person?: number
+          check_in?: string
+          check_out?: string
+          children?: number
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          notes?: string | null
+          owner_user_id?: string
+          price_per_person?: number
+          source?: string
+          status?: string
+          total_amount?: number
+          tourist_tax_per_person?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apartment_reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "apartment_guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apartment_reservations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "apartment_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      apartment_units: {
+        Row: {
+          capacity: number
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          owner_user_id: string
+          price_per_person: number
+          unit_type: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          owner_user_id: string
+          price_per_person?: number
+          unit_type?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          owner_user_id?: string
+          price_per_person?: number
+          unit_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apartment_users: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          id: string
+          name: string
+          owner_user_id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          id?: string
+          name: string
+          owner_user_id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          owner_user_id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           barcode: string | null
