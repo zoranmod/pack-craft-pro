@@ -1,52 +1,62 @@
 
 
-# Plan: Import podataka iz Excel tablice
+# Plan: Lokalizacija na HR + PDF generiranje za apartmanske dokumente
 
-## Izvučeni podaci iz Excela
+## 1. Lokalizacija engleskih termina na hrvatski
 
-### 1. Cjenik apartmana (Page 5)
-Potpuno strukturirani podaci — spreman za import u `apartment_price_list`:
+Sljedeći engleski termini trebaju biti prevedeni u svim apartmanskim stranicama:
 
-| Tip | Osobe | Bez doručka | S doručkom |
-|-----|-------|-------------|------------|
-| Apartman | 1 | 50 € | 60 € |
-| Apartman | 2 | 60 € | 80 € |
-| Apartman | 3 | 80 € | 110 € |
-| Apartman | 4 | 100 € | 140 € |
-| Apartman | 5 | 120 € | 170 € |
-| Apartman | 6 | 140 € | 200 € |
-| Soba | 1 | 50 € | 60 € |
-| Soba | 2 | 60 € | 80 € |
-| Soba | 3 | 80 € | 110 € |
+| Trenutno | Promjena |
+|---|---|
+| "Check-in" | "Dolazak" |
+| "Check-out" | "Odlazak" |
+| "Dashboard" | "Početna" |
+| "Check-in danas" / "Check-out danas" | "Dolasci danas" / "Odlasci danas" |
+| "Nema check-in-ova za danas" | "Nema dolazaka za danas" |
+| "Nema check-out-ova za danas" | "Nema odlazaka za danas" |
+| statusLabels "Check-in" / "Check-out" | "Prijavljen" / "Odjavljen" |
 
-### 2. Evidencija računa (Page 6)
-24 računa s načinom plaćanja, datumom i iznosom — import u `apartment_documents`.
+**Datoteke:**
+- `src/pages/apartmani/ApartmentDashboard.tsx`
+- `src/pages/apartmani/ApartmentReservations.tsx`
+- `src/pages/apartmani/ApartmentDocuments.tsx`
+- `src/components/apartmani/ApartmentLayout.tsx` (nav label "Dashboard" → "Početna")
 
-### 3. Baza klijenata/dobavljača (Page 7+)
-Cca 400+ zapisa s nazivom, šifrom, adresom, OIB-om i kontakt podacima. Ovo su **dobavljači glavnog ERP-a (Akord)**, ne apartmanski gosti. Import u `clients` tablicu ili `suppliers` tablicu u glavnom ERP-u.
+## 2. PDF generiranje za apartmanske dokumente
 
-## Što ću napraviti
+Kreirati novi PDF generator za apartmane koristeći `@react-pdf/renderer` (isti pristup kao glavni Akord portal), baziran na izgledu iz Excel tablice (račun sa zaglavljem firme, stavkama, i napomenama).
 
-1. **Kreirati stranicu za import** na apartmanskom portalu s gumbom koji pokreće batch insert
-2. **Cjenik**: automatski upisati 9 redova u `apartment_price_list` tablicu koristeći SQL insert
-3. **Evidencija računa**: upisati 24 dokumenta u `apartment_documents`
-4. **Baza dobavljača**: upisati ~400 zapisa u `clients` tablicu glavnog ERP-a (jer su to Akord dobavljači, ne apartmanski gosti)
+### Nova datoteka: `src/lib/pdf/ApartmentDocumentPdf.tsx`
 
-## Tehnički pristup
+PDF layout prema Excel uzorku:
+- **Zaglavlje**: Logo + "Apartmani Špoljar" s kompletnim poslovnim podacima (adresa, OIB, IBAN, žiro račun, telefon, email) iz `APARTMENT_COMPANY_INFO`
+- **Naslov**: "PONUDA br. X" ili "RAČUN br. X"
+- **Podaci o gostu**: Ime, adresa, OIB
+- **Tablica stavki**: Smještajna jedinica, datumi dolaska/odlaska, broj noćenja, broj osoba, cijena po noći, ukupno
+- **Napomene**: PDV napomena, boravišna pristojba napomena
+- **Potpis blok**: Za ponude — rok važenja, predujam, potpis
 
-Umjesto Edge Function-a, napravit ću **seed skriptu** — React stranicu koja pri kliku pokreće batch insert pozive prema bazi. Korisnik klikne gumb, podaci se unesu, i stranica prikaže rezultat.
+### Nova datoteka: `src/pages/apartmani/ApartmentDocumentPdf.tsx`
 
-Alternativno, mogu koristiti SQL migraciju za statičke podatke (cjenik), a za klijente napraviti import komponentu.
+Ruta `/apartmani/pdf/:id` — učitava dokument iz baze, generira PDF blob i prikazuje u iframe (isti pattern kao `/pdf/:id` na glavnom portalu).
 
-### Datoteke
+### Izmjena: `src/pages/apartmani/ApartmentDocuments.tsx`
+
+Dodati gumb "Otvori PDF" u tablici dokumenata i u dialog formi koji otvara `/apartmani/pdf/:id`.
+
+### Izmjena: `src/App.tsx`
+
+Dodati rutu `/apartmani/pdf/:id`.
+
+## Sažetak datoteka
 
 | Datoteka | Promjena |
 |---|---|
-| `src/pages/apartmani/ApartmentDataImport.tsx` | Nova stranica za import s 3 gumba (cjenik, računi, dobavljači) |
-| `src/App.tsx` | Dodati rutu za import stranicu |
-| SQL migration | Insert cjenika (9 redova) — ako je sigurnije preko migracije |
-
-## Napomena
-
-Baza dobavljača (~400 zapisa) iz Excela su **Akord dobavljači**, ne apartmanski gosti. Importirat ću ih u `clients` tablicu glavnog ERP-a. Ako želite i apartmanske goste importirati, trebat će mi posebna Excel lista s podacima o gostima.
+| `src/pages/apartmani/ApartmentDashboard.tsx` | HR lokalizacija |
+| `src/pages/apartmani/ApartmentReservations.tsx` | HR lokalizacija |
+| `src/pages/apartmani/ApartmentDocuments.tsx` | HR lokalizacija + gumb "Otvori PDF" |
+| `src/components/apartmani/ApartmentLayout.tsx` | "Dashboard" → "Početna" |
+| `src/lib/pdf/ApartmentDocumentPdf.tsx` | **Nova** — PDF komponenta za apartmane |
+| `src/pages/apartmani/ApartmentDocumentPdf.tsx` | **Nova** — ruta za prikaz PDF-a |
+| `src/App.tsx` | Nova ruta |
 
