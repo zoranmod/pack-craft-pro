@@ -56,9 +56,10 @@ export default function ApartmentGuests() {
             <TableRow>
               <TableHead>Naziv</TableHead>
               <TableHead>Tip</TableHead>
+              <TableHead>Grad</TableHead>
               <TableHead>Telefon</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Država</TableHead>
+              <TableHead>OIB / JIB</TableHead>
               <TableHead className="w-20"></TableHead>
             </TableRow>
           </TableHeader>
@@ -69,9 +70,10 @@ export default function ApartmentGuests() {
                 <TableCell>
                   <Badge variant="outline">{g.guest_type === 'fizicko_lice' ? 'Fizičko lice' : 'Pravno lice'}</Badge>
                 </TableCell>
+                <TableCell>{[g.postal_code, g.city].filter(Boolean).join(' ') || '-'}</TableCell>
                 <TableCell>{g.phone || '-'}</TableCell>
                 <TableCell>{g.email || '-'}</TableCell>
-                <TableCell>{g.country || '-'}</TableCell>
+                <TableCell>{g.jib || g.id_number || '-'}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(g)}><Pencil className="h-4 w-4" /></Button>
@@ -81,14 +83,14 @@ export default function ApartmentGuests() {
               </TableRow>
             ))}
             {filtered.length === 0 && (
-              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nema gostiju</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nema gostiju</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editGuest?.id ? 'Uredi gosta' : 'Novi gost'}</DialogTitle>
           </DialogHeader>
@@ -140,7 +142,7 @@ export default function ApartmentGuests() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>JIB</Label>
+                      <Label>OIB / JIB</Label>
                       <Input value={editGuest.jib || ''} onChange={e => setEditGuest({ ...editGuest, jib: e.target.value })} />
                     </div>
                     <div className="space-y-2">
@@ -165,10 +167,18 @@ export default function ApartmentGuests() {
                   <Input value={editGuest.email || ''} onChange={e => setEditGuest({ ...editGuest, email: e.target.value })} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Adresa</Label>
+                <Input value={editGuest.address || ''} onChange={e => setEditGuest({ ...editGuest, address: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Adresa</Label>
-                  <Input value={editGuest.address || ''} onChange={e => setEditGuest({ ...editGuest, address: e.target.value })} />
+                  <Label>Poštanski broj</Label>
+                  <Input value={editGuest.postal_code || ''} onChange={e => setEditGuest({ ...editGuest, postal_code: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Grad</Label>
+                  <Input value={editGuest.city || ''} onChange={e => setEditGuest({ ...editGuest, city: e.target.value })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Država</Label>
