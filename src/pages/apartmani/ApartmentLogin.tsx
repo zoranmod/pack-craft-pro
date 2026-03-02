@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import apartmaniLogo from '@/assets/apartmani-spoljar-logo.jpg';
 
 export default function ApartmentLogin() {
   const [email, setEmail] = useState('');
@@ -31,9 +31,7 @@ export default function ApartmentLogin() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Building2 className="h-6 w-6 text-primary" />
-          </div>
+          <img src={apartmaniLogo} alt="Apartmani Špoljar" className="mx-auto mb-2 h-16 w-auto" />
           <CardTitle>Apartmani Špoljar</CardTitle>
         </CardHeader>
         <CardContent>

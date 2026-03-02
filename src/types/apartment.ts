@@ -121,6 +121,22 @@ export function getGuestDisplayName(guest: ApartmentGuest): string {
   return [guest.first_name, guest.last_name].filter(Boolean).join(' ') || 'Nepoznati gost';
 }
 
+export const APARTMENT_COMPANY_INFO = {
+  name: 'Apartmani Špoljar',
+  fullName: 'Apartmani Špoljar - Ugostiteljske usluge u domaćinstvu',
+  owner: 'Mario Špoljar',
+  address: 'Veliki kraj 133, 32270 Županja',
+  oib: '93483491514',
+  iban: 'HR2123400093206330292',
+  ziroRacun: 'HR2823400093102324341',
+  swift: 'PBZGHR2X',
+  bankName: 'Privredna banka Zagreb',
+  phone: '098 217 427',
+  email: 'apartmani.spoljar@gmail.com',
+  pdvNote: 'Pdv nije uračunat u cijenu temeljem čl 90. st. 2. Zakona o PDV-u',
+  taxNote: 'Boravišna pristojba je uračunata u cijenu apartmana',
+} as const;
+
 export function getGuestFullAddress(guest: ApartmentGuest): string {
   const parts = [guest.address, guest.postal_code, guest.city, guest.country].filter(Boolean);
   return parts.join(', ');
