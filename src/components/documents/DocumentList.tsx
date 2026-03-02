@@ -58,22 +58,34 @@ export function DocumentList({ documents, filter = 'all' }: DocumentListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
   const [pdfGeneratingId, setPdfGeneratingId] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [sortField, setSortField] = useState<SortField | null>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('doc_list_sort') || '{}');
+      return saved.field || null;
+    } catch { return null; }
+  });
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('doc_list_sort') || '{}');
+      return saved.direction || 'asc';
+    } catch { return 'asc'; }
+  });
   const [copyForClientDoc, setCopyForClientDoc] = useState<Document | null>(null);
 
   const handleSort = (field: SortField) => {
+    let newField: SortField | null = field;
+    let newDirection: SortDirection = 'asc';
     if (sortField === field) {
       if (sortDirection === 'asc') {
-        setSortDirection('desc');
+        newDirection = 'desc';
       } else {
-        setSortField(null);
-        setSortDirection('asc');
+        newField = null;
+        newDirection = 'asc';
       }
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
     }
+    setSortField(newField);
+    setSortDirection(newDirection);
+    localStorage.setItem('doc_list_sort', JSON.stringify({ field: newField, direction: newDirection }));
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
