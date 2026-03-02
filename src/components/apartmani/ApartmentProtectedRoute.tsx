@@ -4,7 +4,7 @@ import { useApartmentAuth } from '@/hooks/useApartmentAuth';
 import { Loader2 } from 'lucide-react';
 
 export function ApartmentProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, loading } = useApartmentAuth();
+  const { user, loading, hasAccess } = useApartmentAuth();
 
   if (loading) {
     return (
@@ -14,7 +14,7 @@ export function ApartmentProtectedRoute({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!user) {
+  if (!user || !hasAccess) {
     return <Navigate to="/apartmani/login" replace />;
   }
 

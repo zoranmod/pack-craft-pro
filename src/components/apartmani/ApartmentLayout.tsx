@@ -29,7 +29,7 @@ export function ApartmentLayout({ children, title }: ApartmentLayoutProps) {
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">Apartmani</span>
+            <span className="font-bold text-lg">Apartmani Špoljar</span>
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-1">

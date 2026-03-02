@@ -21,7 +21,12 @@ export function useApartmentAuth() {
     enabled: !!user?.id,
   });
 
+  // Any authenticated user who is NOT an apartment_users sub-user is considered an owner
+  // They can always access the apartment portal with their own user_id as owner_user_id
+  const isOwner = !!user && !apartmentUser;
+
   const ownerUserId = apartmentUser?.owner_user_id || user?.id || null;
+  const hasAccess = !!apartmentUser || isOwner;
 
   return {
     user,
@@ -29,5 +34,7 @@ export function useApartmentAuth() {
     apartmentUser,
     ownerUserId,
     isApartmentUser: !!apartmentUser,
+    isOwner: !!isOwner,
+    hasAccess,
   };
 }

@@ -34,7 +34,7 @@ export default function ApartmentLogin() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Building2 className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Apartmanski portal</CardTitle>
+          <CardTitle>Apartmani Špoljar</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
