@@ -51,6 +51,7 @@ import ApartmentUnits from "./pages/apartmani/ApartmentUnits";
 import ApartmentReservations from "./pages/apartmani/ApartmentReservations";
 import ApartmentGuests from "./pages/apartmani/ApartmentGuests";
 import ApartmentDocuments from "./pages/apartmani/ApartmentDocuments";
+import ApartmentDataImport from "./pages/apartmani/ApartmentDataImport";
 import { ApartmentProtectedRoute } from "@/components/apartmani/ApartmentProtectedRoute";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
@@ -129,6 +130,7 @@ const App = () => (
                 <Route path="/apartmani/rezervacije" element={<ApartmentProtectedRoute><ApartmentReservations /></ApartmentProtectedRoute>} />
                 <Route path="/apartmani/gosti" element={<ApartmentProtectedRoute><ApartmentGuests /></ApartmentProtectedRoute>} />
                 <Route path="/apartmani/dokumenti" element={<ApartmentProtectedRoute><ApartmentDocuments /></ApartmentProtectedRoute>} />
+                <Route path="/apartmani/import" element={<ApartmentProtectedRoute><ApartmentDataImport /></ApartmentProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
