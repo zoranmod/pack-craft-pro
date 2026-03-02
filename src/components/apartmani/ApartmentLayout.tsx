@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Building2, Users, CalendarDays, FileText, Home, LogOut, BedDouble } from 'lucide-react';
+import { Users, CalendarDays, FileText, Home, LogOut, BedDouble } from 'lucide-react';
+import apartmaniLogo from '@/assets/apartmani-spoljar-logo.jpg';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -28,8 +29,7 @@ export function ApartmentLayout({ children, title }: ApartmentLayoutProps) {
       <aside className="w-56 border-r bg-card flex flex-col">
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">Apartmani Špoljar</span>
+            <img src={apartmaniLogo} alt="Apartmani Špoljar" className="h-8 w-auto" />
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-1">
