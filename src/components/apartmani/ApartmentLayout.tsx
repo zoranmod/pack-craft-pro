@@ -29,9 +29,7 @@ export function ApartmentLayout({ children, title }: ApartmentLayoutProps) {
       {/* Sidebar */}
       <aside className="w-56 border-r bg-card flex flex-col">
         <div className="p-4 border-b">
-          <div className="flex items-center gap-2">
-            <img src={apartmaniLogo} alt="Apartmani Špoljar" className="h-8 w-auto" />
-          </div>
+          <span className="text-base font-semibold">Apartmani Špoljar</span>
         </div>
         <nav className="flex-1 p-2 space-y-1">
           {navItems.map((item) => (
