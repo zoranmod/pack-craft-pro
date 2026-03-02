@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { to: '/apartmani', label: 'Dashboard', icon: Home },
+  { to: '/apartmani', label: 'Početna', icon: Home },
   { to: '/apartmani/jedinice', label: 'Jedinice', icon: BedDouble },
   { to: '/apartmani/rezervacije', label: 'Rezervacije', icon: CalendarDays },
   { to: '/apartmani/gosti', label: 'Gosti', icon: Users },

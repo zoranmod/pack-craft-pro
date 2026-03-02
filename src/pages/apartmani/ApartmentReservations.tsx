@@ -19,8 +19,8 @@ import { getGuestDisplayName, calculateReservationTotal, PAYMENT_METHODS, type A
 
 const statusLabels: Record<string, string> = {
   reserved: 'Rezervirano',
-  checked_in: 'Check-in',
-  checked_out: 'Check-out',
+  checked_in: 'Prijavljen',
+  checked_out: 'Odjavljen',
   cancelled: 'Otkazano',
 };
 
@@ -135,8 +135,8 @@ export default function ApartmentReservations() {
             <TableRow>
               <TableHead>Jedinica</TableHead>
               <TableHead>Gost</TableHead>
-              <TableHead>Check-in</TableHead>
-              <TableHead>Check-out</TableHead>
+              <TableHead>Dolazak</TableHead>
+              <TableHead>Odlazak</TableHead>
               <TableHead>Osobe</TableHead>
               <TableHead>Iznos</TableHead>
               <TableHead>Plaćanje</TableHead>
@@ -200,11 +200,11 @@ export default function ApartmentReservations() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Check-in</Label>
+                  <Label>Dolazak</Label>
                   <Input type="date" value={editRes.check_in || ''} onChange={e => setEditRes({ ...editRes, check_in: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Check-out</Label>
+                  <Label>Odlazak</Label>
                   <Input type="date" value={editRes.check_out || ''} onChange={e => setEditRes({ ...editRes, check_out: e.target.value })} />
                 </div>
               </div>
@@ -255,8 +255,8 @@ export default function ApartmentReservations() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="reserved">Rezervirano</SelectItem>
-                      <SelectItem value="checked_in">Check-in</SelectItem>
-                      <SelectItem value="checked_out">Check-out</SelectItem>
+                      <SelectItem value="checked_in">Prijavljen</SelectItem>
+                      <SelectItem value="checked_out">Odjavljen</SelectItem>
                       <SelectItem value="cancelled">Otkazano</SelectItem>
                     </SelectContent>
                   </Select>
