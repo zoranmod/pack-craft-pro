@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ApartmentLayout } from '@/components/apartmani/ApartmentLayout';
 import { useApartmentAuth } from '@/hooks/useApartmentAuth';
 import { useApartmentUnits } from '@/hooks/useApartmentUnits';
@@ -14,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { DOCUMENT_TYPE_LABELS, PAYMENT_METHODS, type ApartmentDocument } from '@/types/apartment';
 import { differenceInCalendarDays } from 'date-fns';
@@ -29,6 +30,7 @@ interface DocFormState extends Partial<ApartmentDocument> {
 }
 
 export default function ApartmentDocuments() {
+  const navigate = useNavigate();
   const { ownerUserId } = useApartmentAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -235,13 +237,23 @@ export default function ApartmentDocuments() {
                     <TableCell>{Number(d.total_amount).toFixed(2)} €</TableCell>
                     <TableCell><Badge variant="secondary">{d.status}</Badge></TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => { e.stopPropagation(); removeDoc.mutate(d.id); }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Otvori PDF"
+                          onClick={(e) => { e.stopPropagation(); navigate(`/apartmani/pdf/${d.id}`); }}
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => { e.stopPropagation(); removeDoc.mutate(d.id); }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -339,11 +351,11 @@ export default function ApartmentDocuments() {
               {/* Check-in / Check-out */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Check-in</Label>
+                  <Label>Dolazak</Label>
                   <Input type="date" value={editDoc.check_in || ''} onChange={e => setEditDoc({ ...editDoc, check_in: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Check-out</Label>
+                  <Label>Odlazak</Label>
                   <Input type="date" value={editDoc.check_out || ''} onChange={e => setEditDoc({ ...editDoc, check_out: e.target.value })} />
                 </div>
               </div>
@@ -424,9 +436,16 @@ export default function ApartmentDocuments() {
                 <Input value={editDoc.notes || ''} onChange={e => setEditDoc({ ...editDoc, notes: e.target.value })} />
               </div>
 
-              <Button className="w-full" onClick={handleSave} disabled={upsertDoc.isPending}>
-                {upsertDoc.isPending ? 'Spremanje...' : 'Spremi'}
-              </Button>
+              <div className="flex gap-2">
+                {editDoc.id && (
+                  <Button variant="outline" className="flex-1" onClick={() => navigate(`/apartmani/pdf/${editDoc.id}`)}>
+                    <FileText className="h-4 w-4 mr-1" /> Otvori PDF
+                  </Button>
+                )}
+                <Button className="flex-1" onClick={handleSave} disabled={upsertDoc.isPending}>
+                  {upsertDoc.isPending ? 'Spremanje...' : 'Spremi'}
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>

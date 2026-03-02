@@ -41,14 +41,14 @@ export default function ApartmentDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Check-in danas</CardTitle>
+            <CardTitle className="text-sm font-medium">Dolasci danas</CardTitle>
             <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{todayCheckIns.length}</div></CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Check-out danas</CardTitle>
+            <CardTitle className="text-sm font-medium">Odlasci danas</CardTitle>
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{todayCheckOuts.length}</div></CardContent>
@@ -57,10 +57,10 @@ export default function ApartmentDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle className="text-base">Današnji check-in</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Današnji dolasci</CardTitle></CardHeader>
           <CardContent>
             {todayCheckIns.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nema check-in-ova za danas</p>
+              <p className="text-sm text-muted-foreground">Nema dolazaka za danas</p>
             ) : (
               <div className="space-y-2">
                 {todayCheckIns.map(r => (
@@ -74,10 +74,10 @@ export default function ApartmentDashboard() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base">Današnji check-out</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Današnji odlasci</CardTitle></CardHeader>
           <CardContent>
             {todayCheckOuts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nema check-out-ova za danas</p>
+              <p className="text-sm text-muted-foreground">Nema odlazaka za danas</p>
             ) : (
               <div className="space-y-2">
                 {todayCheckOuts.map(r => (
