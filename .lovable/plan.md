@@ -1,39 +1,52 @@
 
 
-## Plan: Ugradnja loga i poslovnih podataka iz PDF-a
+# Plan: Import podataka iz Excel tablice
 
-### Izvučeni podaci
+## Izvučeni podaci iz Excela
 
-**Logo:** Uspješno izvučen iz PDF-a -- sadrži stiliziran tekst "Apartmani Špoljar" s kućicom i 4 zvjezdice.
+### 1. Cjenik apartmana (Page 5)
+Potpuno strukturirani podaci — spreman za import u `apartment_price_list`:
 
-**Poslovni podaci:**
-- Naziv: Apartmani Špoljar - Ugostiteljske usluge u domaćinstvu
-- Vlasnik: Mario Špoljar
-- Adresa: Veliki kraj 133, 32270 Županja
-- OIB: 93483491514
-- IBAN: HR2123400093206330292
-- Žiro račun: HR2823400093102324341
-- Tel: 098 217 427
-- Email: apartmani.spoljar@gmail.com
+| Tip | Osobe | Bez doručka | S doručkom |
+|-----|-------|-------------|------------|
+| Apartman | 1 | 50 € | 60 € |
+| Apartman | 2 | 60 € | 80 € |
+| Apartman | 3 | 80 € | 110 € |
+| Apartman | 4 | 100 € | 140 € |
+| Apartman | 5 | 120 € | 170 € |
+| Apartman | 6 | 140 € | 200 € |
+| Soba | 1 | 50 € | 60 € |
+| Soba | 2 | 60 € | 80 € |
+| Soba | 3 | 80 € | 110 € |
 
-**Iz računa (korisno za buduće PDF generiranje):**
-- Napomena o PDV-u: "Pdv nije uračunat u cijenu temeljem čl 90. st. 2. Zakona o PDV-u"
-- Napomena o boravišnoj pristojbi: "Boravišna pristojba je uračunata u cijenu apartmana"
-- SWIFT/BIC: PBZGHR2X (Privredna banka Zagreb)
+### 2. Evidencija računa (Page 6)
+24 računa s načinom plaćanja, datumom i iznosom — import u `apartment_documents`.
 
-### Što ću napraviti
+### 3. Baza klijenata/dobavljača (Page 7+)
+Cca 400+ zapisa s nazivom, šifrom, adresom, OIB-om i kontakt podacima. Ovo su **dobavljači glavnog ERP-a (Akord)**, ne apartmanski gosti. Import u `clients` tablicu ili `suppliers` tablicu u glavnom ERP-u.
 
-1. **Kopirati logo** u `src/assets/apartmani-spoljar-logo.jpg`
-2. **Login stranica** -- zamijeniti Building2 ikonu s pravim logom
-3. **Sidebar** -- dodati logo umjesto Building2 ikone
-4. **Spremiti poslovne podatke** kao konstantu za buduće PDF generiranje (IBAN, OIB, adresa, napomene)
+## Što ću napraviti
+
+1. **Kreirati stranicu za import** na apartmanskom portalu s gumbom koji pokreće batch insert
+2. **Cjenik**: automatski upisati 9 redova u `apartment_price_list` tablicu koristeći SQL insert
+3. **Evidencija računa**: upisati 24 dokumenta u `apartment_documents`
+4. **Baza dobavljača**: upisati ~400 zapisa u `clients` tablicu glavnog ERP-a (jer su to Akord dobavljači, ne apartmanski gosti)
+
+## Tehnički pristup
+
+Umjesto Edge Function-a, napravit ću **seed skriptu** — React stranicu koja pri kliku pokreće batch insert pozive prema bazi. Korisnik klikne gumb, podaci se unesu, i stranica prikaže rezultat.
+
+Alternativno, mogu koristiti SQL migraciju za statičke podatke (cjenik), a za klijente napraviti import komponentu.
 
 ### Datoteke
 
 | Datoteka | Promjena |
 |---|---|
-| `src/assets/apartmani-spoljar-logo.jpg` | Nova datoteka -- logo |
-| `src/pages/apartmani/ApartmentLogin.tsx` | Logo umjesto ikone |
-| `src/components/apartmani/ApartmentLayout.tsx` | Logo u sidebaru |
-| `src/types/apartment.ts` | Dodati konstantu s poslovnim podacima |
+| `src/pages/apartmani/ApartmentDataImport.tsx` | Nova stranica za import s 3 gumba (cjenik, računi, dobavljači) |
+| `src/App.tsx` | Dodati rutu za import stranicu |
+| SQL migration | Insert cjenika (9 redova) — ako je sigurnije preko migracije |
+
+## Napomena
+
+Baza dobavljača (~400 zapisa) iz Excela su **Akord dobavljači**, ne apartmanski gosti. Importirat ću ih u `clients` tablicu glavnog ERP-a. Ako želite i apartmanske goste importirati, trebat će mi posebna Excel lista s podacima o gostima.
 
