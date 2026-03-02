@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Users, CalendarDays, FileText, Home, LogOut, BedDouble } from 'lucide-react';
+import { Users, CalendarDays, FileText, Home, LogOut, BedDouble, Upload } from 'lucide-react';
 import apartmaniLogo from '@/assets/apartmani-spoljar-logo.jpg';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/apartmani/rezervacije', label: 'Rezervacije', icon: CalendarDays },
   { to: '/apartmani/gosti', label: 'Gosti', icon: Users },
   { to: '/apartmani/dokumenti', label: 'Dokumenti', icon: FileText },
+  { to: '/apartmani/import', label: 'Import podataka', icon: Upload },
 ];
 
 interface ApartmentLayoutProps {
