@@ -1,26 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ApartmentLayout } from '@/components/apartmani/ApartmentLayout';
 import { useApartmentAuth } from '@/hooks/useApartmentAuth';
+import { useApartmentUnits } from '@/hooks/useApartmentUnits';
+import { useApartmentPriceList } from '@/hooks/useApartmentPriceList';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, FileText } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DOCUMENT_TYPE_LABELS, PAYMENT_METHODS, type ApartmentDocument } from '@/types/apartment';
+import { differenceInCalendarDays } from 'date-fns';
+
+interface DocFormState extends Partial<ApartmentDocument> {
+  unit_id?: string;
+  adults?: number;
+  children?: number;
+  breakfast_included?: boolean;
+  check_in?: string;
+  check_out?: string;
+}
 
 export default function ApartmentDocuments() {
   const { ownerUserId } = useApartmentAuth();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editDoc, setEditDoc] = useState<Partial<ApartmentDocument> | null>(null);
+  const [editDoc, setEditDoc] = useState<DocFormState | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
+
+  const { units } = useApartmentUnits(ownerUserId);
+  const { getPrice, priceList } = useApartmentPriceList(ownerUserId);
 
   const { data: documents = [] } = useQuery({
     queryKey: ['apartment-documents', ownerUserId],
@@ -38,7 +54,9 @@ export default function ApartmentDocuments() {
 
   const upsertDoc = useMutation({
     mutationFn: async (doc: Partial<ApartmentDocument> & { owner_user_id: string }) => {
-      const { id, ...data } = doc as any;
+      // Strip non-db fields
+      const { unit_id, adults, children, breakfast_included, check_in, check_out, ...rest } = doc as any;
+      const { id, ...data } = rest;
       if (id) {
         const { error } = await supabase.from('apartment_documents').update(data).eq('id', id);
         if (error) throw error;
@@ -79,24 +97,82 @@ export default function ApartmentDocuments() {
       payment_method: 'gotovinski',
       deposit_amount: 80,
       validity_days: 7,
+      unit_id: '',
+      adults: 1,
+      children: 0,
+      breakfast_included: false,
+      check_in: new Date().toISOString().split('T')[0],
+      check_out: '',
     });
     setDialogOpen(true);
   };
 
+  const openEdit = (doc: ApartmentDocument) => {
+    // Parse pdf_data for saved calculation fields
+    const pdfData = doc.pdf_data || {};
+    setEditDoc({
+      ...doc,
+      unit_id: pdfData.unit_id || '',
+      adults: pdfData.adults || 1,
+      children: pdfData.children || 0,
+      breakfast_included: pdfData.breakfast_included || false,
+      check_in: pdfData.check_in || doc.date,
+      check_out: pdfData.check_out || '',
+    });
+    setDialogOpen(true);
+  };
+
+  // Auto-calculate total when relevant fields change
+  useEffect(() => {
+    if (!editDoc || !editDoc.unit_id || !editDoc.check_in || !editDoc.check_out) return;
+
+    const unit = units.find(u => u.id === editDoc.unit_id);
+    if (!unit) return;
+
+    const nights = differenceInCalendarDays(new Date(editDoc.check_out), new Date(editDoc.check_in));
+    if (nights <= 0) return;
+
+    const persons = (editDoc.adults || 1) + (editDoc.children || 0);
+    const nightlyRate = getPrice(unit.unit_type as 'apartment' | 'room', persons, editDoc.breakfast_included || false);
+
+    if (nightlyRate > 0) {
+      const total = nightlyRate * nights;
+      setEditDoc(prev => prev ? { ...prev, total_amount: total } : prev);
+    }
+  }, [editDoc?.unit_id, editDoc?.adults, editDoc?.children, editDoc?.breakfast_included, editDoc?.check_in, editDoc?.check_out, units, priceList]);
+
   const handleSave = () => {
     if (!editDoc || !ownerUserId) return;
-    upsertDoc.mutate({ ...editDoc, owner_user_id: ownerUserId } as any);
+    // Save calculation data in pdf_data for later retrieval
+    const pdfData = {
+      unit_id: editDoc.unit_id,
+      adults: editDoc.adults,
+      children: editDoc.children,
+      breakfast_included: editDoc.breakfast_included,
+      check_in: editDoc.check_in,
+      check_out: editDoc.check_out,
+      unit_name: units.find(u => u.id === editDoc.unit_id)?.name || '',
+    };
+    upsertDoc.mutate({
+      ...editDoc,
+      pdf_data: pdfData,
+      owner_user_id: ownerUserId,
+    } as any);
   };
 
   const filtered = filterType === 'all' ? documents : documents.filter(d => d.document_type === filterType);
 
-  // Summary for "Evidencija računa"
   const invoices = documents.filter(d => d.document_type === 'racun');
   const totalByPayment = PAYMENT_METHODS.map(pm => ({
     ...pm,
     total: invoices.filter(i => i.payment_method === pm.value).reduce((sum, i) => sum + Number(i.total_amount), 0),
     count: invoices.filter(i => i.payment_method === pm.value).length,
   }));
+
+  const selectedUnit = units.find(u => u.id === editDoc?.unit_id);
+  const nights = editDoc?.check_in && editDoc?.check_out
+    ? differenceInCalendarDays(new Date(editDoc.check_out), new Date(editDoc.check_in))
+    : 0;
 
   return (
     <ApartmentLayout title="Dokumenti">
@@ -136,6 +212,7 @@ export default function ApartmentDocuments() {
                   <TableHead>Tip</TableHead>
                   <TableHead>Datum</TableHead>
                   <TableHead>Gost / Kupac</TableHead>
+                  <TableHead>Smještaj</TableHead>
                   <TableHead>Plaćanje</TableHead>
                   <TableHead>Iznos</TableHead>
                   <TableHead>Status</TableHead>
@@ -144,21 +221,32 @@ export default function ApartmentDocuments() {
               </TableHeader>
               <TableBody>
                 {filtered.map(d => (
-                  <TableRow key={d.id}>
+                  <TableRow
+                    key={d.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => openEdit(d)}
+                  >
                     <TableCell className="font-medium">{d.number}</TableCell>
                     <TableCell><Badge variant="outline">{DOCUMENT_TYPE_LABELS[d.document_type] || d.document_type}</Badge></TableCell>
                     <TableCell>{d.date}</TableCell>
                     <TableCell>{d.guest_name || '-'}</TableCell>
+                    <TableCell>{(d.pdf_data as any)?.unit_name || '-'}</TableCell>
                     <TableCell>{PAYMENT_METHODS.find(p => p.value === d.payment_method)?.label || '-'}</TableCell>
                     <TableCell>{Number(d.total_amount).toFixed(2)} €</TableCell>
                     <TableCell><Badge variant="secondary">{d.status}</Badge></TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" onClick={() => removeDoc.mutate(d.id)}><Trash2 className="h-4 w-4" /></Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); removeDoc.mutate(d.id); }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
                 {filtered.length === 0 && (
-                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nema dokumenata</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nema dokumenata</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
@@ -209,12 +297,14 @@ export default function ApartmentDocuments() {
       </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Novi {DOCUMENT_TYPE_LABELS[editDoc?.document_type || ''] || 'dokument'}</DialogTitle>
+            <DialogTitle>
+              {editDoc?.id ? 'Uredi' : 'Novi'} {DOCUMENT_TYPE_LABELS[editDoc?.document_type || ''] || 'dokument'}
+            </DialogTitle>
           </DialogHeader>
           {editDoc && (
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Broj</Label>
@@ -225,10 +315,81 @@ export default function ApartmentDocuments() {
                   <Input type="date" value={editDoc.date || ''} onChange={e => setEditDoc({ ...editDoc, date: e.target.value })} />
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label>Gost / Kupac</Label>
                 <Input value={editDoc.guest_name || ''} onChange={e => setEditDoc({ ...editDoc, guest_name: e.target.value })} />
               </div>
+
+              {/* Unit selection */}
+              <div className="space-y-2">
+                <Label>Smještajna jedinica</Label>
+                <Select value={editDoc.unit_id || ''} onValueChange={v => setEditDoc({ ...editDoc, unit_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Odaberi apartman ili sobu" /></SelectTrigger>
+                  <SelectContent>
+                    {units.map(u => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.name} ({u.unit_type === 'apartment' ? 'Apartman' : 'Soba'}, kapacitet: {u.capacity})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Check-in / Check-out */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Check-in</Label>
+                  <Input type="date" value={editDoc.check_in || ''} onChange={e => setEditDoc({ ...editDoc, check_in: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Check-out</Label>
+                  <Input type="date" value={editDoc.check_out || ''} onChange={e => setEditDoc({ ...editDoc, check_out: e.target.value })} />
+                </div>
+              </div>
+
+              {nights > 0 && (
+                <p className="text-sm text-muted-foreground">Broj noćenja: <strong>{nights}</strong></p>
+              )}
+
+              {/* Persons */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Broj odraslih</Label>
+                  <Input type="number" min={1} value={editDoc.adults || 1} onChange={e => setEditDoc({ ...editDoc, adults: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Broj djece</Label>
+                  <Input type="number" min={0} value={editDoc.children || 0} onChange={e => setEditDoc({ ...editDoc, children: Number(e.target.value) })} />
+                </div>
+              </div>
+
+              {/* Breakfast toggle */}
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={editDoc.breakfast_included || false}
+                  onCheckedChange={v => setEditDoc({ ...editDoc, breakfast_included: v })}
+                />
+                <Label>Doručak uključen</Label>
+              </div>
+
+              {/* Auto-calculated info */}
+              {selectedUnit && nights > 0 && (
+                <div className="bg-muted/50 rounded-md p-3 text-sm space-y-1">
+                  <p>Jedinica: <strong>{selectedUnit.name}</strong></p>
+                  <p>Osobe: <strong>{(editDoc.adults || 1) + (editDoc.children || 0)}</strong></p>
+                  <p>Cijena po noći (iz cjenika): <strong>
+                    {getPrice(
+                      selectedUnit.unit_type as 'apartment' | 'room',
+                      (editDoc.adults || 1) + (editDoc.children || 0),
+                      editDoc.breakfast_included || false
+                    ).toFixed(2)} €
+                  </strong></p>
+                  <p>Noćenja: <strong>{nights}</strong></p>
+                  <p className="text-base font-semibold">Ukupno: {Number(editDoc.total_amount || 0).toFixed(2)} €</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Način plaćanja</Label>
@@ -244,6 +405,7 @@ export default function ApartmentDocuments() {
                   <Input type="number" step="0.01" value={editDoc.total_amount || 0} onChange={e => setEditDoc({ ...editDoc, total_amount: Number(e.target.value) })} />
                 </div>
               </div>
+
               {editDoc.document_type === 'ponuda' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -256,10 +418,12 @@ export default function ApartmentDocuments() {
                   </div>
                 </div>
               )}
+
               <div className="space-y-2">
                 <Label>Napomene</Label>
                 <Input value={editDoc.notes || ''} onChange={e => setEditDoc({ ...editDoc, notes: e.target.value })} />
               </div>
+
               <Button className="w-full" onClick={handleSave} disabled={upsertDoc.isPending}>
                 {upsertDoc.isPending ? 'Spremanje...' : 'Spremi'}
               </Button>
