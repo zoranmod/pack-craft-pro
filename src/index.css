@@ -24,8 +24,8 @@
     --popover: 40 10% 98%;
     --popover-foreground: 30 8% 12%;
 
-    /* Primary: Adaptiva warm gold */
-    --primary: 40 55% 45%;
+    /* Primary: Akord žuta iz loga */
+    --primary: 38 80% 55%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: Warm neutral */
@@ -36,8 +36,8 @@
     --muted: 35 6% 91%;
     --muted-foreground: 30 5% 45%;
 
-    /* Accent: Warm gold highlights */
-    --accent: 40 55% 45%;
+    /* Accent: Akord žuta */
+    --accent: 38 80% 55%;
     --accent-foreground: 0 0% 100%;
 
     /* Destructive: Clean red */
@@ -48,14 +48,14 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning: Warm gold for consistency */
-    --warning: 40 55% 45%;
+    /* Warning: Akord žuta */
+    --warning: 38 80% 55%;
     --warning-foreground: 0 0% 100%;
 
     /* Borders and inputs: Warm gray */
     --border: 35 8% 86%;
     --input: 35 8% 86%;
-    --ring: 40 55% 45%;
+    --ring: 38 80% 55%;
 
     /* Badge neutral */
     --badge-neutral: 35 8% 86%;
@@ -66,12 +66,12 @@
     /* Sidebar tokens: Warm neutral */
     --sidebar-background: 40 10% 98%;
     --sidebar-foreground: 30 8% 12%;
-    --sidebar-primary: 40 55% 45%;
+    --sidebar-primary: 38 80% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 35 6% 91%;
     --sidebar-accent-foreground: 30 8% 12%;
     --sidebar-border: 35 8% 86%;
-    --sidebar-ring: 40 55% 45%;
+    --sidebar-ring: 38 80% 55%;
 
     /* Minimal shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
@@ -99,8 +99,8 @@
     --popover: 30 8% 12%;
     --popover-foreground: 35 10% 96%;
 
-    /* Primary: Adaptiva warm gold (dark) */
-    --primary: 42 60% 50%;
+    /* Primary: Akord žuta (dark) */
+    --primary: 38 82% 58%;
     --primary-foreground: 0 0% 10%;
 
     /* Secondary */
@@ -112,7 +112,7 @@
     --muted-foreground: 35 5% 72%;
 
     /* Accent */
-    --accent: 42 60% 50%;
+    --accent: 38 82% 58%;
     --accent-foreground: 0 0% 10%;
 
     /* Destructive */
@@ -124,13 +124,13 @@
     --success-foreground: 0 0% 100%;
 
     /* Warning */
-    --warning: 42 60% 50%;
+    --warning: 38 82% 58%;
     --warning-foreground: 0 0% 10%;
 
     /* Borders and inputs */
     --border: 30 6% 22%;
     --input: 30 6% 22%;
-    --ring: 42 60% 50%;
+    --ring: 38 82% 58%;
 
     /* Badge neutral */
     --badge-neutral: 30 6% 24%;
@@ -138,12 +138,12 @@
     /* Sidebar tokens */
     --sidebar-background: 30 8% 8%;
     --sidebar-foreground: 35 10% 96%;
-    --sidebar-primary: 42 60% 50%;
+    --sidebar-primary: 38 82% 58%;
     --sidebar-primary-foreground: 0 0% 10%;
     --sidebar-accent: 30 6% 16%;
     --sidebar-accent-foreground: 35 10% 96%;
     --sidebar-border: 30 6% 22%;
-    --sidebar-ring: 42 60% 50%;
+    --sidebar-ring: 38 82% 58%;
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
