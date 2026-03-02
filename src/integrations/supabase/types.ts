@@ -62,47 +62,59 @@ export type Database = {
         Row: {
           created_at: string
           date: string
+          deposit_amount: number | null
           document_type: string
+          due_date: string | null
           guest_name: string | null
           id: string
           notes: string | null
           number: string
           owner_user_id: string
+          payment_method: string | null
           pdf_data: Json | null
           reservation_id: string | null
           status: string
           total_amount: number
           updated_at: string
+          validity_days: number | null
         }
         Insert: {
           created_at?: string
           date?: string
+          deposit_amount?: number | null
           document_type?: string
+          due_date?: string | null
           guest_name?: string | null
           id?: string
           notes?: string | null
           number: string
           owner_user_id: string
+          payment_method?: string | null
           pdf_data?: Json | null
           reservation_id?: string | null
           status?: string
           total_amount?: number
           updated_at?: string
+          validity_days?: number | null
         }
         Update: {
           created_at?: string
           date?: string
+          deposit_amount?: number | null
           document_type?: string
+          due_date?: string | null
           guest_name?: string | null
           id?: string
           notes?: string | null
           number?: string
           owner_user_id?: string
+          payment_method?: string | null
           pdf_data?: Json | null
           reservation_id?: string | null
           status?: string
           total_amount?: number
           updated_at?: string
+          validity_days?: number | null
         }
         Relationships: [
           {
@@ -117,6 +129,7 @@ export type Database = {
       apartment_guests: {
         Row: {
           address: string | null
+          city: string | null
           company_name: string | null
           contact_person: string | null
           country: string | null
@@ -133,10 +146,12 @@ export type Database = {
           owner_user_id: string
           pdv_number: string | null
           phone: string | null
+          postal_code: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          city?: string | null
           company_name?: string | null
           contact_person?: string | null
           country?: string | null
@@ -153,10 +168,12 @@ export type Database = {
           owner_user_id: string
           pdv_number?: string | null
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          city?: string | null
           company_name?: string | null
           contact_person?: string | null
           country?: string | null
@@ -173,6 +190,40 @@ export type Database = {
           owner_user_id?: string
           pdv_number?: string | null
           phone?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      apartment_price_list: {
+        Row: {
+          created_at: string
+          id: string
+          owner_user_id: string
+          persons: number
+          price_with_breakfast: number
+          price_without_breakfast: number
+          unit_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_user_id: string
+          persons?: number
+          price_with_breakfast?: number
+          price_without_breakfast?: number
+          unit_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_user_id?: string
+          persons?: number
+          price_with_breakfast?: number
+          price_without_breakfast?: number
+          unit_type?: string
           updated_at?: string
         }
         Relationships: []
@@ -191,6 +242,7 @@ export type Database = {
           id: string
           notes: string | null
           owner_user_id: string
+          payment_method: string | null
           price_per_person: number
           source: string
           status: string
@@ -212,6 +264,7 @@ export type Database = {
           id?: string
           notes?: string | null
           owner_user_id: string
+          payment_method?: string | null
           price_per_person?: number
           source?: string
           status?: string
@@ -233,6 +286,7 @@ export type Database = {
           id?: string
           notes?: string | null
           owner_user_id?: string
+          payment_method?: string | null
           price_per_person?: number
           source?: string
           status?: string
