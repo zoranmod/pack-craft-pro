@@ -45,6 +45,13 @@ import PonudaKomarnici from "./pages/PonudaKomarnici";
 import NewMosquitoNetQuote from "./pages/NewMosquitoNetQuote";
 import MosquitoNetPriceList from "./pages/MosquitoNetPriceList";
 import Reklamacije from "./pages/Reklamacije";
+import ApartmentLogin from "./pages/apartmani/ApartmentLogin";
+import ApartmentDashboard from "./pages/apartmani/ApartmentDashboard";
+import ApartmentUnits from "./pages/apartmani/ApartmentUnits";
+import ApartmentReservations from "./pages/apartmani/ApartmentReservations";
+import ApartmentGuests from "./pages/apartmani/ApartmentGuests";
+import ApartmentDocuments from "./pages/apartmani/ApartmentDocuments";
+import { ApartmentProtectedRoute } from "@/components/apartmani/ApartmentProtectedRoute";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import {
   AdminDashboard,
@@ -115,6 +122,13 @@ const App = () => (
                 <Route path="/admin/holidays" element={<AdminProtectedRoute><AdminHolidays /></AdminProtectedRoute>} />
                 <Route path="/admin/qa" element={<AdminProtectedRoute><AdminQA /></AdminProtectedRoute>} />
                 <Route path="/admin/audit" element={<AdminProtectedRoute><AdminAudit /></AdminProtectedRoute>} />
+                {/* Apartment portal routes */}
+                <Route path="/apartmani/login" element={<ApartmentLogin />} />
+                <Route path="/apartmani" element={<ApartmentProtectedRoute><ApartmentDashboard /></ApartmentProtectedRoute>} />
+                <Route path="/apartmani/jedinice" element={<ApartmentProtectedRoute><ApartmentUnits /></ApartmentProtectedRoute>} />
+                <Route path="/apartmani/rezervacije" element={<ApartmentProtectedRoute><ApartmentReservations /></ApartmentProtectedRoute>} />
+                <Route path="/apartmani/gosti" element={<ApartmentProtectedRoute><ApartmentGuests /></ApartmentProtectedRoute>} />
+                <Route path="/apartmani/dokumenti" element={<ApartmentProtectedRoute><ApartmentDocuments /></ApartmentProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

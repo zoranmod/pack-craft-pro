@@ -1,0 +1,118 @@
+import { useState } from 'react';
+import { ApartmentLayout } from '@/components/apartmani/ApartmentLayout';
+import { useApartmentAuth } from '@/hooks/useApartmentAuth';
+import { useApartmentUnits } from '@/hooks/useApartmentUnits';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Pencil, Trash2, BedDouble, Building2 } from 'lucide-react';
+import type { ApartmentUnit } from '@/types/apartment';
+
+export default function ApartmentUnits() {
+  const { ownerUserId } = useApartmentAuth();
+  const { units, isLoading, upsert, remove } = useApartmentUnits(ownerUserId);
+  const [editUnit, setEditUnit] = useState<Partial<ApartmentUnit> | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const openNew = () => {
+    setEditUnit({ name: '', unit_type: 'apartment', capacity: 2, price_per_person: 0, is_active: true });
+    setDialogOpen(true);
+  };
+
+  const openEdit = (u: ApartmentUnit) => {
+    setEditUnit({ ...u });
+    setDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!editUnit || !ownerUserId) return;
+    upsert.mutate({ ...editUnit, owner_user_id: ownerUserId } as any, {
+      onSuccess: () => setDialogOpen(false),
+    });
+  };
+
+  return (
+    <ApartmentLayout title="Smještajne jedinice">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-muted-foreground">{units.length} jedinica</p>
+        <Button size="sm" onClick={openNew}><Plus className="h-4 w-4 mr-1" /> Nova jedinica</Button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {units.map(u => (
+          <Card key={u.id}>
+            <CardContent className="pt-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  {u.unit_type === 'apartment' ? <Building2 className="h-5 w-5 text-primary" /> : <BedDouble className="h-5 w-5 text-primary" />}
+                  <div>
+                    <h3 className="font-medium">{u.name}</h3>
+                    <Badge variant="secondary" className="mt-1">
+                      {u.unit_type === 'apartment' ? 'Apartman' : 'Soba'}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(u)}><Pencil className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => remove.mutate(u.id)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div><span className="text-muted-foreground">Kapacitet:</span> {u.capacity} osoba</div>
+                <div><span className="text-muted-foreground">Cijena/osobi:</span> {u.price_per_person} KM</div>
+              </div>
+              {u.description && <p className="mt-2 text-sm text-muted-foreground">{u.description}</p>}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editUnit?.id ? 'Uredi jedinicu' : 'Nova jedinica'}</DialogTitle>
+          </DialogHeader>
+          {editUnit && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Naziv</Label>
+                <Input value={editUnit.name || ''} onChange={e => setEditUnit({ ...editUnit, name: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Tip</Label>
+                <Select value={editUnit.unit_type || 'apartment'} onValueChange={v => setEditUnit({ ...editUnit, unit_type: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="apartment">Apartman</SelectItem>
+                    <SelectItem value="room">Soba</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Kapacitet (osoba)</Label>
+                  <Input type="number" value={editUnit.capacity || 0} onChange={e => setEditUnit({ ...editUnit, capacity: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cijena po osobi (KM)</Label>
+                  <Input type="number" step="0.01" value={editUnit.price_per_person || 0} onChange={e => setEditUnit({ ...editUnit, price_per_person: Number(e.target.value) })} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Opis</Label>
+                <Input value={editUnit.description || ''} onChange={e => setEditUnit({ ...editUnit, description: e.target.value })} />
+              </div>
+              <Button className="w-full" onClick={handleSave} disabled={upsert.isPending}>
+                {upsert.isPending ? 'Spremanje...' : 'Spremi'}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </ApartmentLayout>
+  );
+}
