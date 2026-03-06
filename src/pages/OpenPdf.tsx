@@ -11,15 +11,12 @@ import { useArticles } from "@/hooks/useArticles";
 import { usePonudaLayoutSettings } from "@/hooks/usePonudaLayoutSettings";
 import { generatePdfObjectUrl } from "@/lib/pdfGenerator";
 
-/**
- * Opens a PDF in a new tab reliably (no popup), by rendering a protected route
- * that generates the PDF and then navigates the tab to the blob URL.
- */
 export default function OpenPdf() {
   const { id } = useParams();
   const navigate = useNavigate();
   const didRun = useRef(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(true);
 
   const { data: document, error: documentError, isLoading: isLoadingDocument } = useDocument(id);
   const { data: companySettings } = useCompanySettings();
@@ -50,12 +47,10 @@ export default function OpenPdf() {
 
   useEffect(() => {
     if (didRun.current) return;
-
     if (isLoadingDocument || isLoadingTemplate) return;
     if (!document) return;
 
     didRun.current = true;
-    setIsGenerating(true);
 
     (async () => {
       try {
@@ -69,11 +64,7 @@ export default function OpenPdf() {
           mpYMm
         );
 
-        // Display the PDF in this tab. Use assign so browser Back can return.
-        window.location.assign(url);
-
-        // Keep blob alive for viewer load.
-        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        setBlobUrl(url);
       } catch (error) {
         console.error("OpenPdf PDF generation error:", error);
         toast.error("Greška pri generiranju PDF-a");
@@ -92,7 +83,11 @@ export default function OpenPdf() {
     template,
   ]);
 
-  const isBusy = isLoadingDocument || isLoadingTemplate || isGenerating;
+  useEffect(() => {
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [blobUrl]);
 
   if (documentError) {
     return (
@@ -117,26 +112,31 @@ export default function OpenPdf() {
     );
   }
 
+  const isBusy = isLoadingDocument || isLoadingTemplate || isGenerating;
+
+  if (isBusy) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center gap-3">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <span className="text-sm text-muted-foreground">Generiram PDF…</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <Button variant="outline" onClick={() => navigate(-1)}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Natrag
+    <div className="h-screen flex flex-col">
+      <div className="flex items-center gap-2 p-2 border-b bg-background shrink-0">
+        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Natrag
         </Button>
       </div>
-
-      <div className="rounded-xl border border-border bg-card p-6">
-        <div className="flex items-center gap-3">
-          <Loader2 className={isBusy ? "h-5 w-5 animate-spin" : "h-5 w-5"} />
-          <div>
-            <div className="font-medium text-foreground">Generiram PDF…</div>
-            <div className="text-sm text-muted-foreground">
-              Ovo može potrajati nekoliko sekundi. Tab će se automatski prebaciti na PDF.
-            </div>
-          </div>
+      {blobUrl ? (
+        <iframe src={blobUrl} className="flex-1 w-full border-0" title="PDF pregled" />
+      ) : (
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          Greška pri generiranju PDF-a.
         </div>
-      </div>
+      )}
     </div>
   );
 }
