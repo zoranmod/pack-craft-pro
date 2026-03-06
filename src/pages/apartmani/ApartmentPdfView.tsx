@@ -67,8 +67,9 @@ export default function ApartmentPdfView() {
 
         const blob = await pdf(<ApartmentDocumentPdf data={pdfData} />).toBlob();
         const url = URL.createObjectURL(blob);
-        window.location.assign(url);
+        window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        navigate(-1);
       } catch (err: any) {
         console.error('ApartmentPdfView error:', err);
         toast.error('Greška pri generiranju PDF-a');
