@@ -15,12 +15,12 @@ export default function ApartmentPdfView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const didRun = useRef(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(true);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (didRun.current || !id) return;
     didRun.current = true;
-    setIsGenerating(true);
 
     (async () => {
       try {
@@ -67,9 +67,7 @@ export default function ApartmentPdfView() {
 
         const blob = await pdf(<ApartmentDocumentPdf data={pdfData} />).toBlob();
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        navigate(-1);
+        setBlobUrl(url);
       } catch (err: any) {
         console.error('ApartmentPdfView error:', err);
         toast.error('Greška pri generiranju PDF-a');
@@ -78,20 +76,35 @@ export default function ApartmentPdfView() {
         setIsGenerating(false);
       }
     })();
+
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
   }, [id]);
 
-  return (
-    <div className="p-6 space-y-4">
-      <Button variant="outline" onClick={() => navigate(-1)}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Natrag
-      </Button>
-      <div className="rounded-xl border bg-card p-6 flex items-center gap-3">
-        <Loader2 className={isGenerating ? 'h-5 w-5 animate-spin' : 'h-5 w-5'} />
-        <div>
-          <div className="font-medium">Generiram PDF…</div>
-          <div className="text-sm text-muted-foreground">Tab će se automatski prebaciti na PDF.</div>
-        </div>
+  if (isGenerating) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center gap-3">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <span className="text-sm text-muted-foreground">Generiram PDF…</span>
       </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col">
+      <div className="flex items-center gap-2 p-2 border-b bg-background shrink-0">
+        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Natrag
+        </Button>
+      </div>
+      {blobUrl ? (
+        <iframe src={blobUrl} className="flex-1 w-full border-0" title="PDF pregled" />
+      ) : (
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          Greška pri generiranju PDF-a.
+        </div>
+      )}
     </div>
   );
 }
