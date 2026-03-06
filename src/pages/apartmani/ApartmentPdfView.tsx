@@ -93,15 +93,15 @@ export default function ApartmentPdfView() {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex items-center gap-2 p-2 border-b bg-background shrink-0">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center gap-2 px-3 h-12 bg-background border-b border-border">
         <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Natrag
         </Button>
       </div>
       {blobUrl ? (
-        <iframe src={blobUrl} className="flex-1 w-full border-0" title="PDF pregled" />
+        <iframe src={blobUrl} className="flex-1 w-full border-0 pt-12" title="PDF pregled" />
       ) : (
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+        <div className="flex-1 flex items-center justify-center text-muted-foreground pt-12">
           Greška pri generiranju PDF-a.
         </div>
       )}
