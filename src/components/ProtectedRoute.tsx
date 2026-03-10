@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading, signOut } = useAuth();
-  const { isLoading: employeeLoading, isEmployee, hasFullAccess } = useCurrentEmployee();
+  const { isLoading: employeeLoading, isEmployee, hasMainAppAccess } = useCurrentEmployee();
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
