@@ -10,7 +10,7 @@ import { useCurrentEmployee } from './useCurrentEmployee';
  */
 export function useOwnerUserId(): string | null {
   const { user } = useAuth();
-  const { employee, isAdmin, hasFullAccess } = useCurrentEmployee();
+  const { employee } = useCurrentEmployee();
 
   // Any employee should use the owner's user_id for data operations
   // The employee.user_id field contains the ID of the owner who created this employee
