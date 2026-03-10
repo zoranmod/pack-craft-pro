@@ -229,7 +229,7 @@ export function useCreateDocument() {
       const { data: doc, error: docError } = await supabase
         .from('documents')
         .insert({
-          user_id: user.id,
+           user_id: ownerUserId || user.id,
           type: data.type,
           number: documentNumber,
           client_name: data.clientName,

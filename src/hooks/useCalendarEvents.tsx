@@ -82,7 +82,7 @@ export function useCreateCalendarEvent() {
       const { data: event, error } = await supabase
         .from('calendar_events')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           title: data.title,
           type: data.type,
           start_at: data.startAt.toISOString(),

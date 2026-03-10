@@ -104,7 +104,7 @@ export function useCreateArticle() {
       const { data, error } = await supabase
         .from('articles')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           code: articleData.code || null,
           name: articleData.name,
           unit: articleData.unit || 'kom',

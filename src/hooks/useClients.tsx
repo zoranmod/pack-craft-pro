@@ -97,7 +97,7 @@ export function useCreateClient() {
       const { data, error } = await supabase
         .from('clients')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           name: clientData.name.trim().replace(/\s+/g, ' '), // Normalize spaces but keep original case
           oib: clientData.oib || null,
           address: clientData.address || null,

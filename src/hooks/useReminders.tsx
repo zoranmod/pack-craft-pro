@@ -144,7 +144,7 @@ export function useCreateReminder() {
       const { data: reminder, error } = await supabase
         .from('reminders')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           document_id: data.documentId || null,
           reminder_type: data.reminderType,
           title: data.title,

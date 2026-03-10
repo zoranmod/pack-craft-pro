@@ -12,9 +12,9 @@ export function useOwnerUserId(): string | null {
   const { user } = useAuth();
   const { employee, isAdmin, hasFullAccess } = useCurrentEmployee();
 
-  // If user is an employee with admin/full access, use the owner's user_id
+  // Any employee should use the owner's user_id for data operations
   // The employee.user_id field contains the ID of the owner who created this employee
-  if (employee && (isAdmin || hasFullAccess)) {
+  if (employee) {
     return employee.user_id;
   }
   
