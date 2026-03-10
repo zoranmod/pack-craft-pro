@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { useLogActivity } from './useActivityLogs';
+import { useOwnerUserId } from './useOwnerUserId';
 import { useCallback } from 'react';
 
 /**
