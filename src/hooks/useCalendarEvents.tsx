@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { CalendarEvent, CalendarEventType } from '@/types/calendar';
+import { useOwnerUserId } from './useOwnerUserId';
 import { toast } from 'sonner';
 
 interface CreateCalendarEventData {
