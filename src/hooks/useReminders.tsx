@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useOwnerUserId } from './useOwnerUserId';
 import { addDays, format, isBefore, isToday, startOfDay } from 'date-fns';
 
 export interface Reminder {
