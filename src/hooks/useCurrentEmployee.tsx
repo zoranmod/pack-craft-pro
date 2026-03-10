@@ -121,5 +121,6 @@ export function useCurrentEmployee() {
     error,
     isEmployee: !!data?.employee,
     hasFullAccess,
+    hasMainAppAccess,
   };
 }

@@ -64,8 +64,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  // If user is an employee without full access, redirect to employee portal
-  if (isEmployee && !hasFullAccess) {
+  // If user is an employee without any main app permissions, redirect to employee portal
+  if (isEmployee && !hasMainAppAccess) {
     return <Navigate to="/employee-portal" replace />;
   }
 
