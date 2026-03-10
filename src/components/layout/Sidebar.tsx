@@ -454,7 +454,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         ))}
       </div>
 
-      {/* Compact Settings Footer */}
+      {/* Compact Settings Footer - only if can view settings */}
+      {canViewSettings && (
       <div className="border-t border-border px-2 py-2">
         <Link
           to="/settings"
