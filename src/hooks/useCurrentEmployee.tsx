@@ -99,8 +99,19 @@ export function useCurrentEmployee() {
     refetchOnWindowFocus: false,
   });
 
-  const hasFullAccess = data?.isAdmin || data?.permissions?.can_manage_employees || 
-    (data?.permissions?.can_view_documents && data?.permissions?.can_create_documents && data?.permissions?.can_edit_documents) || false;
+  // hasMainAppAccess: can the employee use the main app (vs employee portal)?
+  // Any business permission (documents, articles, clients, settings, manage employees) qualifies.
+  const p = data?.permissions;
+  const hasMainAppAccess = data?.isAdmin || 
+    p?.can_manage_employees || 
+    p?.can_view_documents || p?.can_create_documents || p?.can_edit_documents ||
+    p?.can_view_articles || p?.can_edit_articles ||
+    p?.can_view_clients || p?.can_edit_clients ||
+    p?.can_view_settings || p?.can_edit_settings ||
+    false;
+
+  // hasFullAccess: unrestricted access (admin-level)
+  const hasFullAccess = data?.isAdmin || p?.can_manage_employees || false;
 
   return {
     employee: data?.employee ?? null,
@@ -110,5 +121,6 @@ export function useCurrentEmployee() {
     error,
     isEmployee: !!data?.employee,
     hasFullAccess,
+    hasMainAppAccess,
   };
 }

@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading, signOut } = useAuth();
-  const { isLoading: employeeLoading, isEmployee, hasFullAccess } = useCurrentEmployee();
+  const { isLoading: employeeLoading, isEmployee, hasMainAppAccess } = useCurrentEmployee();
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -64,8 +64,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  // If user is an employee without full access, redirect to employee portal
-  if (isEmployee && !hasFullAccess) {
+  // If user is an employee without any main app permissions, redirect to employee portal
+  if (isEmployee && !hasMainAppAccess) {
     return <Navigate to="/employee-portal" replace />;
   }
 
