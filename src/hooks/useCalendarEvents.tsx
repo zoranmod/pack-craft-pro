@@ -182,6 +182,7 @@ export function useDeleteCalendarEvent() {
 export function useUpsertDocumentEvent() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: {
