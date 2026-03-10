@@ -99,7 +99,8 @@ export function useCurrentEmployee() {
     refetchOnWindowFocus: false,
   });
 
-  const hasFullAccess = data?.isAdmin || data?.permissions?.can_manage_employees || false;
+  const hasFullAccess = data?.isAdmin || data?.permissions?.can_manage_employees || 
+    (data?.permissions?.can_view_documents && data?.permissions?.can_create_documents && data?.permissions?.can_edit_documents) || false;
 
   return {
     employee: data?.employee ?? null,
