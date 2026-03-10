@@ -309,7 +309,7 @@ export function useSaveAsTemplate() {
       const { data, error } = await supabase
         .from('articles')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           code: templateData.code || null,
           name: templateData.name,
           unit: templateData.unit || 'kom',
