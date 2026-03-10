@@ -206,7 +206,7 @@ export function useUpsertDocumentEvent() {
         .maybeSingle();
 
       const eventData = {
-        user_id: user.id,
+        user_id: ownerUserId || user.id,
         title: `${data.eventType === 'montaza' ? 'Montaža' : data.eventType === 'isporuka' ? 'Isporuka' : 'Rok'}: ${data.documentNumber}`,
         type: data.eventType,
         start_at: data.date.toISOString(),
