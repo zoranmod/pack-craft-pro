@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { useLogActivity } from './useActivityLogs';
+import { useOwnerUserId } from './useOwnerUserId';
 import { useCallback } from 'react';
 
 /**
@@ -68,6 +69,7 @@ export function useCreateClient() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (clientData: CreateClientData) => {
@@ -97,7 +99,7 @@ export function useCreateClient() {
       const { data, error } = await supabase
         .from('clients')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           name: clientData.name.trim().replace(/\s+/g, ' '), // Normalize spaces but keep original case
           oib: clientData.oib || null,
           address: clientData.address || null,

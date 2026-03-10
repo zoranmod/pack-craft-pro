@@ -4,6 +4,7 @@ import { useAuth } from './useAuth';
 import { Document, DocumentItem, DocumentType, DocumentStatus, DocumentContractArticle } from '@/types/document';
 import { toast } from 'sonner';
 import { useLogActivity } from './useActivityLogs';
+import { useOwnerUserId } from './useOwnerUserId';
 
 export interface CreateDocumentData {
   type: DocumentType;
@@ -215,6 +216,7 @@ export function useCreateDocument() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: CreateDocumentData) => {
@@ -229,7 +231,7 @@ export function useCreateDocument() {
       const { data: doc, error: docError } = await supabase
         .from('documents')
         .insert({
-          user_id: user.id,
+           user_id: ownerUserId || user.id,
           type: data.type,
           number: documentNumber,
           client_name: data.clientName,

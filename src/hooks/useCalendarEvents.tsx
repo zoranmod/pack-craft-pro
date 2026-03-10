@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { CalendarEvent, CalendarEventType } from '@/types/calendar';
+import { useOwnerUserId } from './useOwnerUserId';
 import { toast } from 'sonner';
 
 interface CreateCalendarEventData {
@@ -74,6 +75,7 @@ export function useCalendarEvents(startDate?: Date, endDate?: Date) {
 export function useCreateCalendarEvent() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: CreateCalendarEventData) => {
@@ -82,7 +84,7 @@ export function useCreateCalendarEvent() {
       const { data: event, error } = await supabase
         .from('calendar_events')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           title: data.title,
           type: data.type,
           start_at: data.startAt.toISOString(),
@@ -180,6 +182,7 @@ export function useDeleteCalendarEvent() {
 export function useUpsertDocumentEvent() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: {
@@ -203,7 +206,7 @@ export function useUpsertDocumentEvent() {
         .maybeSingle();
 
       const eventData = {
-        user_id: user.id,
+        user_id: ownerUserId || user.id,
         title: `${data.eventType === 'montaza' ? 'Montaža' : data.eventType === 'isporuka' ? 'Isporuka' : 'Rok'}: ${data.documentNumber}`,
         type: data.eventType,
         start_at: data.date.toISOString(),

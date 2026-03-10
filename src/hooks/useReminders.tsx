@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useOwnerUserId } from './useOwnerUserId';
 import { addDays, format, isBefore, isToday, startOfDay } from 'date-fns';
 
 export interface Reminder {
@@ -136,6 +137,7 @@ export function useOverdueReminders() {
 export function useCreateReminder() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: CreateReminderData) => {
@@ -144,7 +146,7 @@ export function useCreateReminder() {
       const { data: reminder, error } = await supabase
         .from('reminders')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           document_id: data.documentId || null,
           reminder_type: data.reminderType,
           title: data.title,

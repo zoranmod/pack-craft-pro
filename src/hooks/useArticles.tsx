@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { useLogActivity } from './useActivityLogs';
+import { useOwnerUserId } from './useOwnerUserId';
 
 export interface Article {
   id: string;
@@ -96,6 +97,7 @@ export function useCreateArticle() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (articleData: CreateArticleData) => {
@@ -104,7 +106,7 @@ export function useCreateArticle() {
       const { data, error } = await supabase
         .from('articles')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           code: articleData.code || null,
           name: articleData.name,
           unit: articleData.unit || 'kom',
@@ -298,6 +300,7 @@ export function useSaveAsTemplate() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (templateData: Omit<CreateArticleData, 'is_template'>) => {
@@ -306,7 +309,7 @@ export function useSaveAsTemplate() {
       const { data, error } = await supabase
         .from('articles')
         .insert({
-          user_id: user.id,
+          user_id: ownerUserId || user.id,
           code: templateData.code || null,
           name: templateData.name,
           unit: templateData.unit || 'kom',
