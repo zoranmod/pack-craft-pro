@@ -300,6 +300,7 @@ export function useSaveAsTemplate() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (templateData: Omit<CreateArticleData, 'is_template'>) => {
