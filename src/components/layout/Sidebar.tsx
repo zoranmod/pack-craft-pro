@@ -346,7 +346,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           <span className="truncate">Početna</span>
         </Link>
 
-        {/* Novi dokument - always visible, above DOKUMENTI section */}
+        {/* Novi dokument - only if can create documents */}
+        {canCreateDocuments && (
         <div className="pt-2">
           <DropdownMenu modal={false} open={newDocMenuOpen} onOpenChange={setNewDocMenuOpen}>
             <Tooltip>
@@ -395,9 +396,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        )}
 
         {/* Grouped navigation sections */}
-        {navGroups.map((group) => (
+        {filteredNavGroups.map((group) => (
           <Collapsible
             key={group.id}
             open={expandedGroups[group.id]}
