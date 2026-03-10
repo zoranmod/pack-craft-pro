@@ -18,7 +18,7 @@ import { EmployeePortalDashboard } from '@/components/employee-portal/EmployeePo
 
 export default function EmployeePortal() {
   const { user, loading: authLoading } = useAuth();
-  const { employee, permissions, isLoading: employeeLoading, isEmployee, hasFullAccess } = useCurrentEmployee();
+  const { employee, permissions, isLoading: employeeLoading, isEmployee, hasMainAppAccess } = useCurrentEmployee();
   const navigate = useNavigate();
   
   const [email, setEmail] = useState('');
