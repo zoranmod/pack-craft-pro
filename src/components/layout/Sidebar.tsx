@@ -135,11 +135,49 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   const { data: companySettings } = useCompanySettings();
-  const { isAdmin, hasFullAccess } = useCurrentEmployee();
+  const { isAdmin, hasFullAccess, isEmployee, permissions } = useCurrentEmployee();
   const [newDocMenuOpen, setNewDocMenuOpen] = useState(false);
   const navPointerHandledRef = useRef(false);
   
   const showAdminSection = isAdmin || hasFullAccess;
+
+  // For employees, filter navigation based on permissions
+  // Owners/admins see everything
+  const isRestricted = isEmployee && !hasFullAccess;
+  
+  const canViewDocuments = !isRestricted || permissions?.can_view_documents;
+  const canCreateDocuments = !isRestricted || permissions?.can_create_documents;
+  const canViewArticles = !isRestricted || permissions?.can_view_articles;
+  const canViewClients = !isRestricted || permissions?.can_view_clients;
+  const canViewSettings = !isRestricted || permissions?.can_view_settings;
+  const canManageEmployees = !isRestricted || permissions?.can_manage_employees;
+  const canApproveLeave = !isRestricted || permissions?.can_approve_leave;
+  const canViewWorkClothing = !isRestricted || permissions?.can_view_work_clothing;
+
+  // Build filtered nav groups for employees
+  const filteredNavGroups = navGroups.map(group => {
+    if (!isRestricted) return group;
+    
+    const filteredItems = group.items.filter(item => {
+      // Document paths
+      if (['/documents', '/ponude', '/ponuda-komarnici', '/ugovori', '/otpremnice', '/nalozi', '/racuni', '/reklamacije'].includes(item.path)) {
+        return canViewDocuments;
+      }
+      // Šifrarnici
+      if (item.path === '/articles') return canViewArticles;
+      if (item.path === '/clients') return canViewClients;
+      if (item.path === '/dobavljaci') return canViewArticles || canViewClients;
+      if (item.path === '/employees') return canManageEmployees;
+      // Pregledi
+      if (item.path === '/reports') return canViewDocuments;
+      if (item.path === '/godisnji-odmori' || item.path === '/bolovanja') return canApproveLeave || canManageEmployees;
+      if (item.path === '/radna-odjeca') return canViewWorkClothing || canManageEmployees;
+      if (item.path === '/kalendar') return true;
+      return true;
+    });
+    
+    return { ...group, items: filteredItems };
+  }).filter(group => group.items.length > 0);
   
   const STORAGE_KEY = 'sidebar-expanded-groups';
   
