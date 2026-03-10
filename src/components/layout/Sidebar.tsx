@@ -482,6 +482,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           <span>Postavke</span>
         </Link>
       </div>
+      )}
     </div>
   );
 
