@@ -4,6 +4,7 @@ import { useAuth } from './useAuth';
 import { Document, DocumentItem, DocumentType, DocumentStatus, DocumentContractArticle } from '@/types/document';
 import { toast } from 'sonner';
 import { useLogActivity } from './useActivityLogs';
+import { useOwnerUserId } from './useOwnerUserId';
 
 export interface CreateDocumentData {
   type: DocumentType;

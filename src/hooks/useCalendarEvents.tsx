@@ -75,6 +75,7 @@ export function useCalendarEvents(startDate?: Date, endDate?: Date) {
 export function useCreateCalendarEvent() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: CreateCalendarEventData) => {

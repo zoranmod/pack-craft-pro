@@ -137,6 +137,7 @@ export function useOverdueReminders() {
 export function useCreateReminder() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (data: CreateReminderData) => {

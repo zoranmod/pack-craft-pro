@@ -69,6 +69,7 @@ export function useCreateClient() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const logActivity = useLogActivity();
+  const ownerUserId = useOwnerUserId();
 
   return useMutation({
     mutationFn: async (clientData: CreateClientData) => {
