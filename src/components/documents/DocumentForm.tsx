@@ -722,8 +722,8 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
                   className="mt-1.5"
                 />
               </div>
-              {/* Kontakt osoba i Adresa isporuke - samo za otpremnice i naloge */}
-              {(formData.type === 'otpremnica' || formData.type === 'nalog-dostava-montaza') && (
+              {/* Kontakt osoba i Adresa isporuke - za otpremnice, naloge i ponude */}
+              {(formData.type === 'otpremnica' || formData.type === 'nalog-dostava-montaza' || formData.type === 'ponuda') && (
                 <>
                   <div>
                     <Label htmlFor="contactPerson">Kontakt osoba</Label>

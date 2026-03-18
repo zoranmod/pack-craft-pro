@@ -1,24 +1,22 @@
 
 
-# Plan: Dodaj polje "Adresa isporuke" na ponude
+# Plan: Fiksni "Natrag" header na PDF stranicama
 
 ## Problem
-Polje "Adresa isporuke" trenutno se prikazuje samo za otpremnice i naloge (`otpremnica` i `nalog-dostava-montaza`). Korisnik želi isto polje i na ponudama (`ponuda`).
+U PWA modu, iframe s blob PDF-om koristi Chrome-ov ugrađeni PDF viewer koji preuzima cijeli viewport. Header s gumbom "Natrag" nestaje ili je prekriven.
 
-## Promjena
+## Rješenje
+Koristiti `fixed` pozicioniranje za header traku s visokim `z-index`-om, i dodati `padding-top` na iframe kontejner da se header ne preklapa s PDF sadržajem.
+
+## Promjene
 
 | Datoteka | Promjena |
 |---|---|
-| `src/components/documents/DocumentForm.tsx` | Proširiti uvjet na liniji 726 da uključi `ponuda` tip |
+| `src/pages/OpenPdf.tsx` | Header `fixed` + `z-50`, iframe s `pt-12` offset |
+| `src/pages/apartmani/ApartmentPdfView.tsx` | Ista promjena za apartmanski PDF viewer |
 
-Konkretno, uvjet:
-```
-formData.type === 'otpremnica' || formData.type === 'nalog-dostava-montaza'
-```
-postaje:
-```
-formData.type === 'otpremnica' || formData.type === 'nalog-dostava-montaza' || formData.type === 'ponuda'
-```
-
-PDF generator i baza već podržavaju `deliveryAddress` za sve tipove dokumenata — potrebna je samo ova jedna promjena u formi.
+## Detalji
+- Header: `fixed top-0 left-0 right-0 z-50 h-12 bg-background border-b` s gumbom "Natrag"
+- Sadržaj ispod: `pt-12` da iframe počne ispod headera
+- iframe ostaje `flex-1` ali sada ne može prekriti header
 
