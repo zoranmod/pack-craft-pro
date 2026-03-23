@@ -53,13 +53,13 @@
     --warning: 38 80% 55%;
     --warning-foreground: 0 0% 100%;
 
-    /* Borders and inputs: Warm gray */
-    --border: 35 8% 86%;
-    --input: 35 8% 86%;
+    /* Borders and inputs: Neutral gray */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 38 80% 55%;
 
     /* Badge neutral */
-    --badge-neutral: 35 8% 86%;
+    --badge-neutral: 0 0% 90%;
 
     /* Radius: Softer rounding */
     --radius: 0.5rem;
