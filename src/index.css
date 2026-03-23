@@ -13,17 +13,17 @@
        Light mode: clean white/gray, no warm tones
        ============================================= */
 
-    /* Core backgrounds: Warm off-white */
-    --background: 40 10% 96%;
-    --foreground: 30 8% 12%;
+    /* Core backgrounds: Pure white/gray */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
 
     /* Card surfaces */
-    --card: 40 10% 98%;
-    --card-foreground: 30 8% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
 
     /* Popover/dropdown surfaces */
-    --popover: 40 10% 98%;
-    --popover-foreground: 30 8% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
 
     /* Primary: Akord žuta iz loga */
     --primary: 38 80% 55%;
