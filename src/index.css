@@ -129,12 +129,12 @@
     --warning-foreground: 0 0% 10%;
 
     /* Borders and inputs */
-    --border: 30 6% 22%;
-    --input: 30 6% 22%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
     --ring: 38 82% 58%;
 
     /* Badge neutral */
-    --badge-neutral: 30 6% 24%;
+    --badge-neutral: 0 0% 22%;
 
     /* Sidebar tokens */
     --sidebar-background: 30 8% 8%;
