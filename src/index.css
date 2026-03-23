@@ -88,17 +88,17 @@
        Improved readability with subtle separation
        ============================================= */
 
-    /* Core backgrounds: Dark warm brown */
-    --background: 30 8% 8%;
-    --foreground: 35 10% 96%;
+    /* Core backgrounds: True neutral */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
 
     /* Card surfaces */
-    --card: 30 8% 12%;
-    --card-foreground: 35 10% 96%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 95%;
 
     /* Popover/dropdown surfaces */
-    --popover: 30 8% 12%;
-    --popover-foreground: 35 10% 96%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 95%;
 
     /* Primary: Akord žuta (dark) */
     --primary: 38 82% 58%;
