@@ -1,39 +1,34 @@
 
 
-# Plan: Popravak teme + Auto/System detekcija
+# Plan: Potvrda teme — CSS tokeni su ispravni
 
 ## Analiza
 
-Pregledao sam kod i CSS tokene — tema (boje, fontovi, layout) je **netaknuta** u `index.css` i `tailwind.config.ts`. Akord žuta paleta, Work Sans/Space Grotesk fontovi i warm off-white pozadina su na mjestu.
+Usporedio sam oba screenshota s trenutnim CSS tokenima u `src/index.css`:
 
-Problem je vjerojatno u tome da je aplikacija zapela na loading spinneru (vidio sam to na screenshotu), te da History revert nije uspio vratiti stanje. Trebamo:
+**Light mode (Screenshot 2):**
+- Topla off-white pozadina (`40 10% 96%`) — odgovara
+- Bijele kartice (`40 10% 98%`) — odgovara
+- Akord žuti akcenti (`38 80% 55%`) — odgovara
+- Tople sive granice (`35 8% 86%`) — odgovara
 
-1. Popraviti potencijalni build problem (App.css `.card` konflikt)
-2. Dodati "Auto po sustavu" opciju teme kako ste tražili
+**Dark mode (Screenshot 1):**
+- Tamna pozadina (`30 8% 8%`) — odgovara
+- Tamne kartice (`30 8% 12%`) — odgovara
+- Žuti akcenti (`38 82% 58%`) — odgovara
+- Tamne granice (`30 6% 22%`) — odgovara
 
-## Promjene
+**Zaključak: CSS tokeni u kodu su identični onima na screenshotovima. Tema je ispravna.**
+
+## Problem: Publish nije prošao
+
+Aplikacija se pravilno prikazuje u preview-u (vidim ispravan loading spinner s toplom pozadinom). Ako published verzija izgleda drugačije, potrebno je napraviti publish s novom izmjenom.
+
+## Promjena
 
 | Datoteka | Promjena |
 |---|---|
-| `src/App.css` | Obrisati `.card` selektor (linija 36-38) koji konflikta s Tailwind card komponentom — dodaje `padding: 2em` svim cardovima |
-| `src/hooks/useTheme.tsx` | Proširiti na 3 opcije: `light`, `dark`, `system` — system prati `prefers-color-scheme` |
-| `src/components/layout/Header.tsx` | Ažurirati theme toggle gumb: ciklira `light` → `dark` → `system` s odgovarajućom ikonom (Sun/Moon/Monitor) |
-| `src/index.css` | Bez promjena — CSS tokeni su ispravni |
+| `src/App.css` | Trivijalna promjena komentara (v2 → v3) za forsirani deploy |
 
-### Detalji: useTheme proširenje
-
-```typescript
-type Theme = 'light' | 'dark' | 'system';
-
-// Ako je 'system', pratiti window.matchMedia('(prefers-color-scheme: dark)')
-// Dodati mediaQuery listener koji automatski mijenja klasu na <html>
-```
-
-### Detalji: App.css čišćenje
-
-`App.css` sadrži Vite starter CSS koji je zastario i uzrokuje konflikte:
-- `#root { max-width: 1280px; padding: 2rem; text-align: center; }` — ograničava širinu i centrira sadržaj
-- `.card { padding: 2em; }` — dodaje padding svim elementima s klasom `card`
-
-Oba pravila treba ukloniti jer su relikti iz Vite boilerplate-a i interferiraju s Tailwind komponentama.
+Ovo omogućuje publish koji će postaviti trenutni ispravni kod na produkciju.
 
