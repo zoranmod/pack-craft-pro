@@ -47,7 +47,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, className,
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">{title}</p>
           <div className="flex items-end justify-between gap-2">
-            <p className="text-xl font-extrabold text-foreground leading-none">{value}</p>
+            <p className="text-xl font-bold text-foreground leading-none">{value}</p>
             {trend && (
               <span className={cn(
                 "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
