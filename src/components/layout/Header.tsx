@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, User, LogOut, Menu, Sun, Moon, X, Download } from 'lucide-react';
+import { Search, User, LogOut, Menu, Sun, Moon, Monitor, X, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -102,17 +102,20 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
 
       {/* Right section: Actions - flush right */}
       <div className="flex items-center gap-1 justify-end">
-        {/* Theme Toggle */}
+        {/* Theme Toggle: light → dark → system */}
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleTheme}
           className="h-10 w-10"
+          title={theme === 'light' ? 'Svijetla tema' : theme === 'dark' ? 'Tamna tema' : 'Sistemska tema'}
         >
           {theme === 'light' ? (
+            <Sun className="h-4 w-4" />
+          ) : theme === 'dark' ? (
             <Moon className="h-4 w-4" />
           ) : (
-            <Sun className="h-4 w-4" />
+            <Monitor className="h-4 w-4" />
           )}
         </Button>
 
