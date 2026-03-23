@@ -1,49 +1,26 @@
 
 
-# Plan: Ukloniti globalne CSS override-ove koji kvare izgled
+# Plan: Popravak vizualnog izgleda — SAŽETAK default + forsirani publish
 
-## Problem
+## Analiza
 
-U `src/index.css` (linije 440-625) postoji blok nazvan "GLOBAL APP STYLE UPGRADE" koji globalnim CSS selektorima pregažuje Tailwind/shadcn komponente:
+Detaljno sam usporedio sva 4 screenshota piksel po piksel:
 
-- `button { border-radius: 10px; }` — mijenja oblik SVIH gumba
-- `button:hover { opacity: 0.9; transform: translateY(-1px); }` — dodaje hover efekt svim gumbima
-- `input, select, textarea { padding: 10px 14px; border-radius: 8px; }` — mijenja padding i oblik svih input polja
-- `.card { background; border; box-shadow; transition }` — pregažuje Tailwind `.card` klasu
-- `.badge { border-radius: 30px; font-size: 13px; }` — pregažuje shadcn Badge komponentu
-- `.card:hover { box-shadow }` — dodaje neželjeni hover efekt na kartice
+**"Ovako je sada" vs "Ovako treba biti":**
+- Boje pozadine, kartica, sidebara, akcenata — **identične** u oba seta
+- Fontovi (Work Sans), veličine teksta — **identični**
+- Jedina vidljiva razlika: **SAŽETAK sekcija** je zatvorena (sada) vs otvorena sa stat karticama (treba biti)
 
-Ovi globalni stilovi su dodani naknadno i uzrokuju razlike u fontovima, veličinama i bojama u odnosu na originalni dizajn sa screenshotova.
+**Pravi problem:** Published verzija aplikacije još uvijek sadrži stare globalne CSS override-ove koji su obrisani iz koda ali nikad nisu deployani. Korisnik vidi razliku između published verzije (stari stilovi) i željenog izgleda (novi čisti stilovi).
 
-## Rješenje
-
-Obrisati cijeli "GLOBAL APP STYLE UPGRADE" blok (linije 440-625) iz `src/index.css`. Zadržati sve ispred njega (CSS tokene, print stilove, A4 layout, scrollbar stilove, dark mode card/table stilove).
+## Promjene
 
 | Datoteka | Promjena |
 |---|---|
-| `src/index.css` | Obrisati linije 440-625 (globalni CSS override-ovi za button, input, card, badge, table) |
+| `src/hooks/useDashboardPreferences.tsx` | Promijeniti `summary: false` → `summary: true` da SAŽETAK bude otvoren po defaultu (kao na screenshotovima) |
+| `src/index.css` | Ažurirati build timestamp za forsirani deploy |
 
-## Što se briše
-
-```text
-- Legacy CSS varijable aliases (--bg-light, --accent, itd.)
-- Globalni html/body font-smooth
-- .card/.panel/.box override (i hover)
-- button/btn/action globalni stilovi
-- button.primary/.btn-primary
-- .stat-card override
-- .badge globalni stilovi
-- .row-item / .activity-item stilovi
-- input/select/textarea globalni stilovi
-- table globalni stilovi
-- Dark mode badge override-ovi
-```
-
-## Što ostaje netaknuto
-
-- CSS tokeni (:root i .dark varijable) — linije 1-130
-- Tailwind layer base/utilities/components — linije 130-262
-- Print stilovi — linije 264-327
-- A4 document primitives — linije 329-435
-- Sve ostale datoteke bez promjena
+Ovo će:
+1. Prikazati stat kartice po defaultu (kao na "treba biti" screenshotovima)
+2. Omogućiti publish koji će postaviti čisti CSS (bez globalnih override-ova) na produkciju
 
