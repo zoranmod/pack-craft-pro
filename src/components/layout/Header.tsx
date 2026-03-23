@@ -102,17 +102,20 @@ export function Header({ title, subtitle, onMenuClick, showMenuButton, showGloba
 
       {/* Right section: Actions - flush right */}
       <div className="flex items-center gap-1 justify-end">
-        {/* Theme Toggle */}
+        {/* Theme Toggle: light → dark → system */}
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleTheme}
           className="h-10 w-10"
+          title={theme === 'light' ? 'Svijetla tema' : theme === 'dark' ? 'Tamna tema' : 'Sistemska tema'}
         >
           {theme === 'light' ? (
+            <Sun className="h-4 w-4" />
+          ) : theme === 'dark' ? (
             <Moon className="h-4 w-4" />
           ) : (
-            <Sun className="h-4 w-4" />
+            <Monitor className="h-4 w-4" />
           )}
         </Button>
 
