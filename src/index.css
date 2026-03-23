@@ -64,14 +64,14 @@
     /* Radius: Softer rounding */
     --radius: 0.5rem;
 
-    /* Sidebar tokens: Warm neutral */
-    --sidebar-background: 40 10% 98%;
-    --sidebar-foreground: 30 8% 12%;
+    /* Sidebar tokens: Neutral */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 9%;
     --sidebar-primary: 38 80% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 35 6% 91%;
-    --sidebar-accent-foreground: 30 8% 12%;
-    --sidebar-border: 35 8% 86%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
     --sidebar-ring: 38 80% 55%;
 
     /* Minimal shadows */
