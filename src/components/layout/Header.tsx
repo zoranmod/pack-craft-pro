@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, User, LogOut, Menu, Sun, Moon, X, Download } from 'lucide-react';
+import { Search, User, LogOut, Menu, Sun, Moon, Monitor, X, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
