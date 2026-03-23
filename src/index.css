@@ -29,13 +29,13 @@
     --primary: 38 80% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Warm neutral */
-    --secondary: 35 6% 91%;
-    --secondary-foreground: 30 8% 12%;
+    /* Secondary: Neutral */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    /* Muted: Warm neutral for backgrounds and text */
-    --muted: 35 6% 91%;
-    --muted-foreground: 30 5% 45%;
+    /* Muted: Neutral for backgrounds and text */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* Accent: Akord žuta */
     --accent: 38 80% 55%;
