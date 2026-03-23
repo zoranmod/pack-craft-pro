@@ -13,7 +13,7 @@ interface DashboardSections {
 }
 
 const DEFAULT_SECTIONS: DashboardSections = {
-  summary: false,
+  summary: true,
   quickActions: true,
   recentDocuments: true,
   activities: true,
