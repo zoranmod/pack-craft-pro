@@ -137,13 +137,13 @@
     --badge-neutral: 0 0% 22%;
 
     /* Sidebar tokens */
-    --sidebar-background: 30 8% 8%;
-    --sidebar-foreground: 35 10% 96%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 38 82% 58%;
     --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 30 6% 16%;
-    --sidebar-accent-foreground: 35 10% 96%;
-    --sidebar-border: 30 6% 22%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 20%;
     --sidebar-ring: 38 82% 58%;
 
     /* Shadows */
