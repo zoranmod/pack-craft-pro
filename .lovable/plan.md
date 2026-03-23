@@ -1,22 +1,39 @@
 
 
-# Plan: Fiksni "Natrag" header na PDF stranicama
+# Plan: Popravak teme + Auto/System detekcija
 
-## Problem
-U PWA modu, iframe s blob PDF-om koristi Chrome-ov ugrađeni PDF viewer koji preuzima cijeli viewport. Header s gumbom "Natrag" nestaje ili je prekriven.
+## Analiza
 
-## Rješenje
-Koristiti `fixed` pozicioniranje za header traku s visokim `z-index`-om, i dodati `padding-top` na iframe kontejner da se header ne preklapa s PDF sadržajem.
+Pregledao sam kod i CSS tokene — tema (boje, fontovi, layout) je **netaknuta** u `index.css` i `tailwind.config.ts`. Akord žuta paleta, Work Sans/Space Grotesk fontovi i warm off-white pozadina su na mjestu.
+
+Problem je vjerojatno u tome da je aplikacija zapela na loading spinneru (vidio sam to na screenshotu), te da History revert nije uspio vratiti stanje. Trebamo:
+
+1. Popraviti potencijalni build problem (App.css `.card` konflikt)
+2. Dodati "Auto po sustavu" opciju teme kako ste tražili
 
 ## Promjene
 
 | Datoteka | Promjena |
 |---|---|
-| `src/pages/OpenPdf.tsx` | Header `fixed` + `z-50`, iframe s `pt-12` offset |
-| `src/pages/apartmani/ApartmentPdfView.tsx` | Ista promjena za apartmanski PDF viewer |
+| `src/App.css` | Obrisati `.card` selektor (linija 36-38) koji konflikta s Tailwind card komponentom — dodaje `padding: 2em` svim cardovima |
+| `src/hooks/useTheme.tsx` | Proširiti na 3 opcije: `light`, `dark`, `system` — system prati `prefers-color-scheme` |
+| `src/components/layout/Header.tsx` | Ažurirati theme toggle gumb: ciklira `light` → `dark` → `system` s odgovarajućom ikonom (Sun/Moon/Monitor) |
+| `src/index.css` | Bez promjena — CSS tokeni su ispravni |
 
-## Detalji
-- Header: `fixed top-0 left-0 right-0 z-50 h-12 bg-background border-b` s gumbom "Natrag"
-- Sadržaj ispod: `pt-12` da iframe počne ispod headera
-- iframe ostaje `flex-1` ali sada ne može prekriti header
+### Detalji: useTheme proširenje
+
+```typescript
+type Theme = 'light' | 'dark' | 'system';
+
+// Ako je 'system', pratiti window.matchMedia('(prefers-color-scheme: dark)')
+// Dodati mediaQuery listener koji automatski mijenja klasu na <html>
+```
+
+### Detalji: App.css čišćenje
+
+`App.css` sadrži Vite starter CSS koji je zastario i uzrokuje konflikte:
+- `#root { max-width: 1280px; padding: 2rem; text-align: center; }` — ograničava širinu i centrira sadržaj
+- `.card { padding: 2em; }` — dodaje padding svim elementima s klasom `card`
+
+Oba pravila treba ukloniti jer su relikti iz Vite boilerplate-a i interferiraju s Tailwind komponentama.
 
