@@ -660,8 +660,8 @@ const ContractDocumentPDF = ({
                 <Text style={[styles.tableCell, { width: '40%' }]}>{item.name}</Text>
                 <Text style={[styles.tableCell, { width: '12%', textAlign: 'center' }]}>{item.quantity}</Text>
                 <Text style={[styles.tableCell, { width: '12%', textAlign: 'center' }]}>{item.unit}</Text>
-                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.price)} KM</Text>
-                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.total)} KM</Text>
+                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.price)} €</Text>
+                <Text style={[styles.tableCell, { width: '14%', textAlign: 'right' }]}>{formatCurrency(item.total)} €</Text>
               </View>
             ))}
             <View style={[styles.tableRow, { borderTopWidth: 2, borderTopColor: '#000' }]}>
