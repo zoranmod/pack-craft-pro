@@ -275,7 +275,7 @@ const Articles = () => {
                       </TableCell>
                       <TableCell>{article.unit}</TableCell>
                       <TableCell className="text-right text-muted-foreground">
-                        {article.purchase_price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM
+                        {article.purchase_price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {article.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM
