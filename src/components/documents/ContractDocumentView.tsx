@@ -29,10 +29,10 @@ const replacePlaceholders = (content: string, document: Document, companySetting
     })} €`,
     '{predujam}': `${predujam.toLocaleString('hr-HR', {
       minimumFractionDigits: 2
-    })} KM`,
+     })} €`,
     '{ostatak}': `${ostatak.toLocaleString('hr-HR', {
       minimumFractionDigits: 2
-    })} KM`,
+    })} €`,
     '{adresa_kupca}': document.clientAddress || '',
     '{ime_kupca}': document.clientName || '',
     '{oib_kupca}': document.clientOib || '',
