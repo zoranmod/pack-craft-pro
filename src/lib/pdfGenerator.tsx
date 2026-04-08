@@ -666,7 +666,7 @@ const ContractDocumentPDF = ({
             ))}
             <View style={[styles.tableRow, { borderTopWidth: 2, borderTopColor: '#000' }]}>
               <Text style={[styles.tableCellHeader, { width: '86%', textAlign: 'right' }]}>UKUPNO:</Text>
-              <Text style={[styles.tableCellHeader, { width: '14%', textAlign: 'right' }]}>{formatCurrency(doc.totalAmount)} KM</Text>
+              <Text style={[styles.tableCellHeader, { width: '14%', textAlign: 'right' }]}>{formatCurrency(doc.totalAmount)} €</Text>
             </View>
           </View>
         )}
