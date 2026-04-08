@@ -379,7 +379,7 @@ const StandardDocumentPDF = ({
                     </Text>
                   )}
                   <Text style={[styles.tableCell, { width: colWidthsWithPrices.pdv, textAlign: 'right' }]}>{round2(item.pdv)}%</Text>
-                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.total, textAlign: 'right', fontWeight: 'bold' }]}>{formatCurrency(item.total)} KM</Text>
+                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.total, textAlign: 'right', fontWeight: 'bold' }]}>{formatCurrency(item.total)} €</Text>
                 </>
               )}
             </View>
