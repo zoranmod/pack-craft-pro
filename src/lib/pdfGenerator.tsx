@@ -561,9 +561,9 @@ const ContractDocumentPDF = ({
     const predujam = doc.totalAmount * 0.3;
     const ostatak = doc.totalAmount - predujam;
     const replacements: Record<string, string> = {
-      '{ukupna_cijena}': `${doc.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
-      '{predujam}': `${predujam.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
-      '{ostatak}': `${ostatak.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM`,
+      '{ukupna_cijena}': `${doc.totalAmount.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
+      '{predujam}': `${predujam.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
+      '{ostatak}': `${ostatak.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €`,
       '{adresa_kupca}': doc.clientAddress || '',
       '{ime_kupca}': doc.clientName || '',
       '{oib_kupca}': doc.clientOib || '',
