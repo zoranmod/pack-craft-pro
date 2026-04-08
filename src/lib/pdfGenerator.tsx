@@ -391,7 +391,7 @@ const StandardDocumentPDF = ({
           <View style={styles.totalsSection}>
             <View style={styles.totalsRow}>
               <Text style={styles.text}>Osnovica:</Text>
-              <Text style={styles.text}>{formatCurrency(subtotal)} KM</Text>
+              <Text style={styles.text}>{formatCurrency(subtotal)} €</Text>
             </View>
             {totalDiscount > 0 && (
               <View style={styles.totalsRow}>
