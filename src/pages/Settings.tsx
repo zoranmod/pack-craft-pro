@@ -673,7 +673,7 @@ const Settings = () => {
                   id="registrationCourt" 
                   value={company.registration_court}
                   onChange={(e) => setCompany({ ...company, registration_court: e.target.value })}
-                  placeholder="Općinski sud u Sarajevu"
+                  placeholder="Trgovački sud u Zagrebu"
                   className="mt-1.5" 
                 />
               </div>
