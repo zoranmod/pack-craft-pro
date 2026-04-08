@@ -1,79 +1,74 @@
 
 
-# Plan: Popravak boja i fontova — čista bijela + deblji fontovi
+# Plan: Prilagodba za hrvatsko tržište (HR)
 
-## Problem
+Aplikacija je trenutno konfigurirana za BiH tržište. Potrebno je promijeniti sve reference na HR standard.
 
-Trenutni CSS tokeni koriste **toplu/žućkastu** pozadinu (`hsl(40, 10%, 96%)`) umjesto čiste bijele, i fontovi su pretanki.
+## Što se mijenja
 
-## Promjene
-
-### 1. `src/index.css` — Light mode tokeni
-
-| Token | Sada | Novo |
+| Stavka | Sada (BiH) | Novo (HR) |
 |---|---|---|
-| `--background` | `40 10% 96%` (topla off-white) | `0 0% 100%` (čista bijela) |
-| `--foreground` | `30 8% 12%` (topla smeđa) | `0 0% 9%` (neutralno crna) |
-| `--card` | `40 10% 98%` | `0 0% 100%` (bijela) |
-| `--card-foreground` | `30 8% 12%` | `0 0% 9%` |
-| `--popover` | `40 10% 98%` | `0 0% 100%` |
-| `--popover-foreground` | `30 8% 12%` | `0 0% 9%` |
-| `--secondary` | `35 6% 91%` | `0 0% 96%` (neutralna siva) |
-| `--secondary-foreground` | `30 8% 12%` | `0 0% 9%` |
-| `--muted` | `35 6% 91%` | `0 0% 96%` |
-| `--muted-foreground` | `30 5% 45%` | `0 0% 45%` |
-| `--border` | `35 8% 86%` | `0 0% 90%` (neutralna granica) |
-| `--input` | `35 8% 86%` | `0 0% 90%` |
-| `--sidebar-background` | `40 10% 98%` | `0 0% 100%` |
-| `--sidebar-foreground` | `30 8% 12%` | `0 0% 9%` |
-| `--sidebar-accent` | `35 6% 91%` | `0 0% 96%` |
-| `--sidebar-accent-foreground` | `30 8% 12%` | `0 0% 9%` |
-| `--sidebar-border` | `35 8% 86%` | `0 0% 90%` |
-
-Primary/accent/ring ostaju nepromijenjeni (Akord žuta `38 80% 55%`).
-
-### 2. `src/index.css` — Dark mode tokeni
-
-| Token | Sada | Novo |
-|---|---|---|
-| `--background` | `30 8% 8%` | `0 0% 7%` (neutralni crni) |
-| `--foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--card` | `30 8% 12%` | `0 0% 11%` |
-| `--card-foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--popover` | `30 8% 12%` | `0 0% 11%` |
-| `--popover-foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--secondary` | `30 6% 16%` | `0 0% 15%` |
-| `--secondary-foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--muted` | `30 6% 16%` | `0 0% 15%` |
-| `--muted-foreground` | `35 5% 72%` | `0 0% 65%` |
-| `--border` | `30 6% 22%` | `0 0% 20%` |
-| `--input` | `30 6% 22%` | `0 0% 20%` |
-| `--sidebar-background` | `30 8% 8%` | `0 0% 7%` |
-| `--sidebar-foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--sidebar-accent` | `30 6% 16%` | `0 0% 15%` |
-| `--sidebar-accent-foreground` | `35 10% 96%` | `0 0% 95%` |
-| `--sidebar-border` | `30 6% 22%` | `0 0% 20%` |
-| `--badge-neutral` | `30 6% 24%` | `0 0% 22%` |
-
-### 3. `src/index.css` — Deblji fontovi
-
-U `@layer base` sekciji:
-- Body: dodati `font-weight: 500` (medium umjesto regular 400)
-- Headings: promijeniti `font-semibold` u `font-bold`
-
-### 4. `src/components/ui/page-header.tsx` — Deblji greeting
-
-- `text-2xl font-bold` → `text-2xl font-extrabold` za veći kontrast naslova
-
-### 5. `src/components/dashboard/StatCard.tsx` — Deblji stat brojevi
-
-- Stat value: `text-xl font-bold` → `text-xl font-extrabold`
+| **Identifikator tvrtke** | JIB (13 znamenki) | OIB (11 znamenki) |
+| **Valuta** | KM (Konvertibilna marka) | EUR (€) |
+| **PDV stopa** | 17% | 25% |
+| **Bankovni račun** | Transakcijski račun | IBAN |
+| **Registracija** | Općinski sud u Sarajevu | Trgovački sud |
+| **Telefon primjer** | +387 | +385 |
+| **Adresa primjer** | Sarajevo, BiH | Zagreb, Hrvatska |
 
 ## Datoteke za promjenu
 
-| Datoteka | Promjena |
-|---|---|
-| `src/index.css` | Neutralni HSL tokeni (0 hue, 0 saturation) + deblji fontovi |
-| `src/components/ui/page-header.tsx` | font-extrabold na naslovu |
-| `src/components/dashboard/StatCard.tsx` | font-extrabold na vrijednostima |
+### 1. `src/lib/validation.ts` — OIB validacija
+- Promijeniti iz 13-znamenkastog JIB-a u 11-znamenkasti OIB
+- Ažurirati komentare i poruke grešaka
+
+### 2. `src/lib/pdfGenerator.tsx` — PDF dokumenti
+- `JIB:` → `OIB:`
+- `KM` → `EUR` (svi iznosi)
+- `PDV (17%)` → dinamički postotak (ne hardkodirani)
+- `Transakcijski račun:` → `IBAN:`
+
+### 3. `src/components/documents/DocumentForm.tsx`
+- Default PDV: `17` → `25`
+- Label `JIB` → `OIB`
+
+### 4. `src/pages/Settings.tsx`
+- Label `JIB` → `OIB`
+- `Transakcijski račun` → `IBAN`
+- Placeholder `Sarajevo, Bosna i Hercegovina` → `Zagreb, Hrvatska`
+- Placeholder `Općinski sud u Sarajevu` → `Trgovački sud u Zagrebu`
+- Placeholder `2.000,00 KM` → `2.000,00 EUR`
+- Bankarski podaci opis: `Transakcijski računi` → `IBAN računi`
+
+### 5. `src/pages/Articles.tsx`
+- `KM` → `EUR` u cijenama i labelama
+
+### 6. `src/components/documents/ContractDocumentView.tsx`
+- `JIB:` → `OIB:`
+- `Transakcijski račun:` → `IBAN:`
+
+### 7. `src/components/documents/DocumentWysiwygEditor.tsx`
+- `JIB:` → `OIB:`
+
+### 8. `src/pages/ContractLayoutEditor.tsx`
+- Primjeri i labele: JIB → OIB, Transakcijski račun → IBAN
+- Primjeri adresa/telefona: HR format (+385, Zagreb)
+- Primjeri cijena: KM → EUR
+
+### 9. `src/pages/admin/AdminSettings.tsx`
+- Default payment method: `Transakcijski račun` → `Virman`
+
+### 10. `src/hooks/useDocumentTemplates.tsx`
+- Default payment method: `Transakcijski račun` → `Virman`
+
+### 11. `src/data/contractTemplates.ts`
+- "Općinski sud u Županji" → "Trgovački sud" (generičko)
+
+### 12. `src/components/documents/MosquitoNetQuoteForm.tsx` (ako sadrži KM/JIB)
+- Isto ažuriranje valute/identifikatora
+
+## Što se NE mijenja
+- Apartmanski modul (već koristi EUR i OIB — zasebna logika)
+- Struktura baze podataka (kolone ostaju iste, samo se labele mijenjaju)
+- Tipovi (`types/document.ts`, `types/companySettings.ts`) — interno polje `oib` ostaje isto
 
