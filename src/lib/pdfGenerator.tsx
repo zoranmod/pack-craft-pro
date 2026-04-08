@@ -607,8 +607,8 @@ const ContractDocumentPDF = ({
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.textBold}>{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</Text>
             {companySettings?.address && <Text style={styles.text}>{companySettings.address}</Text>}
-            {companySettings?.oib && <Text style={styles.text}>JIB: {companySettings.oib}</Text>}
-            {companySettings?.iban && <Text style={styles.text}>Transakcijski račun: {companySettings.iban}</Text>}
+            {companySettings?.oib && <Text style={styles.text}>OIB: {companySettings.oib}</Text>}
+            {companySettings?.iban && <Text style={styles.text}>IBAN: {companySettings.iban}</Text>}
           </View>
         </View>
 
