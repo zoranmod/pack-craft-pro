@@ -424,7 +424,7 @@ const Articles = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="purchase_price">Nabavna cijena (KM)</Label>
+                <Label htmlFor="purchase_price">Nabavna cijena (EUR)</Label>
                 <Input
                   id="purchase_price"
                   type="number"

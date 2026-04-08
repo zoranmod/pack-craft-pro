@@ -118,7 +118,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
               <div className="ml-4 space-y-0.5">
                 <p className="font-semibold">{document.clientName}</p>
                 {document.clientAddress && <p>{document.clientAddress}</p>}
-                {document.clientOib && <p>JIB: {document.clientOib}</p>}
+                {document.clientOib && <p>OIB: {document.clientOib}</p>}
                 {document.clientPhone && <p>Tel: {document.clientPhone}</p>}
                 {document.clientEmail && <p>Email: {document.clientEmail}</p>}
               </div>
