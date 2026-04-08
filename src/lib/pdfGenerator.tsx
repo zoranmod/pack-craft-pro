@@ -618,7 +618,7 @@ const ContractDocumentPDF = ({
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.textBold}>{doc.clientName}</Text>
             {doc.clientAddress && <Text style={styles.text}>{doc.clientAddress}</Text>}
-            {doc.clientOib && <Text style={styles.text}>JIB: {doc.clientOib}</Text>}
+            {doc.clientOib && <Text style={styles.text}>OIB: {doc.clientOib}</Text>}
             {doc.clientPhone && <Text style={styles.text}>Tel: {doc.clientPhone}</Text>}
             {doc.clientEmail && <Text style={styles.text}>Email: {doc.clientEmail}</Text>}
           </View>
