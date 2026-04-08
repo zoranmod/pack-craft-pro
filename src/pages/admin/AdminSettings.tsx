@@ -42,7 +42,7 @@ const AdminSettings = () => {
   const [documentSettings, setDocumentSettings] = useState({
     default_validity_days: 30,
     default_delivery_days: 14,
-    default_payment_method: 'Transakcijski račun',
+    default_payment_method: 'Virman',
     reset_numbering_yearly: true,
     ponuda_prefix: 'P',
     racun_prefix: 'R',
