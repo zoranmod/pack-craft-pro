@@ -569,7 +569,7 @@ const Settings = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="iban2">Transakcijski račun</Label>
+                    <Label htmlFor="iban2">IBAN</Label>
                     <Input 
                       id="iban2" 
                       value={company.iban_2}
