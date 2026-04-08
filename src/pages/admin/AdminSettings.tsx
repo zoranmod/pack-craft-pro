@@ -376,7 +376,7 @@ const AdminSettings = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Transakcijski račun">Transakcijski račun</SelectItem>
+                      <SelectItem value="Virman">Virman</SelectItem>
                       <SelectItem value="Gotovina">Gotovina</SelectItem>
                       <SelectItem value="Kartica">Kartica</SelectItem>
                       <SelectItem value="Virman">Virman</SelectItem>
