@@ -275,10 +275,10 @@ const Articles = () => {
                       </TableCell>
                       <TableCell>{article.unit}</TableCell>
                       <TableCell className="text-right text-muted-foreground">
-                        {article.purchase_price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM
+                        {article.purchase_price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        {article.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} KM
+                        {article.price.toLocaleString('hr-HR', { minimumFractionDigits: 2 })} €
                       </TableCell>
                       <TableCell className="text-right">
                         <span className={article.stock <= 0 ? 'text-destructive' : article.stock < 10 ? 'text-yellow-500' : 'text-green-500'}>
@@ -385,7 +385,7 @@ const Articles = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="price">Cijena (KM)</Label>
+                <Label htmlFor="price">Cijena (EUR)</Label>
                 <Input
                   id="price"
                   type="number"
@@ -424,7 +424,7 @@ const Articles = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="purchase_price">Nabavna cijena (KM)</Label>
+                <Label htmlFor="purchase_price">Nabavna cijena (EUR)</Label>
                 <Input
                   id="purchase_price"
                   type="number"

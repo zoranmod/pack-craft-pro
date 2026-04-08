@@ -463,18 +463,18 @@ const Settings = () => {
                     id="address" 
                     value={company.address}
                     onChange={(e) => setCompany({ ...company, address: e.target.value })}
-                    placeholder="Sarajevo, Bosna i Hercegovina"
+                    placeholder="Zagreb, Hrvatska"
                     className="mt-1.5" 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="oib">JIB</Label>
+                  <Label htmlFor="oib">OIB</Label>
                   <Input 
                     id="oib" 
                     value={company.oib}
                     onChange={(e) => setCompany({ ...company, oib: e.target.value })}
-                    placeholder="4200000000000"
-                    maxLength={13}
+                    placeholder="12345678901"
+                    maxLength={11}
                     className="mt-1.5" 
                   />
                 </div>
@@ -501,7 +501,7 @@ const Settings = () => {
             </div>
             <div>
               <h2 className="font-semibold text-foreground">Bankarski podaci</h2>
-              <p className="text-sm text-muted-foreground">Transakcijski računi i SWIFT kodovi</p>
+              <p className="text-sm text-muted-foreground">IBAN računi i SWIFT kodovi</p>
             </div>
           </div>
           
@@ -532,7 +532,7 @@ const Settings = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="iban">Transakcijski račun</Label>
+                    <Label htmlFor="iban">IBAN</Label>
                     <Input 
                       id="iban" 
                       value={company.iban}
@@ -569,7 +569,7 @@ const Settings = () => {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="iban2">Transakcijski račun</Label>
+                    <Label htmlFor="iban2">IBAN</Label>
                     <Input 
                       id="iban2" 
                       value={company.iban_2}
@@ -673,7 +673,7 @@ const Settings = () => {
                   id="registrationCourt" 
                   value={company.registration_court}
                   onChange={(e) => setCompany({ ...company, registration_court: e.target.value })}
-                  placeholder="Općinski sud u Sarajevu"
+                  placeholder="Trgovački sud u Zagrebu"
                   className="mt-1.5" 
                 />
               </div>
@@ -693,7 +693,7 @@ const Settings = () => {
                   id="capitalAmount" 
                   value={company.capital_amount}
                   onChange={(e) => setCompany({ ...company, capital_amount: e.target.value })}
-                  placeholder="2.000,00 KM"
+                  placeholder="2.000,00 EUR"
                   className="mt-1.5" 
                 />
               </div>

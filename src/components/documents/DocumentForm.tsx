@@ -655,19 +655,19 @@ export function DocumentForm({ fixedType }: DocumentFormProps) {
               </div>
               <div>
                 <Label htmlFor="clientOib" className={validationErrors.clientOib ? 'text-destructive' : ''}>
-                  JIB
+                  OIB
                 </Label>
                 <Input
                   id="clientOib"
                   value={formData.clientOib}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 13);
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 11);
                     setFormData({ ...formData, clientOib: value });
                     if (validationErrors.clientOib) {
                       setValidationErrors(prev => ({ ...prev, clientOib: undefined }));
                     }
                   }}
-                  placeholder="4200000000000"
+                  placeholder="12345678901"
                   maxLength={13}
                   className={cn("mt-1.5", validationErrors.clientOib && "border-destructive focus-visible:ring-destructive")}
                 />

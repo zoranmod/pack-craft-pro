@@ -73,7 +73,7 @@ const defaultTemplate: Omit<CreateDocumentTemplate, 'document_type' | 'name'> = 
   show_delivery_days: true,
   default_validity_days: 15,
   default_delivery_days: 60,
-  default_payment_method: 'Transakcijski račun',
+  default_payment_method: 'Virman',
   table_columns: ['rbr', 'sifra', 'naziv', 'jmj', 'kolicina', 'cijena', 'rabat', 'cijena_s_rabatom', 'ukupno'],
   show_pdv_breakdown: true,
   show_discount_column: true,

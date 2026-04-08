@@ -29,10 +29,10 @@ const replacePlaceholders = (content: string, document: Document, companySetting
     })} €`,
     '{predujam}': `${predujam.toLocaleString('hr-HR', {
       minimumFractionDigits: 2
-    })} KM`,
+     })} €`,
     '{ostatak}': `${ostatak.toLocaleString('hr-HR', {
       minimumFractionDigits: 2
-    })} KM`,
+    })} €`,
     '{adresa_kupca}': document.clientAddress || '',
     '{ime_kupca}': document.clientName || '',
     '{oib_kupca}': document.clientOib || '',
@@ -107,8 +107,8 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
               <div className="ml-4 space-y-0.5">
                 <p className="font-semibold">{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</p>
                 {companySettings?.address && <p>{companySettings.address}</p>}
-                {companySettings?.oib && <p>JIB: {companySettings.oib}</p>}
-                {companySettings?.iban && <p>Transakcijski račun: {companySettings.iban}</p>}
+                {companySettings?.oib && <p>OIB: {companySettings.oib}</p>}
+                {companySettings?.iban && <p>IBAN: {companySettings.iban}</p>}
               </div>
             </div>
 
@@ -118,7 +118,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
               <div className="ml-4 space-y-0.5">
                 <p className="font-semibold">{document.clientName}</p>
                 {document.clientAddress && <p>{document.clientAddress}</p>}
-                {document.clientOib && <p>JIB: {document.clientOib}</p>}
+                {document.clientOib && <p>OIB: {document.clientOib}</p>}
                 {document.clientPhone && <p>Tel: {document.clientPhone}</p>}
                 {document.clientEmail && <p>Email: {document.clientEmail}</p>}
               </div>
