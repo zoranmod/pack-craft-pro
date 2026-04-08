@@ -693,7 +693,7 @@ const Settings = () => {
                   id="capitalAmount" 
                   value={company.capital_amount}
                   onChange={(e) => setCompany({ ...company, capital_amount: e.target.value })}
-                  placeholder="2.000,00 KM"
+                  placeholder="2.000,00 EUR"
                   className="mt-1.5" 
                 />
               </div>
