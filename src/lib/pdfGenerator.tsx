@@ -396,7 +396,7 @@ const StandardDocumentPDF = ({
             {totalDiscount > 0 && (
               <View style={styles.totalsRow}>
                 <Text style={styles.text}>Rabat:</Text>
-                <Text style={styles.text}>-{formatCurrency(totalDiscount)} KM</Text>
+                <Text style={styles.text}>-{formatCurrency(totalDiscount)} €</Text>
               </View>
             )}
             {template?.show_pdv_breakdown !== false && (
