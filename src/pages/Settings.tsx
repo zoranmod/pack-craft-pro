@@ -501,7 +501,7 @@ const Settings = () => {
             </div>
             <div>
               <h2 className="font-semibold text-foreground">Bankarski podaci</h2>
-              <p className="text-sm text-muted-foreground">Transakcijski računi i SWIFT kodovi</p>
+              <p className="text-sm text-muted-foreground">IBAN računi i SWIFT kodovi</p>
             </div>
           </div>
           
