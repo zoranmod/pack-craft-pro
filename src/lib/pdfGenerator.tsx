@@ -407,7 +407,7 @@ const StandardDocumentPDF = ({
             )}
             <View style={styles.totalsFinal}>
               <Text style={styles.textBold}>UKUPNO:</Text>
-              <Text style={styles.textBold}>{formatCurrency(doc.totalAmount)} KM</Text>
+              <Text style={styles.textBold}>{formatCurrency(doc.totalAmount)} €</Text>
             </View>
           </View>
         )}
