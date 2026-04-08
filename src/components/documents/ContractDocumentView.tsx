@@ -107,8 +107,8 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
               <div className="ml-4 space-y-0.5">
                 <p className="font-semibold">{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</p>
                 {companySettings?.address && <p>{companySettings.address}</p>}
-                {companySettings?.oib && <p>JIB: {companySettings.oib}</p>}
-                {companySettings?.iban && <p>Transakcijski račun: {companySettings.iban}</p>}
+                {companySettings?.oib && <p>OIB: {companySettings.oib}</p>}
+                {companySettings?.iban && <p>IBAN: {companySettings.iban}</p>}
               </div>
             </div>
 
