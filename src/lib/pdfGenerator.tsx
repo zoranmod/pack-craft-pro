@@ -372,7 +372,7 @@ const StandardDocumentPDF = ({
               <Text style={[styles.tableCell, { width: hasPrices ? colWidthsWithPrices.qty : colWidthsNoPrices.qty, textAlign: 'center' }]}>{item.quantity}</Text>
               {hasPrices && (
                 <>
-                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.price, textAlign: 'right' }]}>{formatCurrency(item.price)} KM</Text>
+                  <Text style={[styles.tableCell, { width: colWidthsWithPrices.price, textAlign: 'right' }]}>{formatCurrency(item.price)} €</Text>
                   {showDiscount && (
                     <Text style={[styles.tableCell, { width: colWidthsWithPrices.discount, textAlign: 'right' }]}>
                       {item.discount > 0 ? `${round2(item.discount)}%` : null}
