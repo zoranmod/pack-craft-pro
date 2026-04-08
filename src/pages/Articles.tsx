@@ -385,7 +385,7 @@ const Articles = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="price">Cijena (KM)</Label>
+                <Label htmlFor="price">Cijena (EUR)</Label>
                 <Input
                   id="price"
                   type="number"
