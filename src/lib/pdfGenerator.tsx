@@ -401,8 +401,8 @@ const StandardDocumentPDF = ({
             )}
             {template?.show_pdv_breakdown !== false && (
               <View style={styles.totalsRow}>
-                <Text style={styles.text}>PDV (17%):</Text>
-                <Text style={styles.text}>{formatCurrency(totalPdv)} KM</Text>
+                <Text style={styles.text}>PDV (25%):</Text>
+                <Text style={styles.text}>{formatCurrency(totalPdv)} €</Text>
               </View>
             )}
             <View style={styles.totalsFinal}>
