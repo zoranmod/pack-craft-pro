@@ -463,18 +463,18 @@ const Settings = () => {
                     id="address" 
                     value={company.address}
                     onChange={(e) => setCompany({ ...company, address: e.target.value })}
-                    placeholder="Sarajevo, Bosna i Hercegovina"
+                    placeholder="Zagreb, Hrvatska"
                     className="mt-1.5" 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="oib">JIB</Label>
+                  <Label htmlFor="oib">OIB</Label>
                   <Input 
                     id="oib" 
                     value={company.oib}
                     onChange={(e) => setCompany({ ...company, oib: e.target.value })}
-                    placeholder="4200000000000"
-                    maxLength={13}
+                    placeholder="12345678901"
+                    maxLength={11}
                     className="mt-1.5" 
                   />
                 </div>
