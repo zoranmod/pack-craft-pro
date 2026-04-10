@@ -1,74 +1,44 @@
 
 
-# Plan: Prilagodba za hrvatsko tržište (HR)
+# Plan: Zamjena svih "Adaptiva" referenci s "Akord"
 
-Aplikacija je trenutno konfigurirana za BiH tržište. Potrebno je promijeniti sve reference na HR standard.
+## Problem
+Na 6 mjesta u kodu postoje hardkodirani fallback podaci s "Adaptiva Design" umjesto "Akord". Kad korisnik nema upisane podatke tvrtke u postavkama, prikazuju se Adaptiva podaci.
 
-## Što se mijenja
+## Promjene
 
-| Stavka | Sada (BiH) | Novo (HR) |
-|---|---|---|
-| **Identifikator tvrtke** | JIB (13 znamenki) | OIB (11 znamenki) |
-| **Valuta** | KM (Konvertibilna marka) | EUR (€) |
-| **PDV stopa** | 17% | 25% |
-| **Bankovni račun** | Transakcijski račun | IBAN |
-| **Registracija** | Općinski sud u Sarajevu | Trgovački sud |
-| **Telefon primjer** | +387 | +385 |
-| **Adresa primjer** | Sarajevo, BiH | Zagreb, Hrvatska |
+### 1. `src/components/documents/MemorandumFooter.tsx`
+- Hardkodirani footer: `www.adaptivadesign.ba • info@adaptivadesign.ba` i `Adaptiva Design d.o.o.`
+- Zamijeniti s dinamičkim podacima iz companySettings (treba dodati props), ili fallback na Akord podatke
 
-## Datoteke za promjenu
+### 2. `src/lib/pdfGenerator.tsx`
+- `'www.adaptivadesign.ba'` → `'www.akord.hr'`
+- `'info@adaptivadesign.ba'` → `'info@akord.hr'`
+- `'Adaptiva Design d.o.o.'` → `'Akord d.o.o.'` (2 mjesta — replacePlaceholders i contract section)
 
-### 1. `src/lib/validation.ts` — OIB validacija
-- Promijeniti iz 13-znamenkastog JIB-a u 11-znamenkasti OIB
-- Ažurirati komentare i poruke grešaka
+### 3. `src/components/documents/ContractDocumentView.tsx`
+- `'Adaptiva Design d.o.o.'` → `'Akord d.o.o.'` (2 mjesta — replacePlaceholders i seller display)
 
-### 2. `src/lib/pdfGenerator.tsx` — PDF dokumenti
-- `JIB:` → `OIB:`
-- `KM` → `EUR` (svi iznosi)
-- `PDV (17%)` → dinamički postotak (ne hardkodirani)
-- `Transakcijski račun:` → `IBAN:`
+### 4. `src/pages/ContractLayoutEditor.tsx`
+- Placeholder example: `'Adaptiva Design d.o.o.'` → `'Akord d.o.o.'`
+- Fallback u preview rendereru: `'Adaptiva Design d.o.o.'` → `'Akord d.o.o.'`
 
-### 3. `src/components/documents/DocumentForm.tsx`
-- Default PDV: `17` → `25`
-- Label `JIB` → `OIB`
+### 5. `src/pages/Settings.tsx`
+- Placeholder na company_name input: `"Adaptiva Design d.o.o."` → `"Akord d.o.o."`
+- Placeholder website: `"www.adaptivadesign.ba"` → `"www.akord.hr"`
+- Placeholder email: `"info@adaptivadesign.ba"` → `"info@akord.hr"`
 
-### 4. `src/pages/Settings.tsx`
-- Label `JIB` → `OIB`
-- `Transakcijski račun` → `IBAN`
-- Placeholder `Sarajevo, Bosna i Hercegovina` → `Zagreb, Hrvatska`
-- Placeholder `Općinski sud u Sarajevu` → `Trgovački sud u Zagrebu`
-- Placeholder `2.000,00 KM` → `2.000,00 EUR`
-- Bankarski podaci opis: `Transakcijski računi` → `IBAN računi`
+### 6. `src/components/layout/Sidebar.tsx`
+- Fallback company name: `'Adaptiva Design'` → `'Akord'`
 
-### 5. `src/pages/Articles.tsx`
-- `KM` → `EUR` u cijenama i labelama
+## Datoteke za promjenu (6 datoteka)
 
-### 6. `src/components/documents/ContractDocumentView.tsx`
-- `JIB:` → `OIB:`
-- `Transakcijski račun:` → `IBAN:`
-
-### 7. `src/components/documents/DocumentWysiwygEditor.tsx`
-- `JIB:` → `OIB:`
-
-### 8. `src/pages/ContractLayoutEditor.tsx`
-- Primjeri i labele: JIB → OIB, Transakcijski račun → IBAN
-- Primjeri adresa/telefona: HR format (+385, Zagreb)
-- Primjeri cijena: KM → EUR
-
-### 9. `src/pages/admin/AdminSettings.tsx`
-- Default payment method: `Transakcijski račun` → `Virman`
-
-### 10. `src/hooks/useDocumentTemplates.tsx`
-- Default payment method: `Transakcijski račun` → `Virman`
-
-### 11. `src/data/contractTemplates.ts`
-- "Općinski sud u Županji" → "Trgovački sud" (generičko)
-
-### 12. `src/components/documents/MosquitoNetQuoteForm.tsx` (ako sadrži KM/JIB)
-- Isto ažuriranje valute/identifikatora
-
-## Što se NE mijenja
-- Apartmanski modul (već koristi EUR i OIB — zasebna logika)
-- Struktura baze podataka (kolone ostaju iste, samo se labele mijenjaju)
-- Tipovi (`types/document.ts`, `types/companySettings.ts`) — interno polje `oib` ostaje isto
+| Datoteka | Broj zamjena |
+|---|---|
+| `src/lib/pdfGenerator.tsx` | 4 |
+| `src/components/documents/ContractDocumentView.tsx` | 2 |
+| `src/components/documents/MemorandumFooter.tsx` | 3 |
+| `src/pages/ContractLayoutEditor.tsx` | 2 |
+| `src/pages/Settings.tsx` | 3 |
+| `src/components/layout/Sidebar.tsx` | 1 |
 
