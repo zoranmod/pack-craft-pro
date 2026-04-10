@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { createClient } from "npm:@supabase/supabase-js@2.89.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +25,7 @@ serve(async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? anonKey;
 
     // Create admin client with service role key for privileged operations
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
@@ -34,25 +35,32 @@ serve(async (req: Request): Promise<Response> => {
       },
     });
 
-    // Get the requesting user from the auth header using proper JWT validation
+    // Validate the requesting user from the JWT itself (without relying on an active auth session)
     const authHeader = req.headers.get("Authorization") ?? req.headers.get("authorization");
     if (!authHeader) {
       throw new Error("Nedostaje autorizacija");
     }
 
-    // Create a user-context client to validate the JWT
-    const supabaseUser = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user: authenticatedUser }, error: authError } = await supabaseUser.auth.getUser();
-
-    if (authError || !authenticatedUser) {
-      console.error("Auth error:", authError?.message || "No user found");
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!token) {
       throw new Error("Neautoriziran pristup");
     }
 
-    const requestingUserId = authenticatedUser.id;
+    const supabaseAuth = createClient(supabaseUrl, publishableKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    const requestingUserId = claimsData?.claims?.sub;
+
+    if (claimsError || !requestingUserId || typeof requestingUserId !== "string") {
+      console.error("Auth error:", claimsError?.message || "No valid JWT claims found");
+      throw new Error("Neautoriziran pristup");
+    }
+
     console.log(`Request from authenticated user: ${requestingUserId}`);
 
     const { email, password, employeeId, firstName, lastName, resetPassword }: CreateAccountRequest = await req.json();
