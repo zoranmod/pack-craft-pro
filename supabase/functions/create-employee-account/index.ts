@@ -45,16 +45,12 @@ serve(async (req: Request): Promise<Response> => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: claimsData, error: claimsError } = await supabaseUser.auth.getClaims(
-      authHeader.replace(/^Bearer\s+/i, "").trim()
-    );
+    const { data: { user: authenticatedUser }, error: authError } = await supabaseUser.auth.getUser();
 
-    if (claimsError || !claimsData?.claims) {
-      console.error("Auth error:", claimsError?.message || "No claims found");
+    if (authError || !authenticatedUser) {
+      console.error("Auth error:", authError?.message || "No user found");
       throw new Error("Neautoriziran pristup");
     }
-
-    const authenticatedUser = { id: claimsData.claims.sub as string };
 
     const requestingUserId = authenticatedUser.id;
     console.log(`Request from authenticated user: ${requestingUserId}`);
