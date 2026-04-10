@@ -453,7 +453,7 @@ const Settings = () => {
                     id="companyName" 
                     value={company.company_name}
                     onChange={(e) => setCompany({ ...company, company_name: e.target.value })}
-                    placeholder="Adaptiva Design d.o.o."
+                    placeholder="Akord d.o.o."
                     className="mt-1.5" 
                   />
                 </div>
@@ -634,7 +634,7 @@ const Settings = () => {
                   id="website" 
                   value={company.website}
                   onChange={(e) => setCompany({ ...company, website: e.target.value })}
-                  placeholder="www.adaptivadesign.ba"
+                  placeholder="www.akord.hr"
                   className="mt-1.5" 
                 />
               </div>
@@ -645,7 +645,7 @@ const Settings = () => {
                   type="email"
                   value={company.email_info}
                   onChange={(e) => setCompany({ ...company, email_info: e.target.value })}
-                  placeholder="info@adaptivadesign.ba"
+                  placeholder="info@akord.hr"
                   className="mt-1.5" 
                 />
               </div>

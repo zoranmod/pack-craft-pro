@@ -280,8 +280,8 @@ const StandardDocumentPDF = ({
   const qtyLabel = isOtpremnica ? 'Količina' : 'Kol.';
   const showDiscount = template?.show_discount_column !== false;
 
-  const website = companySettings?.website || 'www.adaptivadesign.ba';
-  const email = companySettings?.email_info || 'info@adaptivadesign.ba';
+  const website = companySettings?.website || 'www.akord.hr';
+  const email = companySettings?.email_info || 'info@akord.hr';
   const phoneMain = companySettings?.phone_main;
   const phoneSales = companySettings?.phone_sales;
   const phoneAccounting = companySettings?.phone_accounting;
@@ -568,7 +568,7 @@ const ContractDocumentPDF = ({
       '{ime_kupca}': doc.clientName || '',
       '{oib_kupca}': doc.clientOib || '',
       '{jamstveni_rok}': '24 mjeseca',
-      '{naziv_prodavatelja}': companySettings?.company_name || 'Adaptiva Design d.o.o.',
+      '{naziv_prodavatelja}': companySettings?.company_name || 'Akord d.o.o.',
       '{adresa_prodavatelja}': companySettings?.address || '',
       '{oib_prodavatelja}': companySettings?.oib || '',
     };
@@ -605,7 +605,7 @@ const ContractDocumentPDF = ({
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.textBold}>1. PRODAVATELJ:</Text>
           <View style={{ marginLeft: 15 }}>
-            <Text style={styles.textBold}>{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</Text>
+            <Text style={styles.textBold}>{companySettings?.company_name || 'Akord d.o.o.'}</Text>
             {companySettings?.address && <Text style={styles.text}>{companySettings.address}</Text>}
             {companySettings?.oib && <Text style={styles.text}>OIB: {companySettings.oib}</Text>}
             {companySettings?.iban && <Text style={styles.text}>IBAN: {companySettings.iban}</Text>}

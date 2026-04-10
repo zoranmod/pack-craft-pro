@@ -37,7 +37,7 @@ const replacePlaceholders = (content: string, document: Document, companySetting
     '{ime_kupca}': document.clientName || '',
     '{oib_kupca}': document.clientOib || '',
     '{jamstveni_rok}': '24 mjeseca',
-    '{naziv_prodavatelja}': companySettings?.company_name || 'Adaptiva Design d.o.o.',
+    '{naziv_prodavatelja}': companySettings?.company_name || 'Akord d.o.o.',
     '{adresa_prodavatelja}': companySettings?.address || '',
     '{oib_prodavatelja}': companySettings?.oib || ''
   };
@@ -105,7 +105,7 @@ export const ContractDocumentView = forwardRef<HTMLDivElement, ContractDocumentV
             <div className="text-sm">
               <p className="font-bold mb-1">1. PRODAVATELJ:</p>
               <div className="ml-4 space-y-0.5">
-                <p className="font-semibold">{companySettings?.company_name || 'Adaptiva Design d.o.o.'}</p>
+                <p className="font-semibold">{companySettings?.company_name || 'Akord d.o.o.'}</p>
                 {companySettings?.address && <p>{companySettings.address}</p>}
                 {companySettings?.oib && <p>OIB: {companySettings.oib}</p>}
                 {companySettings?.iban && <p>IBAN: {companySettings.iban}</p>}
