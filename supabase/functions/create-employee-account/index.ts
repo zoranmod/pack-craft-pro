@@ -40,19 +40,21 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error("Nedostaje autorizacija");
     }
 
-    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-    if (!token) {
+    // Create a user-context client to validate the JWT
+    const supabaseUser = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: claimsData, error: claimsError } = await supabaseUser.auth.getClaims(
+      authHeader.replace(/^Bearer\s+/i, "").trim()
+    );
+
+    if (claimsError || !claimsData?.claims) {
+      console.error("Auth error:", claimsError?.message || "No claims found");
       throw new Error("Neautoriziran pristup");
     }
 
-    // Use Supabase's built-in JWT validation to get the authenticated user
-    // This cryptographically verifies the token signature
-    const { data: { user: authenticatedUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !authenticatedUser) {
-      console.error("Auth error:", authError?.message || "No user found");
-      throw new Error("Neautoriziran pristup");
-    }
+    const authenticatedUser = { id: claimsData.claims.sub as string };
 
     const requestingUserId = authenticatedUser.id;
     console.log(`Request from authenticated user: ${requestingUserId}`);
