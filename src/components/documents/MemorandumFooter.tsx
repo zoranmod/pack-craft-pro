@@ -3,10 +3,10 @@ export const MemorandumFooter = () => {
     <div className="memorandum-footer">
       <div className="footer-lines-wrap">
         <p className="footer-line">
-          www.adaptivadesign.ba • info@adaptivadesign.ba
+          www.akord.hr • info@akord.hr
         </p>
         <p className="footer-line">
-          Adaptiva Design d.o.o.
+          Akord d.o.o.
         </p>
       </div>
     </div>

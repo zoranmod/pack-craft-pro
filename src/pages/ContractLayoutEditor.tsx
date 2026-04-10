@@ -25,7 +25,7 @@ const placeholders = [
   { key: '{broj_dokumenta}', label: 'Broj dokumenta', example: 'UG-2025-001' },
   { key: '{datum}', label: 'Datum', example: '12.01.2025.' },
   { key: '{mjesto}', label: 'Mjesto', example: 'Zagreb' },
-  { key: '{naziv_prodavatelja}', label: 'Naziv prodavatelja', example: 'Adaptiva Design d.o.o.' },
+  { key: '{naziv_prodavatelja}', label: 'Naziv prodavatelja', example: 'Akord d.o.o.' },
   { key: '{adresa_prodavatelja}', label: 'Adresa prodavatelja', example: 'Ulica 123, Zagreb' },
   { key: '{oib_prodavatelja}', label: 'OIB prodavatelja', example: '12345678901' },
   { key: '{iban_prodavatelja}', label: 'IBAN prodavatelja', example: 'HR1234567890123456789' },
@@ -74,7 +74,7 @@ export default function ContractLayoutEditor() {
     let content = htmlContent;
     
     // Replace with company settings if available
-    content = content.replace(/\{naziv_prodavatelja\}/g, companySettings?.company_name || 'Adaptiva Design d.o.o.');
+    content = content.replace(/\{naziv_prodavatelja\}/g, companySettings?.company_name || 'Akord d.o.o.');
     content = content.replace(/\{adresa_prodavatelja\}/g, companySettings?.address || 'Adresa firme');
     content = content.replace(/\{oib_prodavatelja\}/g, companySettings?.oib || '4200000000000');
     content = content.replace(/\{iban_prodavatelja\}/g, companySettings?.iban || '1990000000000000');
