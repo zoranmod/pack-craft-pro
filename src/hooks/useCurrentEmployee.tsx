@@ -33,11 +33,11 @@ export function useCurrentEmployee() {
     queryKey: ['current-employee', user?.id],
     queryFn: async (): Promise<CurrentEmployeeData> => {
       if (!user) {
-        console.log('[useCurrentEmployee] No user');
+        
         return { employee: null, permissions: null, isAdmin: false };
       }
 
-      console.log('[useCurrentEmployee] Checking user:', user.id);
+      
 
       // Roles
       const { data: roles, error: rolesError } = await supabase
@@ -45,7 +45,7 @@ export function useCurrentEmployee() {
         .select('role')
         .eq('user_id', user.id);
 
-      console.log('[useCurrentEmployee] Roles result:', { roles, rolesError });
+      
 
       if (rolesError) throw rolesError;
 
@@ -56,14 +56,14 @@ export function useCurrentEmployee() {
         .eq('user_id', user.id)
         .limit(1);
 
-      console.log('[useCurrentEmployee] Owned employees:', { ownedEmployees, ownedError });
+      
 
       if (ownedError) throw ownedError;
 
       const isOwner = (ownedEmployees?.length ?? 0) > 0;
       const isAdmin = roles?.some((r) => r.role === 'admin') || isOwner || false;
 
-      console.log('[useCurrentEmployee] Final isAdmin:', isAdmin, 'isOwner:', isOwner);
+      
 
       // Current employee account (linked via auth_user_id)
       const { data: employee, error: empError } = await supabase
