@@ -122,9 +122,6 @@ serve(async (req: Request): Promise<Response> => {
 
       if (resetError) {
         console.error("Error resetting password:", resetError);
-        if (resetError.message?.includes("weak") || resetError.message?.includes("pwned")) {
-          throw new Error("Lozinka je previše slaba ili je pronađena u bazi kompromitiranih lozinki. Odaberite jaču lozinku.");
-        }
         throw new Error("Greška pri resetiranju lozinke: " + resetError.message);
       }
 

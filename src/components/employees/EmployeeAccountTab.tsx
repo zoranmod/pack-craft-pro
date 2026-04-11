@@ -100,7 +100,18 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
         },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        if (fnError.context?.body) {
+          try {
+            const text = await new Response(fnError.context.body).text();
+            const parsed = JSON.parse(text);
+            if (parsed.error) throw new Error(parsed.error);
+          } catch (parseErr: any) {
+            if (parseErr.message && parseErr.message !== fnError.message) throw parseErr;
+          }
+        }
+        throw fnError;
+      }
       if (data?.error) throw new Error(data.error);
 
       // Update employee with auth_user_id
@@ -155,7 +166,19 @@ export function EmployeeAccountTab({ employee }: EmployeeAccountTabProps) {
         },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        // Try to extract the actual error message from the response
+        if (fnError.context?.body) {
+          try {
+            const text = await new Response(fnError.context.body).text();
+            const parsed = JSON.parse(text);
+            if (parsed.error) throw new Error(parsed.error);
+          } catch (parseErr: any) {
+            if (parseErr.message && parseErr.message !== fnError.message) throw parseErr;
+          }
+        }
+        throw fnError;
+      }
       if (data?.error) throw new Error(data.error);
 
       toast.success('Lozinka uspješno resetirana');
