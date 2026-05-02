@@ -3,6 +3,17 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Table, 
   TableBody, 
@@ -15,6 +26,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { 
@@ -25,7 +37,10 @@ import {
   Loader2,
   UserPlus,
   Ban,
-  CheckCircle
+  CheckCircle,
+  Key,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -38,6 +53,13 @@ import type { Employee } from '@/types/employee';
 const AdminUsers = () => {
   const { employees, isLoading: employeesLoading } = useEmployees();
   const queryClient = useQueryClient();
+
+  // Reset password dialog state
+  const [resetTarget, setResetTarget] = useState<Employee | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   // Fetch user roles
   const { data: userRoles, isLoading: rolesLoading } = useQuery({
@@ -83,6 +105,87 @@ const AdminUsers = () => {
   const isUserAdmin = (authUserId: string | null) => {
     if (!authUserId || !userRoles) return false;
     return userRoles.some(r => r.user_id === authUserId && r.role === 'admin');
+  };
+
+  const validatePassword = (pwd: string): string | null => {
+    if (pwd.length < 10) return 'Lozinka mora imati najmanje 10 znakova.';
+    if (pwd.length > 128) return 'Lozinka ne smije imati više od 128 znakova.';
+    if (!/[A-Z]/.test(pwd)) return 'Lozinka mora sadržavati barem jedno veliko slovo.';
+    if (!/[a-z]/.test(pwd)) return 'Lozinka mora sadržavati barem jedno malo slovo.';
+    if (!/[0-9]/.test(pwd)) return 'Lozinka mora sadržavati barem jedan broj.';
+    return null;
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+    let pass = '';
+    for (let i = 0; i < 12; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setNewPassword(pass);
+    setConfirmPassword(pass);
+  };
+
+  const openResetDialog = (employee: Employee) => {
+    setResetTarget(employee);
+    setNewPassword('');
+    setConfirmPassword('');
+    setResetError('');
+  };
+
+  const closeResetDialog = () => {
+    setResetTarget(null);
+    setNewPassword('');
+    setConfirmPassword('');
+    setResetError('');
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetTarget) return;
+    setResetError('');
+
+    const err = validatePassword(newPassword);
+    if (err) { setResetError(err); return; }
+    if (newPassword !== confirmPassword) {
+      setResetError('Lozinke se ne podudaraju.');
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('create-employee-account', {
+        body: {
+          email: resetTarget.email,
+          password: newPassword,
+          employeeId: resetTarget.id,
+          firstName: resetTarget.first_name,
+          lastName: resetTarget.last_name,
+          resetPassword: true,
+        },
+      });
+
+      if (fnError) {
+        if ((fnError as any).context?.body) {
+          try {
+            const text = await new Response((fnError as any).context.body).text();
+            const parsed = JSON.parse(text);
+            if (parsed.error) throw new Error(parsed.error);
+          } catch (parseErr: any) {
+            if (parseErr.message && parseErr.message !== fnError.message) throw parseErr;
+          }
+        }
+        throw fnError;
+      }
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('Lozinka uspješno resetirana');
+      closeResetDialog();
+    } catch (err: any) {
+      console.error('Error resetting password:', err);
+      setResetError(err.message || 'Greška pri resetiranju lozinke');
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   const getEmployeeWithAccount = (employees: Employee[] | undefined) => {
@@ -231,6 +334,11 @@ const AdminUsers = () => {
                                   </>
                                 )}
                               </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => openResetDialog(employee)}>
+                                <Key className="h-4 w-4 mr-2" />
+                                Resetiraj lozinku
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -280,6 +388,72 @@ const AdminUsers = () => {
           </Card>
         )}
       </div>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetTarget} onOpenChange={(open) => { if (!open) closeResetDialog(); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resetiraj lozinku</DialogTitle>
+            <DialogDescription>
+              {resetTarget && (
+                <>Postavite novu lozinku za {resetTarget.first_name} {resetTarget.last_name}.</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {resetError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{resetError}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="adminResetPassword">Nova lozinka</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="adminResetPassword"
+                  type="text"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Unesite novu lozinku"
+                />
+                <Button type="button" variant="outline" size="icon" onClick={generatePassword} title="Generiraj lozinku">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="adminResetConfirm">Potvrdite lozinku</Label>
+              <Input
+                id="adminResetConfirm"
+                type="text"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Ponovite lozinku"
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Najmanje 10 znakova, jedno veliko slovo, jedno malo slovo i jedan broj.
+              Zabilježite lozinku i proslijedite je korisniku na siguran način.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeResetDialog} disabled={isResetting}>
+              Odustani
+            </Button>
+            <Button onClick={handleResetPassword} disabled={isResetting}>
+              {isResetting ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Resetiranje...</>
+              ) : (
+                <><Key className="h-4 w-4 mr-2" /> Resetiraj lozinku</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
