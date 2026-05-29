@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
+import { format, parse, isValid } from 'date-fns';
+import { hr } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 import {
   FurnitureComplaint,
   FurnitureComplaintInput,
@@ -19,6 +25,65 @@ interface Props {
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+const toDate = (s: string | null | undefined): Date | undefined => {
+  if (!s) return undefined;
+  const d = parse(s, 'yyyy-MM-dd', new Date());
+  return isValid(d) ? d : undefined;
+};
+const toIso = (d: Date | undefined): string | null =>
+  d ? format(d, 'yyyy-MM-dd') : null;
+
+function HrDatePicker({
+  value,
+  onChange,
+  allowClear = false,
+}: {
+  value: string | null;
+  onChange: (v: string | null) => void;
+  allowClear?: boolean;
+}) {
+  const date = toDate(value);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          className={cn(
+            'w-full justify-start text-left font-normal',
+            !date && 'text-muted-foreground',
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, 'dd.MM.yyyy.', { locale: hr }) : <span>Odaberi datum</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(d) => onChange(toIso(d) ?? (allowClear ? null : value))}
+          initialFocus
+          className={cn('p-3 pointer-events-auto')}
+        />
+        {allowClear && value && (
+          <div className="p-2 border-t border-border">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full"
+              onClick={() => onChange(null)}
+            >
+              Ukloni datum
+            </Button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function FurnitureComplaintFormDialog({ open, onOpenChange, editing }: Props) {
   const save = useSaveFurnitureComplaint();
@@ -107,18 +172,17 @@ export function FurnitureComplaintFormDialog({ open, onOpenChange, editing }: Pr
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label>Datum upisa</Label>
-              <Input
-                type="date"
+              <HrDatePicker
                 value={form.entry_date}
-                onChange={(e) => setForm({ ...form, entry_date: e.target.value })}
+                onChange={(v) => setForm({ ...form, entry_date: v ?? today() })}
               />
             </div>
             <div>
               <Label>Rok za rješavanje</Label>
-              <Input
-                type="date"
-                value={form.deadline_date ?? ''}
-                onChange={(e) => setForm({ ...form, deadline_date: e.target.value || null })}
+              <HrDatePicker
+                value={form.deadline_date}
+                onChange={(v) => setForm({ ...form, deadline_date: v })}
+                allowClear
               />
             </div>
             <div>
