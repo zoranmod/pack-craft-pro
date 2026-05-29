@@ -36,6 +36,15 @@ function buildPrintHtml(rows: FurnitureComplaint[]) {
     )
     .join('');
 
+  // Fill the rest of the A4 page with empty rows so the list can be filled in by hand.
+  // Roughly 18 rows fit on an A4 page after header/title; pad to multiples of 18.
+  const ROWS_PER_PAGE = 18;
+  const used = rows.length;
+  const remainder = used % ROWS_PER_PAGE;
+  const emptyCount = used === 0 ? ROWS_PER_PAGE : (remainder === 0 ? 0 : ROWS_PER_PAGE - remainder);
+  const emptyRow = `<tr>${'<td>&nbsp;</td>'.repeat(7)}</tr>`;
+  const emptyRows = emptyRow.repeat(emptyCount);
+
   return `<!doctype html><html><head><meta charset="utf-8"><title>Lista reklamacija</title>
   <style>
     @page { size: A4; margin: 14mm; }
@@ -46,6 +55,7 @@ function buildPrintHtml(rows: FurnitureComplaint[]) {
     th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top; }
     th { background: #fff; font-weight: bold; }
     tr { page-break-inside: avoid; }
+    td.empty { height: 28px; }
   </style></head><body>
     <h1>Lista reklamacija</h1>
     <div class="meta">Datum ispisa: ${today} &middot; Ukupno: ${rows.length}</div>
@@ -54,7 +64,7 @@ function buildPrintHtml(rows: FurnitureComplaint[]) {
         <th>Ime i prezime</th><th>Lokacija kupca</th><th>Broj telefona</th>
         <th>Opis reklamacije</th><th>Datum upisa</th><th>Rok za rješavanje</th><th>Status</th>
       </tr></thead>
-      <tbody>${body || '<tr><td colspan="7">Nema reklamacija</td></tr>'}</tbody>
+      <tbody>${body}${emptyRows}</tbody>
     </table>
     <script>window.onload=()=>{window.print();}</script>
   </body></html>`;
