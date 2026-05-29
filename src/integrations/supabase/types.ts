@@ -1622,6 +1622,48 @@ export type Database = {
         }
         Relationships: []
       }
+      furniture_complaints: {
+        Row: {
+          created_at: string
+          customer_location: string | null
+          customer_name: string
+          customer_phone: string | null
+          deadline_date: string | null
+          description: string | null
+          entry_date: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_location?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          deadline_date?: string | null
+          description?: string | null
+          entry_date?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_location?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          deadline_date?: string | null
+          description?: string | null
+          entry_date?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ignored_duplicates: {
         Row: {
           created_at: string
