@@ -9,6 +9,8 @@ import { useDocuments } from '@/hooks/useDocuments';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useYearFilter } from '@/hooks/useYearFilter';
 import { DocumentStatus } from '@/types/document';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { FurnitureComplaintsTab } from '@/components/reklamacije/FurnitureComplaintsTab';
 
 type StatusFilter = DocumentStatus | 'all';
 
@@ -66,7 +68,14 @@ const Reklamacije = () => {
       title="Reklamacije" 
       subtitle={`Ukupno ${filteredDocuments.length} reklamacija`}
     >
-      <TableToolbar
+      <Tabs defaultValue="dokumenti" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="dokumenti">Dokumenti (RZ)</TabsTrigger>
+          <TabsTrigger value="namjestaj">Lista reklamacija namještaja</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="dokumenti" className="space-y-4">
+          <TableToolbar
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
         searchValue={searchQuery}
@@ -102,6 +111,12 @@ const Reklamacije = () => {
       ) : (
         <DocumentList documents={filteredDocuments} filter="reklamacija" />
       )}
+        </TabsContent>
+
+        <TabsContent value="namjestaj">
+          <FurnitureComplaintsTab />
+        </TabsContent>
+      </Tabs>
     </MainLayout>
   );
 };
